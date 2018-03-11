@@ -1,0 +1,645 @@
+   1              		.file	"mtx_ops.c"
+   9              	.Ltext0:
+  10              		.global	__muldf3
+  11              		.global	__adddf3
+  12              		.align	2
+  13              		.global	mtx_multiply_mtx_vec
+  15              	mtx_multiply_mtx_vec:
+  16              	.LFB2:
+  17              		.file 1 "mtx_ops.c"
+   1:mtx_ops.c     **** #include "mtx_ops.h"
+   2:mtx_ops.c     **** #ifdef FIP_OPS
+   3:mtx_ops.c     **** #include "fip_ops.h"
+   4:mtx_ops.c     **** #endif
+   5:mtx_ops.c     **** 
+   6:mtx_ops.c     **** /* matrix-vector multiplication: pout = pmtx * pvec.
+   7:mtx_ops.c     ****  * pmtx has size (rows x columns) */
+   8:mtx_ops.c     **** void mtx_multiply_mtx_vec(real_t pout[], const real_t pmtx[],
+   9:mtx_ops.c     **** 		const real_t pvec[],
+  10:mtx_ops.c     **** 		const uint32_t rows,
+  11:mtx_ops.c     **** 		const uint32_t cols)
+  12:mtx_ops.c     **** {
+  18              	unction supports interworking.
+  19              		@ args = 4, pretend = 0, frame = 16
+  20              		@ frame_needed = 0, uses_anonymous_args = 0
+  21              	.LVL0:
+  22              		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+  23 0000 F04F2DE9 	.LCFI0:
+  24              		.loc 1 16 0
+  13:mtx_ops.c     **** ultiply_mtx_vec(real_t pout[], const real_t pmtx[],
+  14:mtx_ops.c     **** 		const real_t pvec[],
+  15:mtx_ops.c     **** 		const uint32_t rows,
+  16:mtx_ops.c     **** 		const uint32_t cols)
+  25              	, #0
+  26 0004 000053E3 	.LVL1:
+  27              		.loc 1 12 0
+  28              		sub	sp, sp, #16
+  29 0008 10D04DE2 	.LCFI1:
+  30              		.loc 1 16 0
+  31              		str	r3, [sp, #0]
+  32 000c 00308DE5 	.LVL2:
+  33              		.loc 1 12 0
+  34              		str	r0, [sp, #12]
+  35 0010 0C008DE5 		str	r1, [sp, #8]
+  36 0014 08108DE5 		str	r2, [sp, #4]
+  37 0018 04208DE5 		ldr	r8, [sp, #52]
+  38 001c 34809DE5 		.loc 1 16 0
+  39              		beq	.L9
+  40 0020 1E00000A 	.LVL3:
+  41              		mov	r9, #0
+  42 0024 0090A0E3 	.LVL4:
+  43              		mov	fp, r9
+  44 0028 09B0A0E1 	.LVL5:
+  45              		mov	sl, r9
+  46 002c 09A0A0E1 	.LVL6:
+  47              	.L4:
+  48              		.loc 1 12 0
+  49              		ldr	r2, [sp, #12]
+  50 0030 0C209DE5 		.loc 1 17 0
+  17:mtx_ops.c     **** x_multiply_mtx_vec(real_t pout[], const real_t pmtx[],
+  51              	add	r4, r2, sl
+  52 0034 0030A0E3 		.loc 1 18 0
+  53              		cmp	r8, #0
+  54 0038 0A4082E0 		.loc 1 17 0
+  18:mtx_ops.c     **** cation: pout = pmtx * pvec.
+  55              		r2, #0
+  56 003c 000058E3 		stmia	r4, {r2-r3}
+  57              		.loc 1 18 0
+  58 0040 0020A0E3 		beq	.L5
+  59 0044 0C0084E8 		ldr	r3, [sp, #8]
+  60              		ldr	r6, [sp, #4]
+  61 0048 0F00000A 		add	r7, r3, fp, asl #3
+  62 004c 08309DE5 		mov	r5, #0
+  63 0050 04609DE5 	.LVL7:
+  64 0054 8B7183E0 	.L7:
+  65 0058 0050A0E3 		.loc 1 20 0
+  66              		ldmia	r6!, {r2-r3}
+  67              		ldmia	r7!, {r0-r1}
+  19:mtx_ops.c     **** #include "mtx_ops.h"
+  20:mtx_ops.c     **** #ifdef FIP_OPS
+  68              		mov	r2, r0
+  69 005c 0C00B6E8 		mov	r3, r1
+  70 0060 0300B7E8 		ldmia	r4, {r0-r1}
+  71 0064 FEFFFFEB 		bl	__adddf3
+  72 0068 0020A0E1 		.loc 1 18 0
+  73 006c 0130A0E1 		add	r5, r5, #1
+  74 0070 030094E8 		cmp	r8, r5
+  75 0074 FEFFFFEB 		.loc 1 20 0
+  76              		stmia	r4, {r0-r1}
+  77 0078 015085E2 		.loc 1 18 0
+  78 007c 050058E1 		bne	.L7
+  79              		add	fp, fp, r8
+  80 0080 030084E8 	.LVL8:
+  81              	.L5:
+  82 0084 F4FFFF1A 		.loc 1 16 0
+  83 0088 08B08BE0 		ldr	r2, [sp, #0]
+  84              		add	r9, r9, #1
+  85              		cmp	r2, r9
+  86              		add	sl, sl, #8
+  87 008c 00209DE5 		bne	.L4
+  88 0090 019089E2 	.LVL9:
+  89 0094 090052E1 	.L9:
+  90 0098 08A08AE2 		.loc 1 28 0
+  91 009c E3FFFF1A 		add	sp, sp, #16
+  92              		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+  93              		bx	lr
+  21:mtx_ops.c     **** #include "mtx_ops.h"
+  22:mtx_ops.c     **** #ifdef FIP_OPS
+  23:mtx_ops.c     **** #include "fip_ops.h"
+  24:mtx_ops.c     **** #endif
+  25:mtx_ops.c     **** 
+  26:mtx_ops.c     **** /* matrix-vector multiplication: pout = pmtx * pvec.
+  27:mtx_ops.c     ****  * pmtx has size (rows x columns) */
+  28:mtx_ops.c     **** void mtx_multiply_mtx_vec(real_t pout[], const real_t pmtx[],
+  94              	_mtx_vec, .-mtx_multiply_mtx_vec
+  95 00a0 10D08DE2 		.align	2
+  96 00a4 F04FBDE8 		.global	mtx_scale
+  98              	mtx_scale:
+  99              	.LFB3:
+ 100              		.loc 1 35 0
+ 101              		@ Function supports interworking.
+ 102              		@ args = 8, pretend = 0, frame = 0
+ 103              		@ frame_needed = 0, uses_anonymous_args = 0
+ 104              	.LVL10:
+  29:mtx_ops.c     **** cation: pout = pmtx * pvec.
+  30:mtx_ops.c     ****  * pmtx has size (rows x columns) */
+  31:mtx_ops.c     **** void mtx_multiply_mtx_vec(real_t pout[], const real_t pmtx[],
+  32:mtx_ops.c     **** 		const real_t pvec[],
+  33:mtx_ops.c     **** 		const uint32_t rows,
+  34:mtx_ops.c     **** 		const uint32_t cols)
+  35:mtx_ops.c     **** {
+ 105              	 {r4, r5, r6, r7, r8, r9, sl, lr}
+ 106              	.LCFI2:
+ 107              		.loc 1 35 0
+ 108              		ldr	lr, [sp, #32]
+ 109              		ldr	ip, [sp, #36]
+ 110 00ac F0472DE9 		.loc 1 37 0
+ 111              		muls	r9, ip, lr
+ 112              		.loc 1 35 0
+ 113 00b0 20E09DE5 		mov	sl, r0
+ 114 00b4 24C09DE5 		mov	r8, r1
+  36:mtx_ops.c     **** ultiply_mtx_vec(real_t pout[], const real_t pmtx[],
+  37:mtx_ops.c     **** 		const real_t pvec[],
+ 115              	2
+ 116 00b8 9C0E19E0 	.LVL11:
+ 117              		mov	r7, r3
+ 118 00bc 00A0A0E1 		.loc 1 37 0
+ 119 00c0 0180A0E1 		beq	.L18
+ 120 00c4 0260A0E1 	.LVL12:
+ 121              		mov	r5, #0
+ 122 00c8 0370A0E1 	.LVL13:
+ 123              		mov	r4, r5
+ 124 00cc 0C00000A 	.L17:
+ 125              		.loc 1 39 0
+ 126 00d0 0050A0E3 		add	r3, r8, r4
+ 127              		ldmia	r3, {r0-r1}
+ 128 00d4 0540A0E1 		mov	r2, r6
+ 129              		mov	r3, r7
+  38:mtx_ops.c     **** ec.
+  39:mtx_ops.c     ****  * pmtx has size (rows x columns) */
+ 130              	VL14:
+ 131 00d8 043088E0 		.loc 1 37 0
+ 132 00dc 030093E8 		add	r5, r5, #1
+ 133 00e0 0620A0E1 		.loc 1 39 0
+ 134 00e4 0730A0E1 		add	r3, sl, r4
+ 135 00e8 FEFFFFEB 		.loc 1 37 0
+ 136              		cmp	r5, r9
+ 137              		.loc 1 39 0
+ 138 00ec 015085E2 		stmia	r3, {r0-r1}
+ 139              		.loc 1 37 0
+ 140 00f0 04308AE0 		add	r4, r4, #8
+ 141              		bne	.L17
+ 142 00f4 090055E1 	.LVL15:
+ 143              	.L18:
+ 144 00f8 030083E8 		.loc 1 45 0
+ 145              		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
+ 146 00fc 084084E2 		bx	lr
+ 147 0100 F4FFFF1A 	.LFE3:
+ 149              		.align	2
+  40:mtx_ops.c     ****  FIP_OPS
+  41:mtx_ops.c     **** #include "fip_ops.h"
+  42:mtx_ops.c     **** #endif
+  43:mtx_ops.c     **** 
+  44:mtx_ops.c     **** /* matrix-vector multiplication: pout = pmtx * pvec.
+  45:mtx_ops.c     ****  * pmtx has size (rows x columns) */
+ 150              	ype	mtx_add, %function
+ 151 0104 F047BDE8 	mtx_add:
+ 152 0108 1EFF2FE1 	.LFB4:
+ 153              		.loc 1 52 0
+ 154              		@ Function supports interworking.
+ 155              		@ args = 4, pretend = 0, frame = 0
+ 156              		@ frame_needed = 0, uses_anonymous_args = 0
+ 157              	.LVL16:
+ 158              		stmfd	sp!, {r4, r5, r6, r7, r8, sl, lr}
+ 159              	.LCFI3:
+  46:mtx_ops.c     ****  FIP_OPS
+  47:mtx_ops.c     **** #include "fip_ops.h"
+  48:mtx_ops.c     **** #endif
+  49:mtx_ops.c     **** 
+  50:mtx_ops.c     **** /* matrix-vector multiplication: pout = pmtx * pvec.
+  51:mtx_ops.c     ****  * pmtx has size (rows x columns) */
+  52:mtx_ops.c     **** void mtx_multiply_mtx_vec(real_t pout[], const real_t pmtx[],
+ 160              	 0
+ 161              		ldr	ip, [sp, #28]
+ 162              		.loc 1 54 0
+ 163              		muls	sl, ip, r3
+ 164              		.loc 1 52 0
+ 165 010c F0452DE9 		mov	r8, r0
+ 166              		mov	r7, r1
+ 167              		mov	r6, r2
+ 168 0110 1CC09DE5 		.loc 1 54 0
+  53:mtx_ops.c     **** cation: pout = pmtx * pvec.
+  54:mtx_ops.c     ****  * pmtx has size (rows x columns) */
+ 169              	
+ 170 0114 9C031AE0 	.LVL17:
+ 171              		mov	r5, #0
+ 172 0118 0080A0E1 	.LVL18:
+ 173 011c 0170A0E1 		mov	r4, r5
+ 174 0120 0260A0E1 	.L23:
+ 175              		.loc 1 55 0
+ 176 0124 0C00000A 		add	r3, r7, r4
+ 177              	.LVL19:
+ 178 0128 0050A0E3 		add	ip, r6, r4
+ 179              	.LVL20:
+ 180 012c 0540A0E1 		ldmia	r3, {r0-r1}
+ 181              		ldmia	ip, {r2-r3}
+  55:mtx_ops.c     ****  FIP_OPS
+ 182              	
+ 183 0130 043087E0 		.loc 1 54 0
+ 184              		add	r5, r5, #1
+ 185 0134 04C086E0 		.loc 1 55 0
+ 186              		add	r3, r8, r4
+ 187 0138 030093E8 		.loc 1 54 0
+ 188 013c 0C009CE8 		cmp	sl, r5
+ 189 0140 FEFFFFEB 		.loc 1 55 0
+ 190              		stmia	r3, {r0-r1}
+ 191 0144 015085E2 		.loc 1 54 0
+ 192              		add	r4, r4, #8
+ 193 0148 043088E0 		bne	.L23
+ 194              	.LVL21:
+ 195 014c 05005AE1 	.L24:
+ 196              		.loc 1 58 0
+ 197 0150 030083E8 		ldmfd	sp!, {r4, r5, r6, r7, r8, sl, lr}
+ 198              		bx	lr
+ 199 0154 084084E2 	.LFE4:
+ 201              		.global	__subdf3
+ 202              		.align	2
+  56:mtx_ops.c     **** #include "mtx_ops.h"
+  57:mtx_ops.c     **** #ifdef FIP_OPS
+  58:mtx_ops.c     **** #include "fip_ops.h"
+ 203              	ct
+ 205 0160 1EFF2FE1 	mtx_substract:
+ 206              	.LFB5:
+ 207              		.loc 1 65 0
+ 208              		@ Function supports interworking.
+ 209              		@ args = 4, pretend = 0, frame = 0
+ 210              		@ frame_needed = 0, uses_anonymous_args = 0
+ 211              	.LVL22:
+ 212              		stmfd	sp!, {r4, r5, r6, r7, r8, sl, lr}
+ 213              	.LCFI4:
+  59:mtx_ops.c     **** #include "mtx_ops.h"
+  60:mtx_ops.c     **** #ifdef FIP_OPS
+  61:mtx_ops.c     **** #include "fip_ops.h"
+  62:mtx_ops.c     **** #endif
+  63:mtx_ops.c     **** 
+  64:mtx_ops.c     **** /* matrix-vector multiplication: pout = pmtx * pvec.
+  65:mtx_ops.c     ****  * pmtx has size (rows x columns) */
+ 214              	0
+ 215              		ldr	ip, [sp, #28]
+ 216              		.loc 1 67 0
+ 217              		muls	sl, ip, r3
+ 218              		.loc 1 65 0
+ 219 0164 F0452DE9 		mov	r8, r0
+ 220              		mov	r7, r1
+ 221              		mov	r6, r2
+ 222 0168 1CC09DE5 		.loc 1 67 0
+  66:mtx_ops.c     ****  FIP_OPS
+  67:mtx_ops.c     **** #include "fip_ops.h"
+ 223              	
+ 224 016c 9C031AE0 	.LVL23:
+ 225              		mov	r5, #0
+ 226 0170 0080A0E1 	.LVL24:
+ 227 0174 0170A0E1 		mov	r4, r5
+ 228 0178 0260A0E1 	.L29:
+ 229              		.loc 1 68 0
+ 230 017c 0C00000A 		add	r3, r7, r4
+ 231              	.LVL25:
+ 232 0180 0050A0E3 		add	ip, r6, r4
+ 233              	.LVL26:
+ 234 0184 0540A0E1 		ldmia	r3, {r0-r1}
+ 235              		ldmia	ip, {r2-r3}
+  68:mtx_ops.c     **** #include "mtx_ops.h"
+ 236              	
+ 237 0188 043087E0 		.loc 1 67 0
+ 238              		add	r5, r5, #1
+ 239 018c 04C086E0 		.loc 1 68 0
+ 240              		add	r3, r8, r4
+ 241 0190 030093E8 		.loc 1 67 0
+ 242 0194 0C009CE8 		cmp	sl, r5
+ 243 0198 FEFFFFEB 		.loc 1 68 0
+ 244              		stmia	r3, {r0-r1}
+ 245 019c 015085E2 		.loc 1 67 0
+ 246              		add	r4, r4, #8
+ 247 01a0 043088E0 		bne	.L29
+ 248              	.LVL27:
+ 249 01a4 05005AE1 	.L30:
+ 250              		.loc 1 71 0
+ 251 01a8 030083E8 		ldmfd	sp!, {r4, r5, r6, r7, r8, sl, lr}
+ 252              		bx	lr
+ 253 01ac 084084E2 	.LFE5:
+ 255              		.global	__gtdf2
+ 256              		.global	__ltdf2
+  69:mtx_ops.c     **** #include "mtx_ops.h"
+  70:mtx_ops.c     **** #ifdef FIP_OPS
+  71:mtx_ops.c     **** #include "fip_ops.h"
+ 257              	tx_saturate_vec
+ 259 01b8 1EFF2FE1 	mtx_saturate_vec:
+ 260              	.LFB6:
+ 261              		.loc 1 78 0
+ 262              		@ Function supports interworking.
+ 263              		@ args = 0, pretend = 0, frame = 12
+ 264              		@ frame_needed = 0, uses_anonymous_args = 0
+ 265              	.LVL28:
+ 266              		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 267              	.LCFI5:
+ 268              		.loc 1 81 0
+  72:mtx_ops.c     **** #include "mtx_ops.h"
+  73:mtx_ops.c     **** #ifdef FIP_OPS
+  74:mtx_ops.c     **** #include "fip_ops.h"
+  75:mtx_ops.c     **** #endif
+  76:mtx_ops.c     **** 
+  77:mtx_ops.c     **** /* matrix-vector multiplication: pout = pmtx * pvec.
+  78:mtx_ops.c     ****  * pmtx has size (rows x columns) */
+ 269              	.LVL29:
+ 270              		.loc 1 78 0
+ 271              		sub	sp, sp, #12
+ 272              	.LCFI6:
+ 273              		.loc 1 81 0
+ 274 01bc F04F2DE9 		str	r3, [sp, #0]
+ 275              	.LVL30:
+  79:mtx_ops.c     ****  FIP_OPS
+  80:mtx_ops.c     **** #include "fip_ops.h"
+  81:mtx_ops.c     **** #endif
+ 276              	 78 0
+ 277 01c0 000053E3 		str	r0, [sp, #8]
+ 278              		str	r1, [sp, #4]
+ 279              		mov	fp, r2
+ 280 01c4 0CD04DE2 		.loc 1 81 0
+ 281              		beq	.L42
+ 282              	.LVL31:
+ 283 01c8 00308DE5 		mov	r9, #0
+ 284              	.LVL32:
+ 285              		mov	sl, r9
+ 286 01cc 08008DE5 	.L35:
+ 287 01d0 04108DE5 		.loc 1 78 0
+ 288 01d4 02B0A0E1 		ldr	r3, [sp, #8]
+ 289              		add	r8, r3, sl
+ 290 01d8 1D00000A 		.loc 1 82 0
+ 291              		add	r3, fp, sl
+ 292 01dc 0090A0E3 		ldmia	r8, {r4-r5}
+ 293              		ldmia	r3, {r6-r7}
+ 294 01e0 09A0A0E1 		mov	r1, r5
+ 295              		mov	r2, r6
+ 296              		mov	r3, r7
+ 297 01e4 08309DE5 		mov	r0, r4
+ 298 01e8 0A8083E0 		bl	__gtdf2
+  82:mtx_ops.c     **** #include "mtx_ops.h"
+ 299              	sp, #4]
+ 300 01ec 0A308BE0 		.loc 1 82 0
+ 301 01f0 300098E8 		cmp	r0, #0
+ 302 01f4 C00093E8 		.loc 1 84 0
+ 303 01f8 0510A0E1 		add	r2, r3, sl
+ 304 01fc 0620A0E1 		mov	r0, r4
+ 305 0200 0730A0E1 		mov	r1, r5
+ 306 0204 0400A0E1 		.loc 1 82 0
+ 307 0208 FEFFFFEB 		bgt	.L44
+  83:mtx_ops.c     **** #include "mtx_ops.h"
+  84:mtx_ops.c     **** #ifdef FIP_OPS
+ 308              	4 0
+ 309 020c 04309DE5 		ldmia	r2, {r6-r7}
+ 310              		mov	r2, r6
+ 311 0210 000050E3 		mov	r3, r7
+ 312              		bl	__ltdf2
+ 313 0214 0A2083E0 		cmp	r0, #0
+ 314 0218 0400A0E1 		bge	.L39
+ 315 021c 0510A0E1 	.L44:
+ 316              		.loc 1 85 0
+ 317 0220 050000CA 		stmia	r8, {r6-r7}
+ 318              	.L39:
+ 319 0224 C00092E8 		.loc 1 81 0
+ 320 0228 0620A0E1 		ldr	r3, [sp, #0]
+ 321 022c 0730A0E1 		add	r9, r9, #1
+ 322 0230 FEFFFFEB 		cmp	r3, r9
+ 323 0234 000050E3 		add	sl, sl, #8
+ 324 0238 000000AA 		bne	.L35
+ 325              	.LVL33:
+  85:mtx_ops.c     **** #include "mtx_ops.h"
+ 326              	
+ 327 023c C00088E8 		add	sp, sp, #12
+ 328              		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 329              		bx	lr
+ 330 0240 00309DE5 	.LFE6:
+ 332 0248 090053E1 		.align	2
+ 333 024c 08A08AE2 		.global	mtx_max_vec_zero
+ 335              	mtx_max_vec_zero:
+ 336              	.LFB7:
+  86:mtx_ops.c     **** #include "mtx_ops.h"
+  87:mtx_ops.c     **** #ifdef FIP_OPS
+  88:mtx_ops.c     **** #include "fip_ops.h"
+ 337              	 0
+ 338 0254 0CD08DE2 		@ Function supports interworking.
+ 339 0258 F04FBDE8 		@ args = 0, pretend = 0, frame = 0
+ 340 025c 1EFF2FE1 		@ frame_needed = 0, uses_anonymous_args = 0
+ 341              	.LVL34:
+ 342              		stmfd	sp!, {r4, r5, r6, r7, r8, lr}
+ 343              	.LCFI7:
+ 344              		.loc 1 96 0
+ 345              		subs	r8, r1, #0
+ 346              		.loc 1 93 0
+ 347              		mov	r7, r0
+  89:mtx_ops.c     **** #include "mtx_ops.h"
+  90:mtx_ops.c     **** #ifdef FIP_OPS
+  91:mtx_ops.c     **** #include "fip_ops.h"
+  92:mtx_ops.c     **** #endif
+  93:mtx_ops.c     **** 
+ 348              	0
+ 349              		beq	.L52
+ 350              	.LVL35:
+ 351              		mov	r6, #0
+ 352              	.LVL36:
+ 353 0260 F0412DE9 		mov	r5, r6
+ 354              		b	.L48
+  94:mtx_ops.c     **** #include "mtx_ops.h"
+  95:mtx_ops.c     **** #ifdef FIP_OPS
+  96:mtx_ops.c     **** #include "fip_ops.h"
+ 355              	
+ 356 0264 008051E2 	.L49:
+ 357              		cmp	r8, r6
+ 358 0268 0070A0E1 		beq	.L52
+ 359              	.LVL38:
+ 360 026c 1200000A 	.L48:
+ 361              		.loc 1 93 0
+ 362 0270 0060A0E3 		add	r4, r7, r5
+ 363              		.loc 1 97 0
+ 364 0274 0650A0E1 		ldmia	r4, {r0-r1}
+ 365 0278 010000EA 		mov	r2, #0
+ 366              		mov	r3, #0
+ 367              		bl	__ltdf2
+ 368 027c 060058E1 		cmp	r0, #0
+ 369 0280 0D00000A 		.loc 1 96 0
+ 370              		add	r6, r6, #1
+ 371              		add	r5, r5, #8
+ 372              		.loc 1 97 0
+ 373 0284 054087E0 		bge	.L49
+  97:mtx_ops.c     **** #include "mtx_ops.h"
+ 374              	r2, #0
+ 375 0288 030094E8 		mov	r3, #0
+ 376 028c 0020A0E3 		.loc 1 96 0
+ 377 0290 0030A0E3 		cmp	r8, r6
+ 378 0294 FEFFFFEB 		.loc 1 98 0
+ 379 0298 000050E3 		stmia	r4, {r2-r3}
+ 380              		.loc 1 96 0
+ 381 029c 016086E2 		bne	.L48
+ 382 02a0 085085E2 	.LVL39:
+ 383              	.L52:
+ 384 02a4 F4FFFFAA 		.loc 1 101 0
+  98:mtx_ops.c     **** #include "mtx_ops.h"
+ 385              	 {r4, r5, r6, r7, r8, lr}
+ 386 02a8 0020A0E3 		bx	lr
+ 387 02ac 0030A0E3 	.LFE7:
+ 389 02b0 060058E1 		.align	2
+ 390              		.global	mtx_min_vec_zero
+ 392              	mtx_min_vec_zero:
+ 393 02b8 F1FFFF1A 	.LFB8:
+ 394              		.loc 1 106 0
+ 395              		@ Function supports interworking.
+  99:mtx_ops.c     **** #include "mtx_ops.h"
+ 100:mtx_ops.c     **** #ifdef FIP_OPS
+ 101:mtx_ops.c     **** #include "fip_ops.h"
+ 396              	, pretend = 0, frame = 0
+ 397 02bc F041BDE8 		@ frame_needed = 0, uses_anonymous_args = 0
+ 398 02c0 1EFF2FE1 	.LVL40:
+ 399              		stmfd	sp!, {r4, r5, r6, r7, r8, lr}
+ 400              	.LCFI8:
+ 401              		.loc 1 109 0
+ 402              		subs	r8, r1, #0
+ 403              		.loc 1 106 0
+ 404              		mov	r7, r0
+ 405              		.loc 1 109 0
+ 102:mtx_ops.c     **** #include "mtx_ops.h"
+ 103:mtx_ops.c     **** #ifdef FIP_OPS
+ 104:mtx_ops.c     **** #include "fip_ops.h"
+ 105:mtx_ops.c     **** #endif
+ 106:mtx_ops.c     **** 
+ 406              	.LVL41:
+ 407              		mov	r6, #0
+ 408              	.LVL42:
+ 409              		mov	r5, r6
+ 410              	.L57:
+ 411 02c4 F0412DE9 		.loc 1 106 0
+ 412              		add	r4, r7, r5
+ 107:mtx_ops.c     **** #include "mtx_ops.h"
+ 108:mtx_ops.c     **** #ifdef FIP_OPS
+ 109:mtx_ops.c     **** #include "fip_ops.h"
+ 413              	 110 0
+ 414 02c8 008051E2 		ldmia	r4, {r0-r1}
+ 415              		mov	r2, #0
+ 416 02cc 0070A0E1 		mov	r3, #0
+ 417              		bl	__gtdf2
+ 418 02d0 0E00000A 		cmp	r0, #0
+ 419              		.loc 1 109 0
+ 420 02d4 0060A0E3 		add	r6, r6, #1
+ 421              		add	r5, r5, #8
+ 422 02d8 0650A0E1 		.loc 1 110 0
+ 423              		.loc 1 111 0
+ 424              		movgt	r2, #0
+ 425 02dc 054087E0 		movgt	r3, #0
+ 110:mtx_ops.c     **** #include "mtx_ops.h"
+ 426              	{r2-r3}
+ 427 02e0 030094E8 	.L58:
+ 428 02e4 0020A0E3 		.loc 1 109 0
+ 429 02e8 0030A0E3 		cmp	r8, r6
+ 430 02ec FEFFFFEB 		bne	.L57
+ 431 02f0 000050E3 	.LVL43:
+ 432              	.L61:
+ 433 02f4 016086E2 		.loc 1 114 0
+ 434 02f8 085085E2 		ldmfd	sp!, {r4, r5, r6, r7, r8, lr}
+ 435              		bx	lr
+ 111:mtx_ops.c     **** #include "mtx_ops.h"
+ 436              	ize	mtx_min_vec_zero, .-mtx_min_vec_zero
+ 437 02fc 0020A0C3 		.align	2
+ 438 0300 0030A0C3 		.global	mtx_transpose
+ 440              	mtx_transpose:
+ 441              	.LFB9:
+ 442 0308 060058E1 		.loc 1 121 0
+ 443 030c F2FFFF1A 		@ Function supports interworking.
+ 444              		@ args = 0, pretend = 0, frame = 0
+ 445              		@ frame_needed = 0, uses_anonymous_args = 0
+ 112:mtx_ops.c     **** #include "mtx_ops.h"
+ 113:mtx_ops.c     **** #ifdef FIP_OPS
+ 114:mtx_ops.c     **** #include "fip_ops.h"
+ 446              	tmfd	sp!, {r4, r5, r6, r7, r8, r9, lr}
+ 447 0310 F041BDE8 	.LCFI9:
+ 448 0314 1EFF2FE1 		.loc 1 127 0
+ 449              		subs	r6, r2, #0
+ 450              		movne	r5, #0
+ 451              	.LVL45:
+ 452              		.loc 1 121 0
+ 453              		mov	r7, r1
+ 454              		.loc 1 127 0
+ 455              		movne	r4, r5
+ 115:mtx_ops.c     **** #include "mtx_ops.h"
+ 116:mtx_ops.c     **** #ifdef FIP_OPS
+ 117:mtx_ops.c     **** #include "fip_ops.h"
+ 118:mtx_ops.c     **** #endif
+ 119:mtx_ops.c     **** 
+ 120:mtx_ops.c     **** /* matrix-vector multiplication: pout = pmtx * pvec.
+ 121:mtx_ops.c     ****  * pmtx has size (rows x columns) */
+ 456              	loc 1 121 0
+ 457              		mov	r1, r3
+ 458              	.LVL47:
+ 459              		.loc 1 127 0
+ 460              		beq	.L71
+ 461 0318 F0432DE9 	.LVL48:
+ 462              	.L66:
+ 122:mtx_ops.c     ****  FIP_OPS
+ 123:mtx_ops.c     **** #include "fip_ops.h"
+ 124:mtx_ops.c     **** #endif
+ 125:mtx_ops.c     **** 
+ 126:mtx_ops.c     **** /* matrix-vector multiplication: pout = pmtx * pvec.
+ 127:mtx_ops.c     ****  * pmtx has size (rows x columns) */
+ 463              	 128 0
+ 464 031c 006052E2 		cmp	r1, #0
+ 465 0320 0050A013 		addne	r3, r7, r5, asl #3
+ 466              		movne	r2, r6, asl #3
+ 467              	.LVL49:
+ 468 0324 0170A0E1 		movne	lr, r0
+ 469              		movne	ip, #0
+ 470 0328 0540A011 		beq	.L69
+ 471              	.L67:
+ 472              		add	ip, ip, #1
+ 473 032c 0310A0E1 		.loc 1 130 0
+ 474              		ldmia	r3!, {r8-r9}
+ 475              		.loc 1 128 0
+ 476 0330 1000000A 		cmp	r1, ip
+ 477              		.loc 1 130 0
+ 478              		stmia	lr, {r8-r9}
+ 128:mtx_ops.c     ****  FIP_OPS
+ 479              	dd	lr, lr, r2
+ 480 0334 000051E3 		bne	.L67
+ 481 0338 85318710 		add	r5, r5, ip
+ 482 033c 8621A011 	.L69:
+ 483              		.loc 1 127 0
+ 484 0340 00E0A011 		add	r4, r4, #1
+ 485 0344 00C0A013 		cmp	r6, r4
+ 486 0348 0600000A 		add	r0, r0, #8
+ 487              		bne	.L66
+ 488 034c 01C08CE2 	.LVL50:
+ 129:mtx_ops.c     **** #include "mtx_ops.h"
+ 130:mtx_ops.c     **** #ifdef FIP_OPS
+ 489              	c 1 135 0
+ 490 0350 0003B3E8 		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, lr}
+ 491              		bx	lr
+ 492 0354 0C0051E1 	.LFE9:
+ 494 0358 00038EE8 		.section	.debug_frame,"",%progbits
+ 495              	.Lframe0:
+ 496 035c 02E08EE0 		.4byte	.LECIE0-.LSCIE0
+ 497 0360 F9FFFF1A 	.LSCIE0:
+ 498 0364 0C5085E0 		.4byte	0xffffffff
+ 499              		.byte	0x1
+ 500              		.ascii	"\000"
+ 501 0368 014084E2 		.uleb128 0x1
+ 502 036c 040056E1 		.sleb128 -4
+ 503 0370 080080E2 		.byte	0xe
+ 504 0374 EEFFFF1A 		.byte	0xc
+ 505              		.uleb128 0xd
+ 506              		.uleb128 0x0
+ 131:mtx_ops.c     **** #include "mtx_ops.h"
+ 132:mtx_ops.c     **** #ifdef FIP_OPS
+ 133:mtx_ops.c     **** #include "fip_ops.h"
+ 134:mtx_ops.c     **** #endif
+ 135:mtx_ops.c     **** 
+ 507              	
+ 508 0378 F043BDE8 	.LSFDE0:
+ 509 037c 1EFF2FE1 		.4byte	.LEFDE0-.LASFDE0
+ 510              	.LASFDE0:
+ 511              		.4byte	.Lframe0
+ 753              		.4byte	0x0
+DEFINED SYMBOLS
+                            *ABS*:00000000 mtx_ops.c
+C:\Users\XY\AppData\Local\Temp/ccoTbaaa.s:15     .text:00000000 mtx_multiply_mtx_vec
+C:\Users\XY\AppData\Local\Temp/ccoTbaaa.s:23     .text:00000000 $a
+C:\Users\XY\AppData\Local\Temp/ccoTbaaa.s:103    .text:000000ac mtx_scale
+C:\Users\XY\AppData\Local\Temp/ccoTbaaa.s:158    .text:0000010c mtx_add
+C:\Users\XY\AppData\Local\Temp/ccoTbaaa.s:212    .text:00000164 mtx_substract
+C:\Users\XY\AppData\Local\Temp/ccoTbaaa.s:267    .text:000001bc mtx_saturate_vec
+C:\Users\XY\AppData\Local\Temp/ccoTbaaa.s:346    .text:00000260 mtx_max_vec_zero
+C:\Users\XY\AppData\Local\Temp/ccoTbaaa.s:404    .text:000002c4 mtx_min_vec_zero
+C:\Users\XY\AppData\Local\Temp/ccoTbaaa.s:454    .text:00000318 mtx_transpose
+
+UNDEFINED SYMBOLS
+__muldf3
+__adddf3
+__subdf3
+__gtdf2
+__ltdf2

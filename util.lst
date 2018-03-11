@@ -1,0 +1,1027 @@
+   1              		.code	16
+   2              		.file	"util.c"
+  10              	.Ltext0:
+  11              		.global	__divsi3
+  12              		.global	__floatsidf
+  13              		.global	__muldf3
+  14              		.global	__truncdfsf2
+  15              		.global	__extendsfdf2
+  16              		.global	__gtdf2
+  17              		.align	2
+  18              		.global	ran1
+  19              		.code 16
+  20              		.thumb_func
+  22              	ran1:
+  23              	.LFB7:
+  24              		.file 1 "util.c"
+   1:util.c        **** /* Produced by CVXGEN, 2018-02-26 09:21:35 -0500.  */
+   2:util.c        **** /* CVXGEN is Copyright (C) 2006-2017 Jacob Mattingley, jem@cvxgen.com. */
+   3:util.c        **** /* The code in this file is Copyright (C) 2006-2017 Jacob Mattingley. */
+   4:util.c        **** /* CVXGEN, or solvers produced by CVXGEN, cannot be used for commercial */
+   5:util.c        **** /* applications without prior written permission from Jacob Mattingley. */
+   6:util.c        **** 
+   7:util.c        **** /* Filename: util.c. */
+   8:util.c        **** /* Description: Common utility file for all cvxgen code. */
+   9:util.c        **** #include "solver.h"
+  10:util.c        **** #include <time.h>
+  11:util.c        **** #include <stdlib.h>
+  12:util.c        **** #include <math.h>
+  13:util.c        **** long global_seed = 1;
+  14:util.c        **** static clock_t tic_timestart;
+  15:util.c        **** void tic(void) {
+  16:util.c        ****   tic_timestart = clock();
+  17:util.c        **** }
+  18:util.c        **** float toc(void) {
+  19:util.c        ****   clock_t tic_timestop;
+  20:util.c        ****   tic_timestop = clock();
+  21:util.c        ****   printf("time: %8.2f.\n", (float)(tic_timestop - tic_timestart) / CLOCKS_PER_SEC);
+  22:util.c        ****   return (float)(tic_timestop - tic_timestart) / CLOCKS_PER_SEC;
+  23:util.c        **** }
+  24:util.c        **** float tocq(void) {
+  25:util.c        ****   clock_t tic_timestop;
+  26:util.c        ****   tic_timestop = clock();
+  27:util.c        ****   return (float)(tic_timestop - tic_timestart) / CLOCKS_PER_SEC;
+  28:util.c        **** }
+  29:util.c        **** void printmatrix(char *name, double *A, int m, int n, int sparse) {
+  30:util.c        ****   int i, j;
+  31:util.c        ****   printf("%s = [...\n", name);
+  32:util.c        ****   for (i = 0; i < m; i++) {
+  33:util.c        ****     for (j = 0; j < n; j++)
+  34:util.c        ****       if ((sparse == 1) && (A[i+j*m] == 0))
+  35:util.c        ****         printf("         0");
+  36:util.c        ****       else
+  37:util.c        ****         printf("  % 9.4f", A[i+j*m]);
+  38:util.c        ****     printf(",\n");
+  39:util.c        ****   }
+  40:util.c        ****   printf("];\n");
+  41:util.c        **** }
+  42:util.c        **** double unif(double lower, double upper) {
+  43:util.c        ****   return lower + ((upper - lower)*rand())/RAND_MAX;
+  44:util.c        **** }
+  45:util.c        **** /* Next function is from numerical recipes in C. */
+  46:util.c        **** #define IA 16807
+  47:util.c        **** #define IM 2147483647
+  48:util.c        **** #define AM (1.0/IM)
+  49:util.c        **** #define IQ 127773
+  50:util.c        **** #define IR 2836
+  51:util.c        **** #define NTAB 32
+  52:util.c        **** #define NDIV (1+(IM-1)/NTAB)
+  53:util.c        **** #define EPS 1.2e-7
+  54:util.c        **** #define RNMX (1.0-EPS)
+  55:util.c        **** float ran1(long*idum, int reset) {
+  25              	r5, r6, r7, lr}
+  26 0000 F0B5     	.LCFI0:
+  27              		mov	r7, sl
+  28 0002 5746     		mov	r6, r8
+  29 0004 4646     		push	{r6, r7}
+  30 0006 C0B4     	.LCFI1:
+  31              	.LVL0:
+  32              		.loc 1 55 0
+  33              		mov	r8, r0
+  34 0008 8046     		.loc 1 61 0
+  56:util.c        **** 
+  57:util.c        **** #define RNMX (1.0-EPS)
+  58:util.c        **** float ran1(long*idum, int reset) {
+  59:util.c        ****   int j;
+  60:util.c        ****   long k;
+  61:util.c        ****   static long iy=0;
+  35              	0
+  36 000a 0029     		beq	.L23
+  37 000c 62D0     	.LVL1:
+  38              		.loc 1 62 0
+  62:util.c        **** um, int reset) {
+  39              		r1, .L33
+  40 000e 3E49     	.LVL2:
+  41              		mov	r3, #0
+  42 0010 0023     		str	r3, [r1]
+  43 0012 0B60     		mov	sl, r1
+  44 0014 8A46     	.LVL3:
+  45              	.L2:
+  46              		.loc 1 64 0
+  63:util.c        **** 
+  64:util.c        **** #define RNMX (1.0-EPS)
+  47              	 r8
+  48 0016 4346     		ldr	r5, [r3]
+  49 0018 1D68     		cmp	r5, #0
+  50 001a 002D     		ble	.L4
+  51 001c 39DD     		mov	r1, sl
+  52 001e 5146     	.LVL4:
+  53              		ldr	r3, [r1]
+  54 0020 0B68     		cmp	r3, #0
+  55 0022 002B     		beq	.L4
+  56 0024 35D0     		ldr	r6, .L33+4
+  57 0026 394E     	.L6:
+  58              		.loc 1 75 0
+  65:util.c        **** V (1+(IM-1)/NTAB)
+  66:util.c        **** #define EPS 1.2e-7
+  67:util.c        **** #define RNMX (1.0-EPS)
+  68:util.c        **** float ran1(long*idum, int reset) {
+  69:util.c        ****   int j;
+  70:util.c        ****   long k;
+  71:util.c        ****   static long iy=0;
+  72:util.c        ****   static long iv[NTAB];
+  73:util.c        ****   float temp;
+  74:util.c        ****   if (reset) {
+  75:util.c        ****     iy = 0;
+  59              	3+8
+  60 0028 394C     		mov	r0, r5
+  61 002a 281C     		mov	r1, r4
+  62 002c 211C     		bl	__divsi3
+  63 002e FFF7FEFF 		.loc 1 76 0
+  76:util.c        ****  iv[NTAB];
+  64              	r3, r0
+  65 0032 031C     		mul	r3, r4
+  66 0034 6343     		ldr	r2, .L33+12
+  67 0036 374A     		sub	r3, r5, r3
+  68 0038 EB1A     		mul	r2, r3
+  69 003a 5A43     		ldr	r3, .L33+16
+  70 003c 364B     		mul	r3, r0
+  71 003e 4343     		sub	r5, r2, r3
+  72 0040 D51A     		mov	r3, r8
+  73 0042 4346     		str	r5, [r3]
+  74 0044 1D60     		.loc 1 77 0
+  77:util.c        **** 
+  75              	
+  76 0046 002D     		blt	.L28
+  77 0048 55DB     	.L16:
+  78              		.loc 1 78 0
+  78:util.c        **** NMX (1.0-EPS)
+  79              	v	r1, sl
+  80 004a 5146     		ldr	r3, [r1]
+  81 004c 0B68     		cmp	r3, #0
+  82 004e 002B     		blt	.L29
+  83 0050 4EDB     	.L18:
+  84              		asr	r3, r3, #26
+  85 0052 9B16     		.loc 1 79 0
+  79:util.c        **** V (1+(IM-1)/NTAB)
+  86              	, r3, #2
+  87 0054 9B00     		ldr	r0, [r3, r6]
+  88 0056 9859     		mov	r1, sl
+  89 0058 5146     		str	r0, [r1]
+  90 005a 0860     		.loc 1 80 0
+  80:util.c        **** 
+  91              	r1, r8
+  92 005c 4146     		ldr	r2, [r1]
+  93 005e 0A68     		str	r2, [r3, r6]
+  94 0060 9A51     		.loc 1 81 0
+  81:util.c        **** 6807
+  95              	__floatsidf
+  96 0062 FFF7FEFF 		ldr	r2, .L33+20
+  97 0066 2D4A     		ldr	r3, .L33+24
+  98 0068 2D4B     		bl	__muldf3
+  99 006a FFF7FEFF 		bl	__truncdfsf2
+ 100 006e FFF7FEFF 		add	r4, r0, #0
+ 101 0072 041C     	.LVL5:
+ 102              		bl	__extendsfdf2
+ 103 0074 FFF7FEFF 		ldr	r2, .L33+28
+ 104 0078 2A4A     		ldr	r3, .L33+32
+ 105 007a 2B4B     		bl	__gtdf2
+ 106 007c FFF7FEFF 		cmp	r0, #0
+ 107 0080 0028     		bgt	.L30
+ 108 0082 33DC     	.L19:
+ 109              		.loc 1 83 0
+  82:util.c        **** * Next function is from numerical recipes in C. */
+  83:util.c        **** #define IA 16807
+ 110              	
+ 111 0084 201C     		@ sp needed for prologue
+ 112              	.LVL6:
+ 113              	.LVL7:
+ 114              		pop	{r2, r3}
+ 115 0086 0CBC     		mov	r8, r2
+ 116 0088 9046     		mov	sl, r3
+ 117 008a 9A46     		pop	{r4, r5, r6, r7}
+ 118 008c F0BC     		pop	{r1}
+ 119 008e 02BC     		bx	r1
+ 120 0090 0847     	.LVL8:
+ 121              	.L4:
+ 122              		.loc 1 65 0
+ 123              		neg	r0, r5
+ 124 0092 6842     		cmp	r0, #0
+ 125 0094 0028     		ble	.L31
+ 126 0096 33DD     		.loc 1 66 0
+ 127              		mov	r3, r8
+ 128 0098 4346     		str	r0, [r3]
+ 129 009a 1860     	.L9:
+ 130              		mov	r1, r8
+ 131 009c 4146     	.LVL9:
+ 132              		ldr	r4, [r1]
+ 133 009e 0C68     		ldr	r5, .L33+36
+ 134 00a0 224D     		ldr	r7, .L33+8
+ 135 00a2 1B4F     		mov	r6, #39
+ 136 00a4 2726     	.LVL10:
+ 137              		b	.L10
+ 138 00a6 05E0     	.L11:
+ 139              		.loc 1 71 0
+ 140              		cmp	r6, #31
+ 141 00a8 1F2E     		bgt	.L13
+ 142 00aa 00DC     		str	r4, [r5]
+ 143 00ac 2C60     	.L13:
+ 144              		.loc 1 67 0
+ 145              		sub	r5, r5, #4
+ 146 00ae 043D     		sub	r6, r6, #1
+ 147 00b0 013E     		bcc	.L32
+ 148 00b2 12D3     	.L10:
+ 149              		.loc 1 68 0
+ 150              		mov	r0, r4
+ 151 00b4 201C     		ldr	r1, .L33+8
+ 152 00b6 1649     		bl	__divsi3
+ 153 00b8 FFF7FEFF 		.loc 1 69 0
+ 154              		mov	r3, r0
+ 155 00bc 031C     		mul	r3, r7
+ 156 00be 7B43     		ldr	r2, .L33+12
+ 157 00c0 144A     		sub	r3, r4, r3
+ 158 00c2 E31A     		mul	r2, r3
+ 159 00c4 5A43     		ldr	r3, .L33+16
+ 160 00c6 144B     		mul	r3, r0
+ 161 00c8 4343     		.loc 1 70 0
+ 162              		sub	r4, r2, r3
+ 163 00ca D41A     		bpl	.L11
+ 164 00cc ECD5     		ldr	r2, .L33+40
+ 165 00ce 184A     		add	r4, r4, r2
+ 166 00d0 A418     		b	.L11
+ 167 00d2 E9E7     	.LVL11:
+ 168              	.L23:
+ 169              		ldr	r2, .L33
+ 170 00d4 0C4A     		mov	sl, r2
+ 171 00d6 9246     		b	.L2
+ 172 00d8 9DE7     	.LVL12:
+ 173              	.L32:
+ 174              		.loc 1 67 0
+ 175              		mov	r3, r8
+ 176 00da 4346     		str	r4, [r3]
+ 177 00dc 1C60     		.loc 1 73 0
+ 178              		ldr	r6, .L33+4
+ 179 00de 0B4E     	.LVL13:
+ 180              		ldr	r3, [r6]
+ 181 00e0 3368     		mov	r1, sl
+ 182 00e2 5146     		str	r3, [r1]
+ 183 00e4 0B60     		mov	r2, r8
+ 184 00e6 4246     		ldr	r5, [r2]
+ 185 00e8 1568     		b	.L6
+ 186 00ea 9DE7     	.LVL14:
+ 187              	.L30:
+ 188              		.loc 1 81 0
+ 189              		ldr	r4, .L33+44
+ 190 00ec 114C     		b	.L19
+ 191 00ee C9E7     	.LVL15:
+ 192              	.L29:
+ 193              		.loc 1 78 0
+ 194              		ldr	r2, .L33+48
+ 195 00f0 114A     		add	r3, r3, r2
+ 196 00f2 9B18     		b	.L18
+ 197 00f4 ADE7     	.L28:
+ 198              		.loc 1 77 0
+ 199              		ldr	r1, .L33+40
+ 200 00f6 0E49     		mov	r2, r8
+ 201 00f8 4246     		add	r3, r5, r1
+ 202 00fa 6B18     		str	r3, [r2]
+ 203 00fc 1360     		b	.L16
+ 204 00fe A4E7     	.LVL16:
+ 205              	.L31:
+ 206              		.loc 1 65 0
+ 207              		mov	r5, #1
+ 208 0100 0125     		mov	r2, r8
+ 209 0102 4246     		str	r5, [r2]
+ 210 0104 1560     		b	.L9
+ 211 0106 C9E7     	.L34:
+ 212              		.align	2
+ 213              	.L33:
+ 214              		.word	iy.2584
+ 215 0108 88000000 		.word	iv.2585
+ 216 010c 08000000 		.word	127773
+ 217 0110 1DF30100 		.word	16807
+ 218 0114 A7410000 		.word	2836
+ 219 0118 140B0000 		.word	1040187392
+ 220 011c 0000003E 		.word	2097152
+ 221 0120 00002000 		.word	1072693247
+ 222 0124 FFFFEF3F 		.word	-1080863911
+ 223 0128 595393BF 		.word	iv.2585+156
+ 224 012c A4000000 		.word	2147483647
+ 225 0130 FFFFFF7F 		.word	1065353214
+ 226 0134 FEFF7F3F 		.word	67108863
+ 227 0138 FFFFFF03 	.LFE7:
+ 229              		.global	__adddf3
+ 230              		.global	__subdf3
+ 231              		.global	__mulsf3
+ 232              		.global	__addsf3
+ 233              		.global	__gesf2
+ 234              		.global	__eqsf2
+ 235              		.global	__divdf3
+ 236              		.align	2
+ 237              		.global	randn_internal
+ 238              		.code 16
+ 239              		.thumb_func
+ 241              	randn_internal:
+ 242              	.LFB8:
+ 243              		.loc 1 85 0
+  84:util.c        **** * Next function is from numerical recipes in C. */
+  85:util.c        **** #define IA 16807
+ 244              	1 89 0
+ 245 013c F0B5     		cmp	r1, #0
+ 246              		beq	.L36
+ 247 013e 5746     	.LVL18:
+ 248 0140 4646     		.loc 1 90 0
+ 249 0142 C0B4     		ldr	r2, .L51
+ 250              		mov	r3, #0
+ 251              		str	r3, [r2]
+ 252              		mov	sl, r2
+ 253 0144 8046     	.LVL19:
+ 254 0146 0D1C     	.L50:
+  86:util.c        **** * Next function is from numerical recipes in C. */
+  87:util.c        **** #define IA 16807
+  88:util.c        **** #define IM 2147483647
+  89:util.c        **** #define AM (1.0/IM)
+ 255              	0
+ 256 0148 0029     		mov	r1, r5
+ 257 014a 65D0     		mov	r0, r8
+ 258              		bl	ran1
+  90:util.c        ****  C. */
+ 259              	__extendsfdf2
+ 260 014c 374A     		mov	r2, r0
+ 261 014e 0023     		mov	r3, r1
+ 262 0150 1360     		bl	__adddf3
+ 263 0152 9246     		ldr	r2, .L51+4
+ 264              		ldr	r3, .L51+8
+ 265              		bl	__subdf3
+  91:util.c        **** d())/RAND_MAX;
+  92:util.c        **** }
+  93:util.c        **** /* Next function is from numerical recipes in C. */
+  94:util.c        **** #define IA 16807
+ 266              	runcdfsf2
+ 267 0154 291C     		.loc 1 95 0
+ 268 0156 4046     		mov	r1, r5
+ 269 0158 FFF7FEFF 		.loc 1 94 0
+ 270 015c FFF7FEFF 		add	r7, r0, #0
+ 271 0160 021C     		.loc 1 95 0
+ 272 0162 0B1C     		mov	r0, r8
+ 273 0164 FFF7FEFF 		bl	ran1
+ 274 0168 314A     		bl	__extendsfdf2
+ 275 016a 324B     		mov	r2, r0
+ 276 016c FFF7FEFF 		mov	r3, r1
+ 277 0170 FFF7FEFF 		bl	__adddf3
+  95:util.c        **** * Next function is from numerical recipes in C. */
+ 278              	1+4
+ 279 0174 291C     		ldr	r3, .L51+8
+ 280              		bl	__subdf3
+ 281 0176 071C     		bl	__truncdfsf2
+ 282              		.loc 1 96 0
+ 283 0178 4046     		add	r1, r7, #0
+ 284 017a FFF7FEFF 	.LVL20:
+ 285 017e FFF7FEFF 		.loc 1 95 0
+ 286 0182 021C     		add	r6, r0, #0
+ 287 0184 0B1C     		.loc 1 96 0
+ 288 0186 FFF7FEFF 		add	r0, r7, #0
+ 289 018a 294A     		bl	__mulsf3
+ 290 018c 294B     	.LVL21:
+ 291 018e FFF7FEFF 		add	r1, r6, #0
+ 292 0192 FFF7FEFF 	.LVL22:
+  96:util.c        **** d())/RAND_MAX;
+ 293              	
+ 294 0196 391C     		add	r0, r6, #0
+ 295              		bl	__mulsf3
+ 296              	.LVL23:
+ 297 0198 061C     		add	r1, r0, #0
+ 298              		add	r0, r4, #0
+ 299 019a 381C     		bl	__addsf3
+ 300 019c FFF7FEFF 		.loc 1 97 0
+ 301              		ldr	r1, .L51+12
+ 302 01a0 311C     		.loc 1 96 0
+ 303              		add	r4, r0, #0
+ 304 01a2 041C     		.loc 1 97 0
+ 305 01a4 301C     		bl	__gesf2
+ 306 01a6 FFF7FEFF 		cmp	r0, #0
+ 307              		bge	.L50
+ 308 01aa 011C     		add	r0, r4, #0
+ 309 01ac 201C     	.LVL24:
+ 310 01ae FFF7FEFF 		ldr	r1, .L51+16
+  97:util.c        **** r, double upper) {
+ 311              	5:
+ 312 01b2 2149     		cmp	r0, #0
+ 313              		beq	.L50
+ 314 01b4 041C     		.loc 1 98 0
+ 315              		add	r0, r4, #0
+ 316 01b6 FFF7FEFF 	.LVL26:
+ 317 01ba 0028     		bl	__extendsfdf2
+ 318 01bc CADA     	.LVL27:
+ 319 01be 201C     		mov	r4, r0
+ 320              		mov	r5, r1
+ 321 01c0 1E49     	.LVL28:
+ 322 01c2 FFF7FEFF 		bl	log
+ 323              		ldr	r2, .L51+20
+ 324 01c6 0028     		ldr	r3, .L51+24
+ 325 01c8 C4D0     		bl	__muldf3
+  98:util.c        **** \n");
+ 326              	v	r3, r5
+ 327 01ca 201C     		bl	__divdf3
+ 328              		bl	sqrt
+ 329 01cc FFF7FEFF 		bl	__truncdfsf2
+ 330              		add	r5, r0, #0
+ 331 01d0 041C     		.loc 1 99 0
+ 332 01d2 0D1C     		add	r1, r5, #0
+ 333              	.LVL29:
+ 334 01d4 FFF7FEFF 		add	r0, r7, #0
+ 335 01d8 194A     	.LVL30:
+ 336 01da 1A4B     		bl	__mulsf3
+ 337 01dc FFF7FEFF 	.LVL31:
+ 338 01e0 221C     		ldr	r4, .L51+28
+ 339 01e2 2B1C     		.loc 1 100 0
+ 340 01e4 FFF7FEFF 		mov	r3, #1
+ 341 01e8 FFF7FEFF 		mov	r2, sl
+ 342 01ec FFF7FEFF 		.loc 1 99 0
+ 343 01f0 051C     		str	r0, [r4]
+  99:util.c        ****    0");
+ 344              		r3, [r2]
+ 345 01f2 291C     		.loc 1 101 0
+ 346              		add	r0, r6, #0
+ 347 01f4 381C     	.LVL32:
+ 348              		add	r1, r5, #0
+ 349 01f6 FFF7FEFF 	.LVL33:
+ 350              		bl	__mulsf3
+ 351 01fa 134C     	.LVL34:
+ 100:util.c        **** j++)
+ 352              	loc 1 106 0
+ 353 01fc 0123     		@ sp needed for prologue
+ 354 01fe 5246     	.LVL35:
+ 355              		pop	{r2, r3}
+ 356 0200 2060     		mov	r8, r2
+ 357              		mov	sl, r3
+ 358 0202 1360     		pop	{r4, r5, r6, r7}
+ 101:util.c        **** tf("%s = [...\n", name);
+ 359              	1}
+ 360 0204 301C     		bx	r1
+ 361              	.LVL36:
+ 362 0206 291C     	.L36:
+ 363              		.loc 1 92 0
+ 364 0208 FFF7FEFF 		ldr	r2, .L51
+ 365              		ldr	r3, [r2]
+ 366              		mov	sl, r2
+ 102:util.c        ****  double *A, int m, int n, int sparse) {
+ 103:util.c        ****   int i, j;
+ 104:util.c        ****   printf("%s = [...\n", name);
+ 105:util.c        ****   for (i = 0; i < m; i++) {
+ 106:util.c        ****     for (j = 0; j < n; j++)
+ 367              	 #0
+ 368              		beq	.L50
+ 369              		.loc 1 104 0
+ 370 020c 0CBC     		ldr	r3, .L51+28
+ 371 020e 9046     		ldr	r0, [r3]
+ 372 0210 9A46     		.loc 1 103 0
+ 373 0212 F0BC     		str	r1, [r2]
+ 374 0214 02BC     		b	.L42
+ 375 0216 0847     	.L52:
+ 376              		.align	2
+ 377              	.L51:
+ 378              		.word	iset.2612
+ 379 0218 044A     		.word	1072693248
+ 380 021a 1368     		.word	0
+ 381 021c 9246     		.word	1065353216
+ 382 021e 002B     		.word	0
+ 383 0220 98D0     		.word	-1073741824
+ 384              		.word	0
+ 385 0222 094B     		.word	gset.2613
+ 386 0224 1868     	.LFE8:
+ 388 0226 1160     		.align	2
+ 389 0228 F0E7     		.global	reset_rand
+ 390              		.code 16
+ 391 022a 0000     		.thumb_func
+ 393 022c 04000000 	reset_rand:
+ 394 0230 0000F03F 	.LFB10:
+ 395 0234 00000000 		.loc 1 110 0
+ 396 0238 0000803F 		push	{lr}
+ 397 023c 00000000 	.LCFI4:
+ 398 0240 000000C0 		.loc 1 111 0
+ 399 0244 00000000 		mov	r0, #15
+ 400 0248 00000000 		bl	srand
+ 401              		.loc 1 112 0
+ 402              		ldr	r0, .L55
+ 403              		mov	r3, #1
+ 404              		str	r3, [r0]
+ 405              		.loc 1 113 0
+ 406              		mov	r1, #1
+ 407              		bl	randn_internal
+ 408              		.loc 1 114 0
+ 409              		@ sp needed for prologue
+ 107:util.c        **** tf("%s = [...\n", name);
+ 108:util.c        ****   for (i = 0; i < m; i++) {
+ 109:util.c        ****     for (j = 0; j < n; j++)
+ 110:util.c        ****       if ((sparse == 1) && (A[i+j*m] == 0))
+ 410              	rd	global_seed
+ 411 024c 00B5     	.LFE10:
+ 111:util.c        ****  i++) {
+ 413              	lign	2
+ 414 024e 0F20     		.global	randn
+ 415 0250 FFF7FEFF 		.code 16
+ 112:util.c        ****  sparse) {
+ 416              	humb_func
+ 418 0256 0123     	randn:
+ 419 0258 0360     	.LFB9:
+ 113:util.c        **** LOCKS_PER_SEC;
+ 420              	c 1 107 0
+ 421 025a 0121     		push	{lr}
+ 422 025c FFF7FEFF 	.LCFI5:
+ 114:util.c        **** c_timestop = clock();
+ 423              	oc 1 108 0
+ 424              		mov	r1, #0
+ 425 0260 01BC     		ldr	r0, .L59
+ 426 0262 0047     		bl	randn_internal
+ 427              		bl	__extendsfdf2
+ 428              		.loc 1 109 0
+ 429              		@ sp needed for prologue
+ 430 0264 00000000 		pop	{r2}
+ 431              		bx	r2
+ 432              	.L60:
+ 433              		.align	2
+ 434              	.L59:
+ 435              		.word	global_seed
+ 436              	.LFE9:
+ 438              		.align	2
+ 439              		.global	unif
+ 440              		.code 16
+ 441 0268 00B5     		.thumb_func
+ 443              	unif:
+ 444 026a 0021     	.LFB6:
+ 445 026c 0348     		.loc 1 42 0
+ 446 026e FFF7FEFF 		push	{r4, r5, r6, lr}
+ 447 0272 FFF7FEFF 	.LCFI6:
+ 448              	.LVL37:
+ 449              		sub	sp, sp, #8
+ 450 0276 04BC     	.LCFI7:
+ 451 0278 1047     		.loc 1 42 0
+ 452              		mov	r4, r2
+ 453 027a 0000     	.LVL38:
+ 454              		mov	r5, r3
+ 455 027c 00000000 		str	r0, [sp]
+ 456              		str	r1, [sp, #4]
+ 457              		.loc 1 43 0
+ 458              		bl	rand
+ 459              	.LVL39:
+ 460              		ldr	r2, [sp]
+ 461              		ldr	r3, [sp, #4]
+ 462              		mov	r6, r0
+ 463              		mov	r1, r5
+ 464              		mov	r0, r4
+ 465              		bl	__subdf3
+ 466 0280 70B5     		mov	r4, r0
+ 467              	.LVL40:
+ 468              		mov	r0, r6
+ 469 0282 82B0     		mov	r5, r1
+ 470              	.LVL41:
+ 471              		bl	__floatsidf
+ 472 0284 141C     		mov	r2, r0
+ 473              		mov	r3, r1
+ 474 0286 1D1C     		mov	r0, r4
+ 475 0288 0090     		mov	r1, r5
+ 476 028a 0191     		bl	__muldf3
+ 477              		ldr	r3, .L63+4
+ 478 028c FFF7FEFF 		ldr	r2, .L63
+ 479              		bl	__divdf3
+ 480 0290 009A     		mov	r2, r0
+ 481 0292 019B     		mov	r3, r1
+ 482 0294 061C     		ldr	r0, [sp]
+ 483 0296 291C     		ldr	r1, [sp, #4]
+ 484 0298 201C     		bl	__adddf3
+ 485 029a FFF7FEFF 		.loc 1 44 0
+ 486 029e 041C     		add	sp, sp, #8
+ 487              		@ sp needed for prologue
+ 488 02a0 301C     		pop	{r4, r5, r6}
+ 489 02a2 0D1C     		pop	{r2}
+ 490              		bx	r2
+ 491 02a4 FFF7FEFF 	.L64:
+ 492 02a8 021C     		.align	2
+ 493 02aa 0B1C     	.L63:
+ 494 02ac 201C     		.word	1105199103
+ 495 02ae 291C     		.word	-4194304
+ 496 02b0 FFF7FEFF 	.LFE6:
+ 498 02b6 064A     		.section	.rodata.str1.4,"aMS",%progbits,1
+ 499 02b8 FFF7FEFF 		.align	2
+ 500 02bc 021C     	.LC8:
+ 501 02be 0B1C     		.ascii	"%s = [...\012\000"
+ 502 02c0 0098     		.global	__eqdf2
+ 503 02c2 0199     		.align	2
+ 504 02c4 FFF7FEFF 	.LC10:
+ 505              		.ascii	"         0\000"
+ 506 02c8 02B0     		.align	2
+ 507              	.LC12:
+ 508 02ca 70BC     		.ascii	"  % 9.4f\000"
+ 509 02cc 04BC     		.align	2
+ 510 02ce 1047     	.LC14:
+ 511              		.ascii	",\000"
+ 512              		.align	2
+ 513              	.LC16:
+ 514 02d0 FFFFDF41 		.ascii	"];\000"
+ 515 02d4 0000C0FF 		.text
+ 516              		.align	2
+ 517              		.global	printmatrix
+ 518              		.code 16
+ 519              		.thumb_func
+ 521 0000 2573203D 	printmatrix:
+ 521      205B2E2E 
+ 521      2E0A00
+ 522              	.LFB5:
+ 523 000b 00       		.loc 1 29 0
+ 524              		push	{r4, r5, r6, r7, lr}
+ 525 000c 20202020 	.LCFI8:
+ 525      20202020 
+ 525      203000
+ 526 0017 00       		mov	r7, fp
+ 527              		mov	r6, sl
+ 528 0018 20202520 		mov	r5, r9
+ 528      392E3466 
+ 528      00
+ 529 0021 000000   		mov	r4, r8
+ 530              		push	{r4, r5, r6, r7}
+ 531 0024 2C00     	.LCFI9:
+ 532 0026 0000     	.LVL42:
+ 533              		sub	sp, sp, #4
+ 534 0028 5D3B00   	.LCFI10:
+ 535              		.loc 1 29 0
+ 536              		mov	r4, r0
+ 537              		mov	r7, r3
+ 538              		ldr	r3, [sp, #40]
+ 539              	.LVL43:
+ 540              		mov	r9, r2
+ 541              		mov	r5, r1
+ 542              		.loc 1 31 0
+ 543              		ldr	r0, .L80
+ 544 02d8 F0B5     	.LVL44:
+ 545              		mov	r1, r4
+ 546 02da 5F46     	.LVL45:
+ 547 02dc 5646     		.loc 1 29 0
+ 548 02de 4D46     		mov	sl, r3
+ 549 02e0 4446     		.loc 1 31 0
+ 550 02e2 F0B4     		bl	printf
+ 551              	.LVL46:
+ 552              		.loc 1 32 0
+ 553 02e4 81B0     		mov	r3, r9
+ 554              		cmp	r3, #0
+ 555              		ble	.L66
+ 556 02e6 041C     	.LVL47:
+ 557 02e8 1F1C     		mov	r3, #0
+ 558 02ea 0A9B     		mov	fp, r3
+ 559              	.LVL48:
+ 560 02ec 9146     		ldr	r3, .L80+4
+ 561 02ee 0D1C     		str	r3, [sp]
+ 562              		mov	r8, r5
+ 563 02f0 2148     	.LVL49:
+ 564              	.L68:
+ 565 02f2 211C     		.loc 1 33 0
+ 566              		cmp	r7, #0
+ 567              		ble	.L76
+ 568 02f4 9A46     		mov	r3, r9
+ 569              		lsl	r6, r3, #3
+ 570 02f6 FFF7FEFF 		mov	r4, r8
+ 571              	.LVL50:
+ 572              		mov	r5, #0
+ 573 02fa 4B46     	.LVL51:
+ 574 02fc 002B     		b	.L69
+ 575 02fe 2FDD     	.L72:
+ 576              		.loc 1 37 0
+ 577 0300 0023     		ldr	r1, [r4]
+ 578 0302 9B46     		ldr	r2, [r4, #4]
+ 579              		ldr	r0, .L80+8
+ 580 0304 1D4B     		.loc 1 33 0
+ 581 0306 0093     		add	r5, r5, #1
+ 582 0308 A846     		.loc 1 37 0
+ 583              		bl	printf
+ 584              		.loc 1 33 0
+ 585              		add	r4, r4, r6
+ 586 030a 002F     		cmp	r7, r5
+ 587 030c 1FDD     		beq	.L76
+ 588 030e 4B46     	.L69:
+ 589 0310 DE00     		.loc 1 34 0
+ 590 0312 4446     		mov	r3, sl
+ 591              		cmp	r3, #1
+ 592 0314 0025     		bne	.L72
+ 593              		ldr	r0, [r4]
+ 594 0316 08E0     		ldr	r1, [r4, #4]
+ 595              		ldr	r2, .L80+12
+ 596              		ldr	r3, .L80+16
+ 597 0318 2168     		bl	__eqdf2
+ 598 031a 6268     		cmp	r0, #0
+ 599 031c 1848     		bne	.L72
+ 600              		.loc 1 35 0
+ 601 031e 0135     		ldr	r0, .L80+20
+ 602              		.loc 1 33 0
+ 603 0320 FFF7FEFF 		add	r5, r5, #1
+ 604              		.loc 1 35 0
+ 605 0324 A419     		bl	printf
+ 606 0326 AF42     		.loc 1 33 0
+ 607 0328 11D0     		add	r4, r4, r6
+ 608              		cmp	r7, r5
+ 609              		bne	.L69
+ 610 032a 5346     	.LVL52:
+ 611 032c 012B     	.L76:
+ 612 032e F3D1     		.loc 1 38 0
+ 613 0330 2068     		ldr	r0, [sp]
+ 614 0332 6168     		bl	puts
+ 615 0334 134A     		.loc 1 32 0
+ 616 0336 144B     		mov	r3, #1
+ 617 0338 FFF7FEFF 		add	fp, fp, r3
+ 618 033c 0028     		mov	r3, #8
+ 619 033e EBD1     		add	r8, r8, r3
+ 620              		cmp	r9, fp
+ 621 0340 1248     		bne	.L68
+ 622              	.L66:
+ 623 0342 0135     		.loc 1 40 0
+ 624              		ldr	r0, .L80+24
+ 625 0344 FFF7FEFF 		bl	puts
+ 626              		.loc 1 41 0
+ 627 0348 A419     		add	sp, sp, #4
+ 628 034a AF42     		@ sp needed for prologue
+ 629 034c EDD1     	.LVL53:
+ 630              	.LVL54:
+ 631              	.LVL55:
+ 632              	.LVL56:
+ 633 034e 0098     	.LVL57:
+ 634 0350 FFF7FEFF 	.LVL58:
+ 635              		pop	{r2, r3, r4, r5}
+ 636 0354 0123     		mov	r8, r2
+ 637 0356 9B44     		mov	r9, r3
+ 638 0358 0823     		mov	sl, r4
+ 639 035a 9844     		mov	fp, r5
+ 640 035c D945     		pop	{r4, r5, r6, r7}
+ 641 035e D4D1     		pop	{r0}
+ 642              		bx	r0
+ 643              	.L81:
+ 644 0360 0B48     		.align	2
+ 645 0362 FFF7FEFF 	.L80:
+ 646              		.word	.LC8
+ 647 0366 01B0     		.word	.LC14
+ 648              		.word	.LC12
+ 649              		.word	0
+ 650              		.word	0
+ 651              		.word	.LC10
+ 652              		.word	.LC16
+ 653              	.LFE5:
+ 655 0368 3CBC     		.global	__floatsisf
+ 656 036a 9046     		.global	__divsf3
+ 657 036c 9946     		.align	2
+ 658 036e A246     		.global	tocq
+ 659 0370 AB46     		.code 16
+ 660 0372 F0BC     		.thumb_func
+ 662 0376 0047     	tocq:
+ 663              	.LFB4:
+ 664              		.loc 1 24 0
+ 665              		push	{lr}
+ 666 0378 00000000 	.LCFI11:
+ 667 037c 24000000 		.loc 1 26 0
+ 668 0380 18000000 		bl	clock
+ 669 0384 00000000 		ldr	r3, .L86
+ 670 0388 00000000 		ldr	r3, [r3]
+ 671 038c 0C000000 	.LVL59:
+ 672 0390 28000000 		sub	r2, r0, r3
+ 673              		bmi	.L84
+ 674              		mov	r0, r2
+ 675              	.LVL60:
+ 676              		bl	__floatsisf
+ 677              		add	r1, r0, #0
+ 678              	.L83:
+ 679              		add	r0, r1, #0
+ 680              		ldr	r1, .L86+4
+ 681              		bl	__divsf3
+ 682              		.loc 1 28 0
+ 683              		@ sp needed for prologue
+ 684              		pop	{r1}
+ 685 0394 00B5     		bx	r1
+ 686              	.LVL61:
+ 687              	.L84:
+ 688 0396 FFF7FEFF 		.loc 1 26 0
+ 689 039a 0D4B     		mov	r0, r2
+ 690 039c 1B68     	.LVL62:
+ 691              		mov	r3, #1
+ 692 039e C21A     		and	r0, r0, r3
+ 693 03a0 09D4     		lsr	r3, r2, #1
+ 694 03a2 101C     		orr	r0, r0, r3
+ 695              		bl	__floatsisf
+ 696 03a4 FFF7FEFF 		add	r1, r0, #0
+ 697 03a8 011C     		bl	__addsf3
+ 698              		add	r1, r0, #0
+ 699 03aa 081C     		b	.L83
+ 700 03ac 0949     	.L87:
+ 701 03ae FFF7FEFF 		.align	2
+ 702              	.L86:
+ 703              		.word	tic_timestart
+ 704 03b2 02BC     		.word	1120403456
+ 705 03b4 0847     	.LFE4:
+ 707              		.section	.rodata.str1.4
+ 708              		.align	2
+ 709 03b6 101C     	.LC19:
+ 710              		.ascii	"time: %8.2f.\012\000"
+ 711 03b8 0123     		.text
+ 712 03ba 1840     		.align	2
+ 713 03bc 5308     		.global	toc
+ 714 03be 1843     		.code 16
+ 715 03c0 FFF7FEFF 		.thumb_func
+ 717 03c6 FFF7FEFF 	toc:
+ 718 03ca 011C     	.LFB3:
+ 719 03cc EDE7     		.loc 1 18 0
+ 720              		push	{r4, r5, r6, lr}
+ 721 03ce 0000     	.LCFI12:
+ 722              		.loc 1 20 0
+ 723 03d0 8C000000 		bl	clock
+ 724 03d4 0000C842 		.loc 1 21 0
+ 725              		ldr	r5, .L94
+ 726              		ldr	r3, [r5]
+ 727              		.loc 1 20 0
+ 728 002b 00       		mov	r4, r0
+ 729              	.LVL63:
+ 730 002c 74696D65 		.loc 1 21 0
+ 730      3A202538 
+ 730      2E32662E 
+ 730      0A00
+ 731 003a 0000     		ldr	r6, .L94+4
+ 732              		sub	r2, r0, r3
+ 733              		bmi	.L90
+ 734              	.LVL64:
+ 735              		mov	r0, r2
+ 736              	.LVL65:
+ 737              		bl	__floatsisf
+ 738              		add	r1, r0, #0
+ 739              	.L89:
+ 740 03d8 70B5     		add	r0, r1, #0
+ 741              		ldr	r1, .L94+8
+ 742              		bl	__divsf3
+ 743 03da FFF7FEFF 		bl	__extendsfdf2
+ 744              		mov	r2, r1
+ 745 03de 1D4D     		mov	r1, r0
+ 746 03e0 2B68     		mov	r0, r6
+ 747              		bl	printf
+ 748 03e2 041C     		ldr	r3, [r5]
+ 749              		sub	r2, r4, r3
+ 750              		bmi	.L92
+ 751 03e4 1C4E     		mov	r0, r2
+ 752 03e6 C21A     		bl	__floatsisf
+ 753 03e8 1CD4     		add	r1, r0, #0
+ 754              	.L91:
+ 755 03ea 101C     		add	r0, r1, #0
+ 756              		ldr	r1, .L94+8
+ 757 03ec FFF7FEFF 		bl	__divsf3
+ 758 03f0 011C     		.loc 1 23 0
+ 759              		@ sp needed for prologue
+ 760 03f2 081C     	.LVL66:
+ 761 03f4 1949     		pop	{r4, r5, r6}
+ 762 03f6 FFF7FEFF 		pop	{r1}
+ 763 03fa FFF7FEFF 		bx	r1
+ 764 03fe 0A1C     	.LVL67:
+ 765 0400 011C     	.L90:
+ 766 0402 301C     		.loc 1 21 0
+ 767 0404 FFF7FEFF 		mov	r0, r2
+ 768 0408 2B68     	.LVL68:
+ 769 040a E21A     		mov	r3, #1
+ 770 040c 16D4     		and	r0, r0, r3
+ 771 040e 101C     		lsr	r3, r2, #1
+ 772 0410 FFF7FEFF 		orr	r0, r0, r3
+ 773 0414 011C     		bl	__floatsisf
+ 774              		add	r1, r0, #0
+ 775 0416 081C     		bl	__addsf3
+ 776 0418 1049     		add	r1, r0, #0
+ 777 041a FFF7FEFF 		b	.L89
+ 778              	.L92:
+ 779              		mov	r0, r2
+ 780              		mov	r3, #1
+ 781 041e 70BC     		and	r0, r0, r3
+ 782 0420 02BC     		lsr	r3, r2, #1
+ 783 0422 0847     		orr	r0, r0, r3
+ 784              		bl	__floatsisf
+ 785              		add	r1, r0, #0
+ 786              		bl	__addsf3
+ 787 0424 101C     		add	r1, r0, #0
+ 788              		b	.L91
+ 789 0426 0123     	.L95:
+ 790 0428 1840     		.align	2
+ 791 042a 5308     	.L94:
+ 792 042c 1843     		.word	tic_timestart
+ 793 042e FFF7FEFF 		.word	.LC19
+ 794 0432 011C     		.word	1120403456
+ 795 0434 FFF7FEFF 	.LFE3:
+ 797 043a DAE7     		.align	2
+ 798              		.global	tic
+ 799 043c 101C     		.code 16
+ 800 043e 0123     		.thumb_func
+ 802 0442 5308     	tic:
+ 803 0444 1843     	.LFB2:
+ 804 0446 FFF7FEFF 		.loc 1 15 0
+ 805 044a 011C     		push	{lr}
+ 806 044c FFF7FEFF 	.LCFI13:
+ 807 0450 011C     		.loc 1 16 0
+ 808 0452 E0E7     		bl	clock
+ 809              		ldr	r3, .L98
+ 810              		.loc 1 17 0
+ 811              		@ sp needed for prologue
+ 812 0454 8C000000 		.loc 1 16 0
+ 813 0458 2C000000 		str	r0, [r3]
+ 814 045c 0000C842 		.loc 1 17 0
+ 815              		pop	{r0}
+ 816              		bx	r0
+ 817              	.L99:
+ 818              		.align	2
+ 819              	.L98:
+ 820              		.word	tic_timestart
+ 821              	.LFE2:
+ 823              		.global	global_seed
+ 824              		.data
+ 825 0460 00B5     		.align	2
+ 828 0462 FFF7FEFF 	global_seed:
+ 829 0466 024B     		.word	1
+ 830              		.bss
+ 831              		.align	2
+ 832              	gset.2613:
+ 833 0468 1860     		.space	4
+ 834              		.align	2
+ 835 046a 01BC     	iset.2612:
+ 836 046c 0047     		.space	4
+ 837              		.align	2
+ 838 046e 0000     	iv.2585:
+ 839              		.space	128
+ 840 0470 8C000000 		.align	2
+ 841              	iy.2584:
+ 842              		.space	4
+ 843              		.align	2
+ 844              	tic_timestart:
+ 845              		.space	4
+ 846              		.section	.debug_frame,"",%progbits
+ 847              	.Lframe0:
+ 848              		.4byte	.LECIE0-.LSCIE0
+ 849 0000 01000000 	.LSCIE0:
+ 850              		.4byte	0xffffffff
+ 851              		.byte	0x1
+ 852              		.ascii	"\000"
+ 853 0000 00000000 		.uleb128 0x1
+ 854              		.sleb128 -4
+ 855              		.byte	0xe
+ 856 0004 00000000 		.byte	0xc
+ 857              		.uleb128 0xd
+ 858              		.uleb128 0x0
+ 859 0008 00000000 		.align	2
+ 859      00000000 
+ 859      00000000 
+ 859      00000000 
+ 859      00000000 
+ 860              	.LECIE0:
+ 861              	.LSFDE0:
+ 862 0088 00000000 		.4byte	.LEFDE0-.LASFDE0
+ 863              	.LASFDE0:
+ 864              		.4byte	.Lframe0
+ 865 008c 00000000 		.4byte	.LFB7
+ 1081              	.LLST1:
+DEFINED SYMBOLS
+                            *ABS*:00000000 util.c
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:1      .text:00000000 $t
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:22     .text:00000000 ran1
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:215    .text:00000108 $d
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:861    .bss:00000088 iy.2584
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:858    .bss:00000008 iv.2585
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:242    .text:0000013c randn_internal
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:239    .text:0000013c $t
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:393    .text:0000022c $d
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:855    .bss:00000004 iset.2612
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:852    .bss:00000000 gset.2613
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:408    .text:0000024c reset_rand
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:405    .text:0000024c $t
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:430    .text:00000264 $d
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:848    .data:00000000 global_seed
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:438    .text:00000268 randn
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:435    .text:00000268 $t
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:455    .text:0000027c $d
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:463    .text:00000280 unif
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:460    .text:00000280 $t
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:514    .text:000002d0 $d
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:541    .text:000002d8 printmatrix
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:538    .text:000002d8 $t
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:666    .text:00000378 $d
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:682    .text:00000394 tocq
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:679    .text:00000394 $t
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:723    .text:000003d0 $d
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:864    .bss:0000008c tic_timestart
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:737    .text:000003d8 toc
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:734    .text:000003d8 $t
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:812    .text:00000454 $d
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:822    .text:00000460 tic
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:819    .text:00000460 $t
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:840    .text:00000470 $d
+C:\Users\XY\AppData\Local\Temp/ccwFaaaa.s:849    .data:00000000 $d
+
+UNDEFINED SYMBOLS
+__divsi3
+__floatsidf
+__muldf3
+__truncdfsf2
+__extendsfdf2
+__gtdf2
+__adddf3
+__subdf3
+__mulsf3
+__addsf3
+__gesf2
+__eqsf2
+__divdf3
+log
+sqrt
+srand
+rand
+__eqdf2
+printf
+puts
+__floatsisf
+__divsf3
+clock

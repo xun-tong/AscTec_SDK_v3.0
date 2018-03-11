@@ -1,0 +1,572 @@
+   1              		.file	"mpc_inc.c"
+   9              	.Ltext0:
+  10              		.align	2
+  11              		.global	mpc_warmstart_vector
+  13              	mpc_warmstart_vector:
+  14              	.LFB9:
+  15              		.file 1 "mpc_inc.c"
+   1:mpc_inc.c     **** /** Quadratic Programming online solver using Fast gradients.
+   2:mpc_inc.c     ****  */
+   3:mpc_inc.c     **** 
+   4:mpc_inc.c     **** #include <string.h> /* sizeof */
+   5:mpc_inc.c     **** #include "mpc_inc.h"
+   6:mpc_inc.c     **** #include "mpc_const.h"
+   7:mpc_inc.c     **** 
+   8:mpc_inc.c     **** /* static functions declaration */
+   9:mpc_inc.c     **** static void inc_fgm_compute_projected_grad_step(const struct mpc_fgm *fgm,
+  10:mpc_inc.c     **** 		real_t u[], const real_t w[],
+  11:mpc_inc.c     **** 		const real_t gradoL[]);
+  12:mpc_inc.c     **** 
+  13:mpc_inc.c     **** 
+  14:mpc_inc.c     **** /* external functions definition */
+  15:mpc_inc.c     **** 
+  16:mpc_inc.c     **** /* Solve input constrained MPC problem for the current state */
+  17:mpc_inc.c     **** void inc_ctl_solve_problem(struct mpc_ctl *ctl, const real_t x[]) {
+  18:mpc_inc.c     **** 	inc_ctl_form_qp(ctl, x);
+  19:mpc_inc.c     **** 	inc_fgm_minimize_qp(ctl->alm->fgm, ctl->u_opt);
+  20:mpc_inc.c     **** 	return;
+  21:mpc_inc.c     **** }
+  22:mpc_inc.c     **** 
+  23:mpc_inc.c     **** /* Form quadratic program for current state */
+  24:mpc_inc.c     **** void inc_ctl_form_qp(struct mpc_ctl *ctl, const real_t x[])  {
+  25:mpc_inc.c     **** 	inc_compute_gxoL(ctl->alm->fgm, x);
+  26:mpc_inc.c     **** 	return;
+  27:mpc_inc.c     **** }
+  28:mpc_inc.c     **** 
+  29:mpc_inc.c     **** /* Warmstart input constrained MPC */
+  30:mpc_inc.c     **** void inc_ctl_warmstart(struct mpc_ctl *ctl) {
+  31:mpc_inc.c     **** 	mpc_warmstart_vector(ctl->alm->fgm, ctl->alm->fgm->u_0, ctl->u_opt, MPC_INPUTS, MPC_HOR);
+  32:mpc_inc.c     **** }
+  33:mpc_inc.c     **** 
+  34:mpc_inc.c     **** /* Minimize MPC quadratic program using fast gradient method */
+  35:mpc_inc.c     **** void inc_fgm_minimize_qp(const struct mpc_fgm *fgm, real_t u[]) {
+  36:mpc_inc.c     **** 	static real_t u_old[MPC_HOR_INPUTS];
+  37:mpc_inc.c     **** 	static real_t w[MPC_HOR_INPUTS];
+  38:mpc_inc.c     **** 	static real_t gradoL[MPC_HOR_INPUTS];
+  39:mpc_inc.c     **** 	uint32_t j;
+  40:mpc_inc.c     **** 	const size_t sizeof_u = MPC_HOR_INPUTS * sizeof(*u);
+  41:mpc_inc.c     **** 
+  42:mpc_inc.c     **** 	memcpy(u, fgm->u_0, sizeof_u);
+  43:mpc_inc.c     **** 	memcpy(w, u, sizeof_u);
+  44:mpc_inc.c     **** 	memcpy(u_old, u, sizeof_u);
+  45:mpc_inc.c     **** 
+  46:mpc_inc.c     **** 	for (j = 0; j < *(fgm->j_in); j++) {
+  47:mpc_inc.c     **** 		inc_fgm_compute_grad_over_L(fgm, gradoL, w);
+  48:mpc_inc.c     **** 		inc_fgm_minimize_qp_iteration(fgm, u, u_old, w, gradoL);
+  49:mpc_inc.c     **** 	}
+  50:mpc_inc.c     **** 
+  51:mpc_inc.c     **** 	return;
+  52:mpc_inc.c     **** }
+  53:mpc_inc.c     **** 
+  54:mpc_inc.c     **** /* Execute one iteration of the minimization algorithm */
+  55:mpc_inc.c     **** void inc_fgm_minimize_qp_iteration(const struct mpc_fgm *fgm, real_t u[],
+  56:mpc_inc.c     **** 		real_t u_old[], real_t w[],	const real_t gradoL[]) {
+  57:mpc_inc.c     **** 	static real_t du[MPC_HOR_INPUTS];
+  58:mpc_inc.c     **** 	static real_t nu_du[MPC_HOR_INPUTS];
+  59:mpc_inc.c     **** 	const size_t sizeof_u = MPC_HOR_INPUTS * sizeof(*u);
+  60:mpc_inc.c     **** 
+  61:mpc_inc.c     **** 	inc_fgm_compute_projected_grad_step(fgm, u, w, gradoL);
+  62:mpc_inc.c     **** 	mtx_substract(du, u, u_old, MPC_HOR_INPUTS, 1);
+  63:mpc_inc.c     **** 	mtx_scale(nu_du, du, *(fgm->nu), MPC_HOR_INPUTS, 1);
+  64:mpc_inc.c     **** 	mtx_add(w, u, nu_du, MPC_HOR_INPUTS, 1);
+  65:mpc_inc.c     **** 	memcpy(u_old, u, sizeof_u);
+  66:mpc_inc.c     **** 
+  67:mpc_inc.c     **** 	return;
+  68:mpc_inc.c     **** }
+  69:mpc_inc.c     **** 
+  70:mpc_inc.c     **** /* Compute gradient divided by Lipschitz constant */
+  71:mpc_inc.c     **** void inc_fgm_compute_grad_over_L(const struct mpc_fgm *fgm, real_t gradoL[],
+  72:mpc_inc.c     **** 								const real_t w[]) {
+  73:mpc_inc.c     **** 	real_t HoL_w[MPC_HOR_INPUTS];
+  74:mpc_inc.c     **** 	/* gradoL = (H/L) * w + (G/L) * x */
+  75:mpc_inc.c     **** 	mtx_multiply_mtx_vec(HoL_w, fgm->HoL, w, MPC_HOR_INPUTS, MPC_HOR_INPUTS);
+  76:mpc_inc.c     **** 	mtx_add(gradoL, HoL_w, fgm->gxoL, MPC_HOR_INPUTS, 1);
+  77:mpc_inc.c     **** 
+  78:mpc_inc.c     **** 	return;
+  79:mpc_inc.c     **** }
+  80:mpc_inc.c     **** 
+  81:mpc_inc.c     **** /* compute gradient vector, referenced to the origin, for the current state */
+  82:mpc_inc.c     **** void inc_compute_gxoL(struct mpc_fgm *fgm, const real_t x[]) {
+  83:mpc_inc.c     **** 	mtx_multiply_mtx_vec(fgm->gxoL, fgm->GoL, x, MPC_HOR_INPUTS, MPC_STATES);
+  84:mpc_inc.c     **** 	return;
+  85:mpc_inc.c     **** }
+  86:mpc_inc.c     **** 
+  87:mpc_inc.c     **** /* Copy the contents of the input vector, except for the first element, to the
+  88:mpc_inc.c     ****  * output vector. The last element of the output vector is equal to the zero.
+  89:mpc_inc.c     ****  */
+  90:mpc_inc.c     **** void mpc_warmstart_vector(struct mpc_fgm *fgm, real_t outvec[], const real_t vec[],
+  91:mpc_inc.c     **** 		const uint32_t unit_size, const uint32_t hor)
+  92:mpc_inc.c     **** {
+  16              	 Function supports interworking.
+  17              		@ args = 4, pretend = 0, frame = 0
+  18              		@ frame_needed = 0, uses_anonymous_args = 0
+  19              	.LVL0:
+  20              		stmfd	sp!, {r4, r5, r6, lr}
+  21 0000 70402DE9 	.LCFI0:
+  22              		.loc 1 92 0
+  23              		ldr	r4, [sp, #16]
+  24 0004 10409DE5 		mov	lr, r3
+  25 0008 03E0A0E1 		.loc 1 95 0
+  93:mpc_inc.c     ****  const uint32_t hor)
+  94:mpc_inc.c     **** {
+  95:mpc_inc.c     **** 	uint32_t i;
+  26              	4, #1
+  27 000c 013044E2 	.LVL1:
+  28              		muls	r3, lr, r3
+  29 0010 9E0313E0 	.LVL2:
+  30              		beq	.L2
+  31 0014 0700000A 	.LVL3:
+  32              		add	r2, r2, lr, asl #3
+  33 0018 8E2182E0 	.LVL4:
+  34              		mov	r0, #0
+  35 001c 0000A0E3 	.LVL5:
+  36              		mov	ip, r1
+  37 0020 01C0A0E1 	.LVL6:
+  38              	.L4:
+  39              		add	r0, r0, #1
+  40 0024 010080E2 		.loc 1 96 0
+  96:mpc_inc.c     **** t hor)
+  41              	-r6}
+  42 0028 6000B2E8 		.loc 1 95 0
+  43              		cmp	r0, r3
+  44 002c 030050E1 		.loc 1 96 0
+  45              		stmia	ip!, {r5-r6}
+  46 0030 6000ACE8 		.loc 1 95 0
+  47              		bne	.L4
+  48 0034 FAFFFF1A 	.LVL7:
+  49              	.L2:
+  50              		.loc 1 100 0
+  97:mpc_inc.c     **** ze, const uint32_t hor)
+  98:mpc_inc.c     **** {
+  99:mpc_inc.c     **** 	uint32_t i;
+ 100:mpc_inc.c     **** 	/* shift input vector one horizon step backwards */
+  51              	r, r4
+  52 0038 9E0402E0 	.LVL8:
+  53              		cmp	r3, r2
+  54 003c 020053E1 		bcs	.L8
+  55 0040 0800002A 		rsb	r0, r3, r2
+  56 0044 020063E0 	.LVL9:
+  57              		add	r1, r1, r3, asl #3
+  58 0048 831181E0 	.LVL10:
+  59              		mov	r2, #0
+  60 004c 0020A0E3 	.L7:
+  61              		.loc 1 101 0
+ 101:mpc_inc.c     **** on step backwards */
+  62              	, #1
+  63 0050 012082E2 		mov	r3, #0
+  64 0054 0030A0E3 	.LVL11:
+  65              		mov	r4, #0
+  66 0058 0040A0E3 	.LVL12:
+  67              		.loc 1 100 0
+  68              		cmp	r2, r0
+  69 005c 000052E1 		.loc 1 101 0
+  70              		stmia	r1!, {r3-r4}
+  71 0060 1800A1E8 		.loc 1 100 0
+  72              		bne	.L7
+  73 0064 F9FFFF1A 	.LVL13:
+  74              	.L8:
+  75              		.loc 1 104 0
+ 102:mpc_inc.c     **** on step backwards */
+ 103:mpc_inc.c     **** 	for (i=0; i < (hor - 1) * unit_size; i++) {
+ 104:mpc_inc.c     **** 		outvec[i] = vec[i + unit_size];
+  76              	4, r5, r6, lr}
+  77 0068 7040BDE8 		bx	lr
+  78 006c 1EFF2FE1 	.LFE9:
+  80              		.align	2
+  81              		.global	inc_ctl_warmstart
+  83              	inc_ctl_warmstart:
+  84              	.LFB4:
+  85              		.loc 1 30 0
+  86              		@ Function supports interworking.
+  87              		@ args = 0, pretend = 0, frame = 0
+  88              		@ frame_needed = 0, uses_anonymous_args = 0
+  89              	.LVL14:
+  90              		str	lr, [sp, #-4]!
+  91 0070 04E02DE5 	.LCFI1:
+  92              		.loc 1 31 0
+  93              		ldr	r3, [r0, #20]
+  94 0074 143090E5 		ldr	ip, [r3, #0]
+  95 0078 00C093E5 		ldr	r2, [r0, #24]
+  96 007c 182090E5 		ldr	r1, [ip, #0]
+  97 0080 00109CE5 		.loc 1 30 0
+  98              		sub	sp, sp, #4
+  99 0084 04D04DE2 	.LCFI2:
+ 100              		.loc 1 31 0
+ 101              		mov	r0, ip
+ 102 0088 0C00A0E1 	.LVL15:
+ 103              		mov	r3, #3
+ 104 008c 0330A0E3 		mov	ip, #19
+ 105 0090 13C0A0E3 		str	ip, [sp, #0]
+ 106 0094 00C08DE5 		bl	mpc_warmstart_vector
+ 107 0098 FEFFFFEB 		.loc 1 32 0
+ 108              		add	sp, sp, #4
+ 109 009c 04D08DE2 		ldr	lr, [sp], #4
+ 110 00a0 04E09DE4 		bx	lr
+ 111 00a4 1EFF2FE1 	.LFE4:
+ 113              		.align	2
+ 114              		.global	inc_compute_gxoL
+ 116              	inc_compute_gxoL:
+ 117              	.LFB8:
+ 118              		.loc 1 82 0
+ 119              		@ Function supports interworking.
+ 120              		@ args = 0, pretend = 0, frame = 0
+ 121              		@ frame_needed = 0, uses_anonymous_args = 0
+ 122              	.LVL16:
+ 123              		str	lr, [sp, #-4]!
+ 124 00a8 04E02DE5 	.LCFI3:
+ 125              		.loc 1 83 0
+ 126              		ldr	r3, [r0, #20]
+ 127 00ac 143090E5 		.loc 1 82 0
+ 128              		sub	sp, sp, #4
+ 129 00b0 04D04DE2 	.LCFI4:
+ 130              		.loc 1 83 0
+ 131              		ldr	r0, [r0, #4]
+ 132 00b4 040090E5 	.LVL17:
+ 133              		.loc 1 82 0
+ 134              		mov	r2, r1
+ 135 00b8 0120A0E1 		.loc 1 83 0
+ 136              		mov	ip, #8
+ 137 00bc 08C0A0E3 		mov	r1, r3
+ 138 00c0 0310A0E1 	.LVL18:
+ 139              		mov	r3, #57
+ 140 00c4 3930A0E3 		str	ip, [sp, #0]
+ 141 00c8 00C08DE5 		bl	mtx_multiply_mtx_vec
+ 142 00cc FEFFFFEB 	.LVL19:
+ 143              		.loc 1 85 0
+ 144              		add	sp, sp, #4
+ 145 00d0 04D08DE2 		ldr	lr, [sp], #4
+ 146 00d4 04E09DE4 		bx	lr
+ 147 00d8 1EFF2FE1 	.LFE8:
+ 149              		.align	2
+ 150              		.global	inc_ctl_form_qp
+ 152              	inc_ctl_form_qp:
+ 153              	.LFB3:
+ 154              		.loc 1 24 0
+ 155              		@ Function supports interworking.
+ 156              		@ args = 0, pretend = 0, frame = 0
+ 157              		@ frame_needed = 0, uses_anonymous_args = 0
+ 158              		@ link register save eliminated.
+ 159              	.LVL20:
+ 160              		.loc 1 25 0
+ 161              		ldr	r3, [r0, #20]
+ 162 00dc 143090E5 		ldr	r0, [r3, #0]
+ 163 00e0 000093E5 	.LVL21:
+ 164              		.loc 1 24 0
+ 165              		@ lr needed for prologue
+ 166              		.loc 1 27 0
+ 167              		.loc 1 25 0
+ 168              		b	inc_compute_gxoL
+ 169 00e4 FEFFFFEA 	.LVL22:
+ 170              	.LFE3:
+ 172              		.align	2
+ 173              		.global	inc_fgm_compute_grad_over_L
+ 175              	inc_fgm_compute_grad_over_L:
+ 176              	.LFB7:
+ 177              		.loc 1 72 0
+ 178              		@ Function supports interworking.
+ 179              		@ args = 0, pretend = 0, frame = 456
+ 180              		@ frame_needed = 0, uses_anonymous_args = 0
+ 181              	.LVL23:
+ 182              		stmfd	sp!, {r4, r5, r6, r7, lr}
+ 183 00e8 F0402DE9 	.LCFI5:
+ 184              		.loc 1 75 0
+ 185              		ldr	r3, [r0, #16]
+ 186 00ec 103090E5 		.loc 1 72 0
+ 187              		sub	sp, sp, #460
+ 188 00f0 73DF4DE2 	.LCFI6:
+ 189              		.loc 1 75 0
+ 190              		mov	r4, #57
+ 191 00f4 3940A0E3 		add	r5, sp, #4
+ 192 00f8 04508DE2 		.loc 1 72 0
+ 193              		mov	r6, r0
+ 194 00fc 0060A0E1 		mov	r7, r1
+ 195 0100 0170A0E1 		.loc 1 75 0
+ 196              		mov	r0, r5
+ 197 0104 0500A0E1 	.LVL24:
+ 198              		mov	r1, r3
+ 199 0108 0310A0E1 	.LVL25:
+ 200              		mov	r3, r4
+ 201 010c 0430A0E1 		str	r4, [sp, #0]
+ 202 0110 00408DE5 		bl	mtx_multiply_mtx_vec
+ 203 0114 FEFFFFEB 	.LVL26:
+ 204              		.loc 1 76 0
+ 205              		ldr	r2, [r6, #4]
+ 206 0118 042096E5 		mov	ip, #1
+ 207 011c 01C0A0E3 		mov	r0, r7
+ 208 0120 0700A0E1 		mov	r1, r5
+ 209 0124 0510A0E1 		mov	r3, r4
+ 210 0128 0430A0E1 		str	ip, [sp, #0]
+ 211 012c 00C08DE5 		bl	mtx_add
+ 212 0130 FEFFFFEB 		.loc 1 79 0
+ 213              		add	sp, sp, #460
+ 214 0134 73DF8DE2 		ldmfd	sp!, {r4, r5, r6, r7, lr}
+ 215 0138 F040BDE8 		bx	lr
+ 216 013c 1EFF2FE1 	.LFE7:
+ 218              		.align	2
+ 219              		.global	inc_fgm_minimize_qp_iteration
+ 221              	inc_fgm_minimize_qp_iteration:
+ 222              	.LFB6:
+ 223              		.loc 1 56 0
+ 224              		@ Function supports interworking.
+ 225              		@ args = 4, pretend = 0, frame = 0
+ 226              		@ frame_needed = 0, uses_anonymous_args = 0
+ 227              	.LVL27:
+ 228              		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
+ 229 0140 F0472DE9 	.LCFI7:
+ 230              		mov	r7, r1
+ 231 0144 0170A0E1 		sub	sp, sp, #8
+ 232 0148 08D04DE2 	.LCFI8:
+ 233              		.loc 1 56 0
+ 234              		mov	r4, r0
+ 235 014c 0040A0E1 	.LBB4:
+ 236              	.LBB5:
+ 237              		.loc 1 111 0
+ 105:mpc_inc.c     **** ec[i + unit_size];
+ 106:mpc_inc.c     **** 	}
+ 107:mpc_inc.c     **** 
+ 108:mpc_inc.c     **** 	/* zero the las element */
+ 109:mpc_inc.c     **** 	for (i=(hor -1) * unit_size; i < hor * unit_size; i++) {
+ 110:mpc_inc.c     **** 		outvec[i] = 0.;
+ 111:mpc_inc.c     **** 	}
+ 238              	 0
+ 239 0150 0160A0E3 		ldr	r8, .L22
+ 240              	.LBB8:
+ 241              	.LBB9:
+ 242              		.loc 1 111 0
+ 243 0154 0290A0E1 		mov	r0, r7
+ 244 0158 03A0A0E1 	.LVL30:
+ 245              		mov	r3, #57
+ 246              	.LVL31:
+ 247              		str	r6, [sp, #0]
+ 248 015c 0310A0E1 		bl	mtx_substract
+ 249              	.LVL32:
+ 250 0160 28209DE5 		.loc 1 112 0
+ 251              		mov	r0, r7
+ 252              		add	r1, r4, #28
+ 253              		ldmia	r1, {r1, r2}	@ phole ldm
+ 254              		mov	r3, #57
+ 255 0164 8C809FE5 		bl	mtx_saturate_vec
+ 256              	.LBE9:
+ 257              	.LBE8:
+ 258              		.loc 1 62 0
+ 259 0168 0700A0E1 		mov	r0, r8
+ 260              		mov	r1, r7
+ 261 016c 3930A0E3 		mov	r2, r9
+ 262              		mov	r3, #57
+ 263 0170 00608DE5 		.loc 1 63 0
+ 264 0174 FEFFFFEB 		ldr	r5, .L22+4
+ 265              		.loc 1 62 0
+ 112:mpc_inc.c     **** [i] = 0.;
+ 266              	bstract
+ 267 0178 0700A0E1 		.loc 1 63 0
+ 268 017c 1C1084E2 		ldr	r1, [r4, #36]
+ 269 0180 060091E8 		mov	r0, r5
+ 270 0184 3930A0E3 		ldmia	r1, {r2-r3}
+ 271 0188 FEFFFFEB 		mov	r4, #57
+ 272              	.LVL33:
+ 273              		mov	r1, r8
+ 274              		stmia	sp, {r4, r6}	@ phole stm
+ 275 018c 0800A0E1 		bl	mtx_scale
+ 276 0190 0710A0E1 		.loc 1 64 0
+ 277 0194 0920A0E1 		mov	r2, r5
+ 278 0198 3930A0E3 		mov	r0, sl
+ 279              		mov	r1, r7
+ 280 019c 58509FE5 		mov	r3, r4
+ 281              		str	r6, [sp, #0]
+ 282 01a0 00608DE5 		bl	mtx_add
+ 283 01a4 FEFFFFEB 		.loc 1 65 0
+ 284              		mov	r0, r9
+ 285 01a8 241094E5 		mov	r1, r7
+ 286 01ac 0500A0E1 		mov	r2, #456
+ 287 01b0 0C0091E8 		bl	memcpy
+ 288 01b4 3940A0E3 		.loc 1 68 0
+ 289              		add	sp, sp, #8
+ 290 01b8 0810A0E1 		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
+ 291 01bc 50008DE8 		bx	lr
+ 292 01c0 FEFFFFEB 	.L23:
+ 293              		.align	2
+ 294 01c4 0520A0E1 	.L22:
+ 295 01c8 0A00A0E1 		.word	du.1752
+ 296 01cc 0710A0E1 		.word	nu_du.1753
+ 297 01d0 0430A0E1 	.LFE6:
+ 299 01d8 FEFFFFEB 		.align	2
+ 300              		.global	inc_fgm_minimize_qp
+ 302 01e0 0710A0E1 	inc_fgm_minimize_qp:
+ 303 01e4 722FA0E3 	.LFB5:
+ 304 01e8 FEFFFFEB 		.loc 1 35 0
+ 305              		@ Function supports interworking.
+ 306 01ec 08D08DE2 		@ args = 0, pretend = 0, frame = 0
+ 307 01f0 F047BDE8 		@ frame_needed = 0, uses_anonymous_args = 0
+ 308 01f4 1EFF2FE1 	.LVL34:
+ 309              		stmfd	sp!, {r4, r5, r6, r7, lr}
+ 310              	.LCFI9:
+ 311              		mov	r6, r1
+ 312 01f8 C8010000 		sub	sp, sp, #4
+ 313 01fc 00000000 	.LCFI10:
+ 314              		.loc 1 42 0
+ 315              		ldr	r1, [r0, #0]
+ 316              	.LVL35:
+ 317              		.loc 1 35 0
+ 318              		mov	r4, r0
+ 319              		.loc 1 42 0
+ 320              		mov	r2, #456
+ 321              		mov	r0, r6
+ 322              	.LVL36:
+ 323              		bl	memcpy
+ 324              		.loc 1 43 0
+ 325              		mov	r1, r6
+ 326 0200 F0402DE9 		mov	r2, #456
+ 327              		ldr	r0, .L30
+ 328 0204 0160A0E1 		bl	memcpy
+ 329 0208 04D04DE2 		.loc 1 44 0
+ 330              		mov	r2, #456
+ 331              		ldr	r0, .L30+4
+ 332 020c 001090E5 		mov	r1, r6
+ 333              		bl	memcpy
+ 334              		.loc 1 46 0
+ 335 0210 0040A0E1 		ldr	r3, [r4, #12]
+ 336              		ldr	r2, [r3, #0]
+ 337 0214 722FA0E3 		cmp	r2, #0
+ 338 0218 0600A0E1 		beq	.L28
+ 339              		ldr	r7, .L30+8
+ 340 021c FEFFFFEB 		mov	r5, #0
+ 341              	.LVL37:
+ 342 0220 0610A0E1 	.L27:
+ 343 0224 722FA0E3 		.loc 1 47 0
+ 344 0228 70009FE5 		mov	r0, r4
+ 345 022c FEFFFFEB 		ldr	r1, .L30+8
+ 346              		ldr	r2, .L30
+ 347 0230 722FA0E3 		bl	inc_fgm_compute_grad_over_L
+ 348 0234 68009FE5 		.loc 1 48 0
+ 349 0238 0610A0E1 		ldr	r2, .L30+4
+ 350 023c FEFFFFEB 		ldr	r3, .L30
+ 351              		mov	r0, r4
+ 352 0240 0C3094E5 		mov	r1, r6
+ 353 0244 002093E5 		str	r7, [sp, #0]
+ 354 0248 000052E3 		bl	inc_fgm_minimize_qp_iteration
+ 355 024c 1000000A 		.loc 1 46 0
+ 356 0250 50709FE5 		ldr	r3, [r4, #12]
+ 357 0254 0050A0E3 		ldr	r2, [r3, #0]
+ 358              		add	r5, r5, #1
+ 359              		cmp	r2, r5
+ 360              		bhi	.L27
+ 361 0258 0400A0E1 	.L28:
+ 362 025c 44109FE5 		.loc 1 52 0
+ 363 0260 38209FE5 		add	sp, sp, #4
+ 364 0264 FEFFFFEB 		ldmfd	sp!, {r4, r5, r6, r7, lr}
+ 365              		bx	lr
+ 366 0268 34209FE5 	.L31:
+ 367 026c 2C309FE5 		.align	2
+ 368 0270 0400A0E1 	.L30:
+ 369 0274 0610A0E1 		.word	w.1735
+ 370 0278 00708DE5 		.word	u_old.1734
+ 371 027c FEFFFFEB 		.word	gradoL.1736
+ 372              	.LFE5:
+ 374 0284 002093E5 		.align	2
+ 375 0288 015085E2 		.global	inc_ctl_solve_problem
+ 377 0290 F0FFFF8A 	inc_ctl_solve_problem:
+ 378              	.LFB2:
+ 379              		.loc 1 17 0
+ 380 0294 04D08DE2 		@ Function supports interworking.
+ 381 0298 F040BDE8 		@ args = 0, pretend = 0, frame = 0
+ 382 029c 1EFF2FE1 		@ frame_needed = 0, uses_anonymous_args = 0
+ 383              	.LVL38:
+ 384              		stmfd	sp!, {r4, lr}
+ 385              	.LCFI11:
+ 386 02a0 58050000 		.loc 1 17 0
+ 387 02a4 20070000 		mov	r4, r0
+ 388 02a8 90030000 		.loc 1 18 0
+ 389              		bl	inc_ctl_form_qp
+ 390              	.LVL39:
+ 391              		.loc 1 19 0
+ 392              		ldr	r3, [r4, #20]
+ 393              		ldr	r1, [r4, #24]
+ 394              		ldr	r0, [r3, #0]
+ 395              		.loc 1 21 0
+ 396              		ldmfd	sp!, {r4, lr}
+ 397              		.loc 1 19 0
+ 398              		b	inc_fgm_minimize_qp
+ 399              	.LFE2:
+ 401 02ac 10402DE9 		.bss
+ 402              		.align	2
+ 403              	nu_du.1753:
+ 404 02b0 0040A0E1 		.space	456
+ 405              		.align	2
+ 406 02b4 FEFFFFEB 	du.1752:
+ 407              		.space	456
+ 408              		.align	2
+ 409 02b8 143094E5 	gradoL.1736:
+ 410 02bc 181094E5 		.space	456
+ 411 02c0 000093E5 		.align	2
+ 412              	w.1735:
+ 413 02c4 1040BDE8 		.space	456
+ 414              		.align	2
+ 415 02c8 FEFFFFEA 	u_old.1734:
+ 416              		.space	456
+ 417              		.section	.debug_frame,"",%progbits
+ 418              	.Lframe0:
+ 419              		.4byte	.LECIE0-.LSCIE0
+ 420              	.LSCIE0:
+ 421 0000 00000000 		.4byte	0xffffffff
+ 421      00000000 
+ 421      00000000 
+ 421      00000000 
+ 421      00000000 
+ 422              		.byte	0x1
+ 423              		.ascii	"\000"
+ 424 01c8 00000000 		.uleb128 0x1
+ 424      00000000 
+ 424      00000000 
+ 424      00000000 
+ 424      00000000 
+ 425              		.sleb128 -4
+ 426              		.byte	0xe
+ 427 0390 00000000 		.byte	0xc
+ 427      00000000 
+ 427      00000000 
+ 427      00000000 
+ 427      00000000 
+ 428              		.uleb128 0xd
+ 429              		.uleb128 0x0
+ 430 0558 00000000 		.align	2
+ 430      00000000 
+ 430      00000000 
+ 430      00000000 
+ 430      00000000 
+ 431              	.LECIE0:
+ 432              	.LSFDE0:
+ 433 0720 00000000 		.4byte	.LEFDE0-.LASFDE0
+ 433      00000000 
+ 433      00000000 
+ 433      00000000 
+ 433      00000000 
+ 618              		.4byte	.LVL5-.Ltext0
+DEFINED SYMBOLS
+                            *ABS*:00000000 mpc_inc.c
+C:\Users\XY\AppData\Local\Temp/ccELaaaa.s:13     .text:00000000 mpc_warmstart_vector
+C:\Users\XY\AppData\Local\Temp/ccELaaaa.s:21     .text:00000000 $a
+C:\Users\XY\AppData\Local\Temp/ccELaaaa.s:84     .text:00000070 inc_ctl_warmstart
+C:\Users\XY\AppData\Local\Temp/ccELaaaa.s:117    .text:000000a8 inc_compute_gxoL
+C:\Users\XY\AppData\Local\Temp/ccELaaaa.s:153    .text:000000dc inc_ctl_form_qp
+C:\Users\XY\AppData\Local\Temp/ccELaaaa.s:176    .text:000000e8 inc_fgm_compute_grad_over_L
+C:\Users\XY\AppData\Local\Temp/ccELaaaa.s:222    .text:00000140 inc_fgm_minimize_qp_iteration
+C:\Users\XY\AppData\Local\Temp/ccELaaaa.s:312    .text:000001f8 $d
+C:\Users\XY\AppData\Local\Temp/ccELaaaa.s:423    .bss:000001c8 du.1752
+C:\Users\XY\AppData\Local\Temp/ccELaaaa.s:420    .bss:00000000 nu_du.1753
+C:\Users\XY\AppData\Local\Temp/ccELaaaa.s:319    .text:00000200 inc_fgm_minimize_qp
+C:\Users\XY\AppData\Local\Temp/ccELaaaa.s:326    .text:00000200 $a
+C:\Users\XY\AppData\Local\Temp/ccELaaaa.s:386    .text:000002a0 $d
+C:\Users\XY\AppData\Local\Temp/ccELaaaa.s:429    .bss:00000558 w.1735
+C:\Users\XY\AppData\Local\Temp/ccELaaaa.s:432    .bss:00000720 u_old.1734
+C:\Users\XY\AppData\Local\Temp/ccELaaaa.s:426    .bss:00000390 gradoL.1736
+C:\Users\XY\AppData\Local\Temp/ccELaaaa.s:394    .text:000002ac inc_ctl_solve_problem
+C:\Users\XY\AppData\Local\Temp/ccELaaaa.s:401    .text:000002ac $a
+                             .bss:00000000 $d
+
+UNDEFINED SYMBOLS
+mtx_multiply_mtx_vec
+mtx_add
+mtx_substract
+mtx_saturate_vec
+mtx_scale
+memcpy

@@ -1,0 +1,233 @@
+   1              		.file	"fip_ops.c"
+   9              	.Ltext0:
+  10              		.global	__floatsisf
+  11              		.global	__mulsf3
+  12              		.global	__addsf3
+  13              		.align	2
+  14              		.global	fip_fip2real
+  16              	fip_fip2real:
+  17              	.LFB2:
+  18              		.file 1 "fip_ops.c"
+   1:fip_ops.c     **** #include "fip_ops.h"
+   2:fip_ops.c     **** #include "mpc_base.h"
+   3:fip_ops.c     **** 
+   4:fip_ops.c     **** #ifndef FRAC_BITS  /* defined (or not) in mpc_base.h */
+   5:fip_ops.c     **** #define FRAC_BITS 1  /* allows compilation */
+   6:fip_ops.c     **** #endif
+   7:fip_ops.c     **** 
+   8:fip_ops.c     **** enum {
+   9:fip_ops.c     **** 	BITS_IN_BYTE = 8,
+  10:fip_ops.c     **** 	ARCH_BITS = sizeof(float32_t) * BITS_IN_BYTE
+  11:fip_ops.c     **** };
+  12:fip_ops.c     **** const int32_t FILTER = (0xffffffff >> (ARCH_BITS - FRAC_BITS));
+  13:fip_ops.c     **** 
+  14:fip_ops.c     **** float32_t fip_fip2real(int32_t a)
+  15:fip_ops.c     **** {
+  19              	nction supports interworking.
+  20              		@ args = 0, pretend = 0, frame = 0
+  21              		@ frame_needed = 0, uses_anonymous_args = 0
+  22              	.LVL0:
+  23              		stmfd	sp!, {r4, r5, lr}
+  24 0000 30402DE9 	.LCFI0:
+  25              		.loc 1 15 0
+  26              		mov	r4, r0
+  27 0004 0040A0E1 		and	r0, r0, #1
+  28 0008 010000E2 	.LVL1:
+  29              		bl	__floatsisf
+  30 000c FEFFFFEB 		mov	r1, #1056964608
+  31 0010 3F14A0E3 		bl	__mulsf3
+  32 0014 FEFFFFEB 		mov	r5, r0
+  33 0018 0050A0E1 		mov	r0, r4, asr #1
+  34 001c C400A0E1 		bl	__floatsisf
+  35 0020 FEFFFFEB 		mov	r1, r0
+  36 0024 0010A0E1 		mov	r0, r5
+  37 0028 0500A0E1 		bl	__addsf3
+  38 002c FEFFFFEB 		.loc 1 20 0
+  16:fip_ops.c     **** ));
+  17:fip_ops.c     **** 
+  18:fip_ops.c     **** float32_t fip_fip2real(int32_t a)
+  19:fip_ops.c     **** {
+  20:fip_ops.c     **** 	const float32_t factor = (float32_t) (1 << FRAC_BITS);
+  39              	 lr}
+  40 0030 3040BDE8 		bx	lr
+  41 0034 1EFF2FE1 	.LFE2:
+  43              		.global	__fixsfsi
+  44              		.global	__subsf3
+  45              		.align	2
+  46              		.global	fip_real2fip
+  48              	fip_real2fip:
+  49              	.LFB3:
+  50              		.loc 1 23 0
+  21:fip_ops.c     ****  factor = (float32_t) (1 << FRAC_BITS);
+  22:fip_ops.c     **** 	int32_t ci = a >> FRAC_BITS;
+  23:fip_ops.c     **** 	float32_t cd = (float32_t) (a & FILTER) / factor;
+  51              	supports interworking.
+  52              		@ args = 0, pretend = 0, frame = 0
+  53              		@ frame_needed = 0, uses_anonymous_args = 0
+  54              	.LVL2:
+  55              		stmfd	sp!, {r4, r5, lr}
+  56 0038 30402DE9 	.LCFI1:
+  57              		.loc 1 23 0
+  58              		mov	r4, r0
+  59 003c 0040A0E1 		.loc 1 25 0
+  24:fip_ops.c     ****  = (float32_t) (a & FILTER) / factor;
+  25:fip_ops.c     **** 	return ci + cd;
+  60              	sfsi
+  61 0040 FEFFFFEB 	.LVL3:
+  62              		mov	r5, r0
+  63 0044 0050A0E1 		bl	__floatsisf
+  64 0048 FEFFFFEB 		mov	r1, r0
+  65 004c 0010A0E1 		mov	r0, r4
+  66 0050 0400A0E1 		bl	__subsf3
+  67 0054 FEFFFFEB 		mov	r1, r0
+  68 0058 0010A0E1 		bl	__addsf3
+  69 005c FEFFFFEB 		bl	__fixsfsi
+  70 0060 FEFFFFEB 		.loc 1 28 0
+  26:fip_ops.c     **** & FILTER) / factor;
+  27:fip_ops.c     **** 	return ci + cd;
+  28:fip_ops.c     **** }
+  71              	, r5, asl #1
+  72 0064 850080E0 		ldmfd	sp!, {r4, r5, lr}
+  73 0068 3040BDE8 		bx	lr
+  74 006c 1EFF2FE1 	.LFE3:
+  76              		.align	2
+  77              		.global	fip_mul
+  79              	fip_mul:
+  80              	.LFB4:
+  81              		.loc 1 31 0
+  29:fip_ops.c     **** ILTER) / factor;
+  30:fip_ops.c     **** 	return ci + cd;
+  31:fip_ops.c     **** }
+  82              	 supports interworking.
+  83              		@ args = 0, pretend = 0, frame = 0
+  84              		@ frame_needed = 0, uses_anonymous_args = 0
+  85              		@ link register save eliminated.
+  86              	.LVL4:
+  87              		str	r4, [sp, #-4]!
+  88 0070 04402DE5 	.LCFI2:
+  89              		smull	r3, r4, r0, r1
+  90 0074 9031C4E0 		movs	r1, r4, asr #1
+  91 0078 C410B0E1 		mov	r0, r3, rrx
+  92 007c 6300A0E1 	.LVL5:
+  93              		@ lr needed for prologue
+  94              		.loc 1 35 0
+  32:fip_ops.c     **** ILTER) / factor;
+  33:fip_ops.c     **** 	return ci + cd;
+  34:fip_ops.c     **** }
+  35:fip_ops.c     **** 
+  95              	r4}
+  96 0080 1000BDE8 		bx	lr
+  97 0084 1EFF2FE1 	.LFE4:
+  99              		.align	2
+ 100              		.global	fip_add
+ 102              	fip_add:
+ 103              	.LFB5:
+ 104              		.loc 1 38 0
+  36:fip_ops.c     **** TER) / factor;
+  37:fip_ops.c     **** 	return ci + cd;
+  38:fip_ops.c     **** }
+ 105              	n supports interworking.
+ 106              		@ args = 0, pretend = 0, frame = 0
+ 107              		@ frame_needed = 0, uses_anonymous_args = 0
+ 108              		@ link register save eliminated.
+ 109              	.LVL6:
+ 110              		.loc 1 40 0
+  39:fip_ops.c     **** ILTER) / factor;
+  40:fip_ops.c     **** 	return ci + cd;
+ 111              	0, r0, r1
+ 112 0088 010080E0 	.LVL7:
+ 113              		.loc 1 38 0
+ 114              		@ lr needed for prologue
+ 115              		.loc 1 40 0
+ 116              		bx	lr
+ 117 008c 1EFF2FE1 	.LFE5:
+ 119              		.align	2
+ 120              		.global	fip_sub
+ 122              	fip_sub:
+ 123              	.LFB6:
+ 124              		.loc 1 43 0
+  41:fip_ops.c     **** & FILTER) / factor;
+  42:fip_ops.c     **** 	return ci + cd;
+  43:fip_ops.c     **** }
+ 125              	pports interworking.
+ 126              		@ args = 0, pretend = 0, frame = 0
+ 127              		@ frame_needed = 0, uses_anonymous_args = 0
+ 128              		@ link register save eliminated.
+ 129              	.LVL8:
+ 130              		.loc 1 45 0
+  44:fip_ops.c     **** ILTER) / factor;
+  45:fip_ops.c     **** 	return ci + cd;
+ 131              	0, r1, r0
+ 132 0090 000061E0 	.LVL9:
+ 133              		.loc 1 43 0
+ 134              		@ lr needed for prologue
+ 135              		.loc 1 45 0
+ 136              		bx	lr
+ 137 0094 1EFF2FE1 	.LFE6:
+ 139              		.global	__divdi3
+ 140              		.align	2
+ 141              		.global	fip_div
+ 143              	fip_div:
+ 144              	.LFB7:
+ 145              		.loc 1 48 0
+  46:fip_ops.c     **** & FILTER) / factor;
+  47:fip_ops.c     **** 	return ci + cd;
+  48:fip_ops.c     **** }
+ 146              	ports interworking.
+ 147              		@ args = 0, pretend = 0, frame = 0
+ 148              		@ frame_needed = 0, uses_anonymous_args = 0
+ 149              	.LVL10:
+ 150              		stmfd	sp!, {r4, r5, lr}
+ 151 0098 30402DE9 	.LCFI3:
+ 152              		.loc 1 48 0
+ 153              		mov	r4, r0
+ 154 009c 0040A0E1 		mov	r5, r4, asr #31
+ 155 00a0 C45FA0E1 		mov	r5, r4
+ 156 00a4 0450A0E1 	.LVL11:
+ 157              		mov	r4, #0
+ 158 00a8 0040A0E3 		mov	r2, r1
+ 159 00ac 0120A0E1 		mov	r3, r2, asr #31
+ 160 00b0 C23FA0E1 		mov	r0, r4
+ 161 00b4 0400A0E1 		mov	r1, r5
+ 162 00b8 0510A0E1 	.LVL12:
+ 163              		bl	__divdi3
+ 164 00bc FEFFFFEB 	.LVL13:
+ 165              		mov	r0, r0, lsr #31
+ 166 00c0 A00FA0E1 		orr	r0, r0, r1, asl #1
+ 167 00c4 810080E1 		.loc 1 55 0
+  49:fip_ops.c     **** ILTER) / factor;
+  50:fip_ops.c     **** 	return ci + cd;
+  51:fip_ops.c     **** }
+  52:fip_ops.c     **** 
+  53:fip_ops.c     **** int32_t fip_real2fip(float32_t a)
+  54:fip_ops.c     **** {
+  55:fip_ops.c     **** 	const float32_t factor = (float32_t) (1 << FRAC_BITS);
+ 168              	r}
+ 169 00c8 3040BDE8 		bx	lr
+ 170 00cc 1EFF2FE1 	.LFE7:
+ 172              		.global	FILTER
+ 173              		.section	.rodata
+ 174              		.align	2
+ 177              	FILTER:
+ 178              		.word	1
+ 179 0000 01000000 		.section	.debug_frame,"",%progbits
+ 282              		.section	.debug_loc,"",%progbits
+DEFINED SYMBOLS
+                            *ABS*:00000000 fip_ops.c
+C:\Users\XY\AppData\Local\Temp/ccgTbaaa.s:16     .text:00000000 fip_fip2real
+C:\Users\XY\AppData\Local\Temp/ccgTbaaa.s:24     .text:00000000 $a
+C:\Users\XY\AppData\Local\Temp/ccgTbaaa.s:49     .text:00000038 fip_real2fip
+C:\Users\XY\AppData\Local\Temp/ccgTbaaa.s:80     .text:00000070 fip_mul
+C:\Users\XY\AppData\Local\Temp/ccgTbaaa.s:103    .text:00000088 fip_add
+C:\Users\XY\AppData\Local\Temp/ccgTbaaa.s:123    .text:00000090 fip_sub
+C:\Users\XY\AppData\Local\Temp/ccgTbaaa.s:144    .text:00000098 fip_div
+C:\Users\XY\AppData\Local\Temp/ccgTbaaa.s:178    .rodata:00000000 FILTER
+C:\Users\XY\AppData\Local\Temp/ccgTbaaa.s:179    .rodata:00000000 $d
+
+UNDEFINED SYMBOLS
+__floatsisf
+__mulsf3
+__addsf3
+__fixsfsi
+__subsf3
+__divdi3

@@ -1,0 +1,72 @@
+   1              		.file	"firefly_mpc.c"
+   9              	.Ltext0:
+  10              		.align	2
+  11              		.global	firefly_mpc
+  13              	firefly_mpc:
+  14              	.LFB2:
+  15              		.file 1 "firefly_mpc.c"
+   1:firefly_mpc.c **** /*
+   2:firefly_mpc.c ****  * firefly_mpc.c
+   3:firefly_mpc.c ****  */
+   4:firefly_mpc.c **** 
+   5:firefly_mpc.c **** #include "mpc.h"
+   6:firefly_mpc.c **** 
+   7:firefly_mpc.c **** int firefly_mpc(void)
+   8:firefly_mpc.c **** {
+  16              	Function supports interworking.
+  17              		@ args = 0, pretend = 0, frame = 64
+  18              		@ frame_needed = 0, uses_anonymous_args = 0
+  19              		stmfd	sp!, {r4, lr}
+  20 0000 10402DE9 	.LCFI0:
+  21              		.loc 1 11 0
+   9:firefly_mpc.c **** real_t x[MPC_STATES]; /* current state of the system */
+  10:firefly_mpc.c **** extern struct mpc_ctl ctl; /* already defined */
+  11:firefly_mpc.c **** ctl.conf->in_iter = 10; /* number of iterations */
+  22              	0, .L3
+  23 0004 38009FE5 		ldr	r2, [r0, #0]
+  24 0008 002090E5 		.loc 1 8 0
+  25              		sub	sp, sp, #64
+  26 000c 40D04DE2 	.LCFI1:
+  27              		.loc 1 11 0
+  28              		mov	r3, #10
+  29 0010 0A30A0E3 		str	r3, [r2, #0]
+  30 0014 003082E5 		.loc 1 13 0
+  12:firefly_mpc.c **** /* The current state */
+  13:firefly_mpc.c **** x[0] = 0;
+  31              	#0
+  32 0018 0040A0E3 		mov	r3, #0
+  33 001c 0030A0E3 		.loc 1 16 0
+  14:firefly_mpc.c **** x[1] = 0;
+  15:firefly_mpc.c **** /* Solve MPC problem and print the first element of input sequence */
+  16:firefly_mpc.c **** mpc_ctl_solve_problem(&ctl, x); /* solve the MPC problem */
+  34              	v	r1, sp
+  35 0020 0D10A0E1 		.loc 1 14 0
+  36              		str	r3, [sp, #8]
+  37 0024 08308DE5 		str	r4, [sp, #12]
+  38 0028 0C408DE5 		.loc 1 13 0
+  39              		stmia	sp, {r3-r4}
+  40 002c 18008DE8 		.loc 1 16 0
+  41              		bl	mpc_ctl_solve_problem
+  42 0030 FEFFFFEB 		.loc 1 18 0
+  17:firefly_mpc.c **** return 0;
+  18:firefly_mpc.c **** }
+  43              	#0
+  44 0034 0000A0E3 		add	sp, sp, #64
+  45 0038 40D08DE2 		ldmfd	sp!, {r4, lr}
+  46 003c 1040BDE8 		bx	lr
+  47 0040 1EFF2FE1 	.L4:
+  48              		.align	2
+  49              	.L3:
+  50              		.word	ctl
+  51 0044 00000000 	.LFE2:
+  53              		.section	.debug_frame,"",%progbits
+  93              		.section	.debug_loc,"",%progbits
+DEFINED SYMBOLS
+                            *ABS*:00000000 firefly_mpc.c
+C:\Users\XY\AppData\Local\Temp/ccOSbaaa.s:13     .text:00000000 firefly_mpc
+C:\Users\XY\AppData\Local\Temp/ccOSbaaa.s:20     .text:00000000 $a
+C:\Users\XY\AppData\Local\Temp/ccOSbaaa.s:51     .text:00000044 $d
+
+UNDEFINED SYMBOLS
+mpc_ctl_solve_problem
+ctl

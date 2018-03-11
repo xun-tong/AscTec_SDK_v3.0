@@ -1,0 +1,2832 @@
+   1              		.code	16
+   2              		.file	"firefly_solver.c"
+  10              	.Ltext0:
+  11              		.align	2
+  12              		.global	load_default_data
+  13              		.code 16
+  14              		.thumb_func
+  16              	load_default_data:
+  17              	.LFB3:
+  18              		.file 1 "firefly_solver.c"
+   1:firefly_solver.c **** /* Produced by CVXGEN, 2018-02-26 09:21:35 -0500.  */
+   2:firefly_solver.c **** /* CVXGEN is Copyright (C) 2006-2017 Jacob Mattingley, jem@cvxgen.com. */
+   3:firefly_solver.c **** /* The code in this file is Copyright (C) 2006-2017 Jacob Mattingley. */
+   4:firefly_solver.c **** /* CVXGEN, or solvers produced by CVXGEN, cannot be used for commercial */
+   5:firefly_solver.c **** /* applications without prior written permission from Jacob Mattingley. */
+   6:firefly_solver.c **** 
+   7:firefly_solver.c **** /* Filename: testsolver.c. */
+   8:firefly_solver.c **** /* Description: Basic test harness for solver.c. */
+   9:firefly_solver.c **** #include "solver.h"
+  10:firefly_solver.c **** Vars vars;
+  11:firefly_solver.c **** Params params;
+  12:firefly_solver.c **** Workspace work;
+  13:firefly_solver.c **** Settings settings;
+  14:firefly_solver.c **** #define NUMTESTS 0
+  15:firefly_solver.c **** int init_solver(int argc, char **argv) {
+  16:firefly_solver.c ****   int num_iters;
+  17:firefly_solver.c **** #if (NUMTESTS > 0)
+  18:firefly_solver.c ****   int i;
+  19:firefly_solver.c ****   double time;
+  20:firefly_solver.c ****   double time_per;
+  21:firefly_solver.c **** #endif
+  22:firefly_solver.c ****   set_defaults();
+  23:firefly_solver.c ****   setup_indexing();
+  24:firefly_solver.c ****   load_default_data();
+  25:firefly_solver.c ****   /* Solve problem instance for the record. */
+  26:firefly_solver.c ****   settings.verbose = 1;
+  27:firefly_solver.c ****   num_iters = solve();
+  28:firefly_solver.c **** #ifndef ZERO_LIBRARY_MODE
+  29:firefly_solver.c **** #if (NUMTESTS > 0)
+  30:firefly_solver.c ****   /* Now solve multiple problem instances for timing purposes. */
+  31:firefly_solver.c ****   settings.verbose = 0;
+  32:firefly_solver.c ****   tic();
+  33:firefly_solver.c ****   for (i = 0; i < NUMTESTS; i++) {
+  34:firefly_solver.c ****     solve();
+  35:firefly_solver.c ****   }
+  36:firefly_solver.c ****   time = tocq();
+  37:firefly_solver.c ****   printf("Timed %d solves over %.3f seconds.\n", NUMTESTS, time);
+  38:firefly_solver.c ****   time_per = time / NUMTESTS;
+  39:firefly_solver.c ****   if (time_per > 1) {
+  40:firefly_solver.c ****     printf("Actual time taken per solve: %.3g s.\n", time_per);
+  41:firefly_solver.c ****   } else if (time_per > 1e-3) {
+  42:firefly_solver.c ****     printf("Actual time taken per solve: %.3g ms.\n", 1e3*time_per);
+  43:firefly_solver.c ****   } else {
+  44:firefly_solver.c ****     printf("Actual time taken per solve: %.3g us.\n", 1e6*time_per);
+  45:firefly_solver.c ****   }
+  46:firefly_solver.c **** #endif
+  47:firefly_solver.c **** #endif
+  48:firefly_solver.c ****   return 0;
+  49:firefly_solver.c **** }
+  50:firefly_solver.c **** void load_default_data(void) {
+  19              		{r4, lr}
+  20 0000 10B5     	.LCFI0:
+  21              		.loc 1 51 0
+  51:firefly_solver.c **** .x_0[2] = 0;
+  22              	r	r2, .L3
+  23 0002 DE4A     		ldr	r3, .L3+4
+  24 0004 DE4B     		ldr	r4, .L3+8
+  25 0006 DF4C     		str	r3, [r2]
+  26 0008 1360     		str	r4, [r2, #4]
+  27 000a 5460     		.loc 1 52 0
+  52:firefly_solver.c ****  params.x_0[3] = 0;
+  28              	3, [r2, #8]
+  29 000c 9360     		str	r4, [r2, #12]
+  30 000e D460     		.loc 1 53 0
+  53:firefly_solver.c ****  params.x_0[4] = 0;
+  31              	r	r3, [r2, #16]
+  32 0010 1361     		str	r4, [r2, #20]
+  33 0012 5461     		.loc 1 54 0
+  54:firefly_solver.c ****  params.x_0[5] = 0;
+  34              	r	r3, [r2, #24]
+  35 0014 9361     		str	r4, [r2, #28]
+  36 0016 D461     		.loc 1 55 0
+  55:firefly_solver.c ****  params.x_0[6] = 0;
+  37              	r	r3, [r2, #32]
+  38 0018 1362     		str	r4, [r2, #36]
+  39 001a 5462     		.loc 1 56 0
+  56:firefly_solver.c ****  params.x_0[7] = 0;
+  40              	r	r3, [r2, #40]
+  41 001c 9362     		str	r4, [r2, #44]
+  42 001e D462     		.loc 1 57 0
+  57:firefly_solver.c ****  params.x_ss_0[0] = -1.7941311867966805;
+  43              	r	r3, [r2, #48]
+  44 0020 1363     		str	r4, [r2, #52]
+  45 0022 5463     		.loc 1 58 0
+  58:firefly_solver.c ****  params.x_ss_0[1] = -0.23676062539745413;
+  46              	r	r3, [r2, #56]
+  47 0024 9363     		str	r4, [r2, #60]
+  48 0026 D463     		.loc 1 59 0
+  59:firefly_solver.c ****  params.x_ss_0[2] = -1.8804951564857322;
+  49              	r	r3, .L3+12
+  50 0028 D74B     		ldr	r4, .L3+16
+  51 002a D84C     		str	r3, [r2, #64]
+  52 002c 1364     		str	r4, [r2, #68]
+  53 002e 5464     		.loc 1 60 0
+  60:firefly_solver.c ****  params.x_ss_0[3] = -0.17266710242115568;
+  54              	r3, .L3+20
+  55 0030 D74B     		ldr	r4, .L3+24
+  56 0032 D84C     		str	r3, [r2, #72]
+  57 0034 9364     		str	r4, [r2, #76]
+  58 0036 D464     		.loc 1 61 0
+  61:firefly_solver.c ****  params.x_ss_0[4] = 0.596576190459043;
+  59              	r3, .L3+28
+  60 0038 D74B     		ldr	r4, .L3+32
+  61 003a D84C     		str	r3, [r2, #80]
+  62 003c 1365     		str	r4, [r2, #84]
+  63 003e 5465     		.loc 1 62 0
+  62:firefly_solver.c ****  params.x_ss_0[5] = -0.8860508694080989;
+  64              	r3, .L3+36
+  65 0040 D74B     		ldr	r4, .L3+40
+  66 0042 D84C     		str	r3, [r2, #88]
+  67 0044 9365     		str	r4, [r2, #92]
+  68 0046 D465     		.loc 1 63 0
+  63:firefly_solver.c ****  params.x_ss_0[6] = 0.7050196079205251;
+  69              	r3, .L3+44
+  70 0048 D74B     		ldr	r4, .L3+48
+  71 004a D84C     		str	r3, [r2, #96]
+  72 004c 1366     		str	r4, [r2, #100]
+  73 004e 5466     		.loc 1 64 0
+  64:firefly_solver.c ****  params.x_ss_0[7] = 0.3634512696654033;
+  74              	r3, .L3+52
+  75 0050 D74B     		ldr	r4, .L3+56
+  76 0052 D84C     		str	r3, [r2, #104]
+  77 0054 9366     		str	r4, [r2, #108]
+  78 0056 D466     		.loc 1 65 0
+  65:firefly_solver.c ****  /* Make this a diagonal PSD matrix, even though it's not diagonal. */
+  79              	r3, .L3+60
+  80 0058 D74B     		ldr	r4, .L3+64
+  81 005a D84C     		str	r3, [r2, #112]
+  82 005c 1367     		str	r4, [r2, #116]
+  83 005e 5467     		.loc 1 66 0
+  66:firefly_solver.c ****  /*
+  84              	r3, .L3+68
+  85 0060 D74B     		ldr	r4, .L3+72
+  86 0062 D84C     		str	r3, [r2, #120]
+  87 0064 9367     		str	r4, [r2, #124]
+  88 0066 D467     		.loc 1 134 0
+  67:firefly_solver.c ****  params.Q_x[0] = 40;
+  68:firefly_solver.c ****   params.Q_x[8] = 0;
+  69:firefly_solver.c ****   params.Q_x[16] = 0;
+  70:firefly_solver.c ****   params.Q_x[24] = 0;
+  71:firefly_solver.c ****   params.Q_x[32] = 0;
+  72:firefly_solver.c ****   params.Q_x[40] = 0;
+  73:firefly_solver.c ****   params.Q_x[48] = 0;
+  74:firefly_solver.c ****   params.Q_x[56] = 0;
+  75:firefly_solver.c ****   params.Q_x[1] = 0;
+  76:firefly_solver.c ****   params.Q_x[9] = 40;
+  77:firefly_solver.c ****   params.Q_x[17] = 0;
+  78:firefly_solver.c ****   params.Q_x[25] = 0;
+  79:firefly_solver.c ****   params.Q_x[33] = 0;
+  80:firefly_solver.c ****   params.Q_x[41] = 0;
+  81:firefly_solver.c ****   params.Q_x[49] = 0;
+  82:firefly_solver.c ****   params.Q_x[57] = 0;
+  83:firefly_solver.c ****   params.Q_x[2] = 0;
+  84:firefly_solver.c ****   params.Q_x[10] = 0;
+  85:firefly_solver.c ****   params.Q_x[18] = 60;
+  86:firefly_solver.c ****   params.Q_x[26] = 0;
+  87:firefly_solver.c ****   params.Q_x[34] = 0;
+  88:firefly_solver.c ****   params.Q_x[42] = 0;
+  89:firefly_solver.c ****   params.Q_x[50] = 0;
+  90:firefly_solver.c ****   params.Q_x[58] = 0;
+  91:firefly_solver.c ****   params.Q_x[3] = 0;
+  92:firefly_solver.c ****   params.Q_x[11] = 0;
+  93:firefly_solver.c ****   params.Q_x[19] = 0;
+  94:firefly_solver.c ****   params.Q_x[27] = 20;
+  95:firefly_solver.c ****   params.Q_x[35] = 0;
+  96:firefly_solver.c ****   params.Q_x[43] = 0;
+  97:firefly_solver.c ****   params.Q_x[51] = 0;
+  98:firefly_solver.c ****   params.Q_x[59] = 0;
+  99:firefly_solver.c ****   params.Q_x[4] = 0;
+ 100:firefly_solver.c ****   params.Q_x[12] = 0;
+ 101:firefly_solver.c ****   params.Q_x[20] = 0;
+ 102:firefly_solver.c ****   params.Q_x[28] = 0;
+ 103:firefly_solver.c ****   params.Q_x[36] = 20;
+ 104:firefly_solver.c ****   params.Q_x[44] = 0;
+ 105:firefly_solver.c ****   params.Q_x[52] = 0;
+ 106:firefly_solver.c ****   params.Q_x[60] = 0;
+ 107:firefly_solver.c ****   params.Q_x[5] = 0;
+ 108:firefly_solver.c ****   params.Q_x[13] = 0;
+ 109:firefly_solver.c ****   params.Q_x[21] = 0;
+ 110:firefly_solver.c ****   params.Q_x[29] = 0;
+ 111:firefly_solver.c ****   params.Q_x[37] = 0;
+ 112:firefly_solver.c ****   params.Q_x[45] = 25;
+ 113:firefly_solver.c ****   params.Q_x[53] = 0;
+ 114:firefly_solver.c ****   params.Q_x[61] = 0;
+ 115:firefly_solver.c ****   params.Q_x[6] = 0;
+ 116:firefly_solver.c ****   params.Q_x[14] = 0;
+ 117:firefly_solver.c ****   params.Q_x[22] = 0;
+ 118:firefly_solver.c ****   params.Q_x[30] = 0;
+ 119:firefly_solver.c ****   params.Q_x[38] = 0;
+ 120:firefly_solver.c ****   params.Q_x[46] = 0;
+ 121:firefly_solver.c ****   params.Q_x[54] = 20;
+ 122:firefly_solver.c ****   params.Q_x[62] = 0;
+ 123:firefly_solver.c ****   params.Q_x[7] = 0;
+ 124:firefly_solver.c ****   params.Q_x[15] = 0;
+ 125:firefly_solver.c ****   params.Q_x[23] = 0;
+ 126:firefly_solver.c ****   params.Q_x[31] = 0;
+ 127:firefly_solver.c ****   params.Q_x[39] = 0;
+ 128:firefly_solver.c ****   params.Q_x[47] = 0;
+ 129:firefly_solver.c ****   params.Q_x[55] = 0;
+ 130:firefly_solver.c ****   params.Q_x[63] = 20;
+ 131:firefly_solver.c ****   */
+ 132:firefly_solver.c ****   params.u_ss_0[0] = 0.17859607212737894;
+ 133:firefly_solver.c ****   params.u_ss_0[1] = 1.1212590580454682;
+ 134:firefly_solver.c ****   params.u_ss_0[2] = -0.774545870495281;
+  89              	r3, #160
+  90 0068 A023     		lsl	r3, r3, #2
+  91 006a 9B00     		add	r1, r2, r3
+  92 006c D118     		ldr	r3, .L3+76
+  93 006e D64B     		ldr	r4, .L3+80
+  94 0070 D64C     		str	r3, [r1]
+  95 0072 0B60     		str	r4, [r1, #4]
+  96 0074 4C60     		.loc 1 135 0
+ 135:firefly_solver.c ****  */
+  97              	 #162
+  98 0076 A223     		lsl	r3, r3, #2
+  99 0078 9B00     		add	r1, r2, r3
+ 100 007a D118     		ldr	r3, .L3+84
+ 101 007c D44B     		ldr	r4, .L3+88
+ 102 007e D54C     		str	r3, [r1]
+ 103 0080 0B60     		str	r4, [r1, #4]
+ 104 0082 4C60     		.loc 1 136 0
+ 136:firefly_solver.c ****  /*
+ 105              	 #164
+ 106 0084 A423     		lsl	r3, r3, #2
+ 107 0086 9B00     		add	r1, r2, r3
+ 108 0088 D118     		ldr	r3, .L3+92
+ 109 008a D34B     		ldr	r4, .L3+96
+ 110 008c D34C     		str	r3, [r1]
+ 111 008e 0B60     		str	r4, [r1, #4]
+ 112 0090 4C60     		.loc 1 163 0
+ 137:firefly_solver.c ****  params.R_u[0] = 35;
+ 138:firefly_solver.c ****   params.R_u[3] = 0;
+ 139:firefly_solver.c ****   params.R_u[6] = 0;
+ 140:firefly_solver.c ****   params.R_u[1] = 0;
+ 141:firefly_solver.c ****   params.R_u[4] = 35;
+ 142:firefly_solver.c ****   params.R_u[7] = 0;
+ 143:firefly_solver.c ****   params.R_u[2] = 0;
+ 144:firefly_solver.c ****   params.R_u[5] = 0;
+ 145:firefly_solver.c ****   params.R_u[8] = 2;
+ 146:firefly_solver.c ****   params.u_prev[0] = 1.9039816898917352;
+ 147:firefly_solver.c ****   params.u_prev[1] = 0.6895347036512547;
+ 148:firefly_solver.c ****   params.u_prev[2] = 1.6113364341535923;
+ 149:firefly_solver.c ****   /* Make this a diagonal PSD matrix, even though it's not diagonal. */
+ 150:firefly_solver.c ****   /*
+ 151:firefly_solver.c ****   params.R_delta[0] = 0.3;
+ 152:firefly_solver.c ****   params.R_delta[3] = 0;
+ 153:firefly_solver.c ****   params.R_delta[6] = 0;
+ 154:firefly_solver.c ****   params.R_delta[1] = 0;
+ 155:firefly_solver.c ****   params.R_delta[4] = 0.3;
+ 156:firefly_solver.c ****   params.R_delta[7] = 0;
+ 157:firefly_solver.c ****   params.R_delta[2] = 0;
+ 158:firefly_solver.c ****   params.R_delta[5] = 0;
+ 159:firefly_solver.c ****   params.R_delta[8] = 0.0025;
+ 160:firefly_solver.c ****   */
+ 161:firefly_solver.c ****   params.x_ss_1[0] = 0.6136436100941447;
+ 162:firefly_solver.c ****   params.x_ss_1[1] = 0.2313630495538037;
+ 163:firefly_solver.c ****   params.x_ss_1[2] = -0.5537409477496875;
+ 113              	 #208
+ 114 0092 D023     		lsl	r3, r3, #2
+ 115 0094 9B00     		add	r1, r2, r3
+ 116 0096 D118     		ldr	r3, .L3+100
+ 117 0098 D14B     		ldr	r4, .L3+104
+ 118 009a D24C     		str	r3, [r1]
+ 119 009c 0B60     		str	r4, [r1, #4]
+ 120 009e 4C60     		.loc 1 164 0
+ 164:firefly_solver.c **** 7819806406723;
+ 121              	 #210
+ 122 00a0 D223     		lsl	r3, r3, #2
+ 123 00a2 9B00     		add	r1, r2, r3
+ 124 00a4 D118     		ldr	r3, .L3+108
+ 125 00a6 D04B     		ldr	r4, .L3+112
+ 126 00a8 D04C     		str	r3, [r1]
+ 127 00aa 0B60     		str	r4, [r1, #4]
+ 128 00ac 4C60     		.loc 1 165 0
+ 165:firefly_solver.c ****  params.x_ss_1[4] = -0.3739203344950055;
+ 129              	 #212
+ 130 00ae D423     		lsl	r3, r3, #2
+ 131 00b0 9B00     		add	r1, r2, r3
+ 132 00b2 D118     		ldr	r3, .L3+116
+ 133 00b4 CE4B     		ldr	r4, .L3+120
+ 134 00b6 CF4C     		str	r3, [r1]
+ 135 00b8 0B60     		str	r4, [r1, #4]
+ 136 00ba 4C60     		.loc 1 166 0
+ 166:firefly_solver.c ****  params.x_ss_1[5] = -0.12423900520332376;
+ 137              	 #214
+ 138 00bc D623     		lsl	r3, r3, #2
+ 139 00be 9B00     		add	r1, r2, r3
+ 140 00c0 D118     		ldr	r3, .L3+124
+ 141 00c2 CD4B     		ldr	r4, .L3+128
+ 142 00c4 CD4C     		str	r3, [r1]
+ 143 00c6 0B60     		str	r4, [r1, #4]
+ 144 00c8 4C60     		.loc 1 167 0
+ 167:firefly_solver.c ****  params.x_ss_1[6] = -0.923057686995755;
+ 145              	 #216
+ 146 00ca D823     		lsl	r3, r3, #2
+ 147 00cc 9B00     		add	r1, r2, r3
+ 148 00ce D118     		ldr	r3, .L3+132
+ 149 00d0 CB4B     		ldr	r4, .L3+136
+ 150 00d2 CC4C     		str	r3, [r1]
+ 151 00d4 0B60     		str	r4, [r1, #4]
+ 152 00d6 4C60     		.loc 1 168 0
+ 168:firefly_solver.c ****  params.x_ss_1[7] = -0.8328289030982696;
+ 153              	 #218
+ 154 00d8 DA23     		lsl	r3, r3, #2
+ 155 00da 9B00     		add	r1, r2, r3
+ 156 00dc D118     		ldr	r3, .L3+140
+ 157 00de CA4B     		ldr	r4, .L3+144
+ 158 00e0 CA4C     		str	r3, [r1]
+ 159 00e2 0B60     		str	r4, [r1, #4]
+ 160 00e4 4C60     		.loc 1 169 0
+ 169:firefly_solver.c ****  params.u_ss_1[0] = -0.16925440270808823;
+ 161              	 #220
+ 162 00e6 DC23     		lsl	r3, r3, #2
+ 163 00e8 9B00     		add	r1, r2, r3
+ 164 00ea D118     		ldr	r3, .L3+148
+ 165 00ec C84B     		ldr	r4, .L3+152
+ 166 00ee C94C     		str	r3, [r1]
+ 167 00f0 0B60     		str	r4, [r1, #4]
+ 168 00f2 4C60     		.loc 1 170 0
+ 170:firefly_solver.c ****  params.u_ss_1[1] = 1.442135651787706;
+ 169              	 #222
+ 170 00f4 DE23     		lsl	r3, r3, #2
+ 171 00f6 9B00     		add	r1, r2, r3
+ 172 00f8 D118     		ldr	r3, .L3+156
+ 173 00fa C74B     		ldr	r4, .L3+160
+ 174 00fc C74C     		str	r3, [r1]
+ 175 00fe 0B60     		str	r4, [r1, #4]
+ 176 0100 4C60     		.loc 1 171 0
+ 171:firefly_solver.c ****  params.u_ss_1[2] = 0.34501161787128565;
+ 177              	 #224
+ 178 0102 E023     		lsl	r3, r3, #2
+ 179 0104 9B00     		add	r1, r2, r3
+ 180 0106 D118     		ldr	r3, .L3+164
+ 181 0108 C54B     		ldr	r4, .L3+168
+ 182 010a C64C     		str	r3, [r1]
+ 183 010c 0B60     		str	r4, [r1, #4]
+ 184 010e 4C60     		.loc 1 172 0
+ 172:firefly_solver.c ****  params.x_ss_2[0] = -0.8660485502711608;
+ 185              	 #226
+ 186 0110 E223     		lsl	r3, r3, #2
+ 187 0112 9B00     		add	r1, r2, r3
+ 188 0114 D118     		ldr	r3, .L3+172
+ 189 0116 C44B     		ldr	r4, .L3+176
+ 190 0118 C44C     		str	r3, [r1]
+ 191 011a 0B60     		str	r4, [r1, #4]
+ 192 011c 4C60     		.loc 1 173 0
+ 173:firefly_solver.c ****  params.x_ss_2[1] = -0.8880899735055947;
+ 193              	 #228
+ 194 011e E423     		lsl	r3, r3, #2
+ 195 0120 9B00     		add	r1, r2, r3
+ 196 0122 D118     		ldr	r3, .L3+180
+ 197 0124 C24B     		ldr	r4, .L3+184
+ 198 0126 C34C     		str	r3, [r1]
+ 199 0128 0B60     		str	r4, [r1, #4]
+ 200 012a 4C60     		.loc 1 174 0
+ 174:firefly_solver.c ****  params.x_ss_2[2] = -0.1815116979122129;
+ 201              	 #230
+ 202 012c E623     		lsl	r3, r3, #2
+ 203 012e 9B00     		add	r1, r2, r3
+ 204 0130 D118     		ldr	r3, .L3+188
+ 205 0132 C14B     		ldr	r4, .L3+192
+ 206 0134 C14C     		str	r3, [r1]
+ 207 0136 0B60     		str	r4, [r1, #4]
+ 208 0138 4C60     		.loc 1 175 0
+ 175:firefly_solver.c ****  params.x_ss_2[3] = -1.17835862158005;
+ 209              	 #232
+ 210 013a E823     		lsl	r3, r3, #2
+ 211 013c 9B00     		add	r1, r2, r3
+ 212 013e D118     		ldr	r3, .L3+196
+ 213 0140 BF4B     		ldr	r4, .L3+200
+ 214 0142 C04C     		str	r3, [r1]
+ 215 0144 0B60     		str	r4, [r1, #4]
+ 216 0146 4C60     		.loc 1 176 0
+ 176:firefly_solver.c ****  params.x_ss_2[4] = -1.1944851558277074;
+ 217              	 #234
+ 218 0148 EA23     		lsl	r3, r3, #2
+ 219 014a 9B00     		add	r1, r2, r3
+ 220 014c D118     		ldr	r3, .L3+204
+ 221 014e BE4B     		ldr	r4, .L3+208
+ 222 0150 BE4C     		str	r3, [r1]
+ 223 0152 0B60     		str	r4, [r1, #4]
+ 224 0154 4C60     		.loc 1 177 0
+ 177:firefly_solver.c ****  params.x_ss_2[5] = 0.05614023926976763;
+ 225              	 #236
+ 226 0156 EC23     		lsl	r3, r3, #2
+ 227 0158 9B00     		add	r1, r2, r3
+ 228 015a D118     		ldr	r3, .L3+212
+ 229 015c BC4B     		ldr	r4, .L3+216
+ 230 015e BD4C     		str	r3, [r1]
+ 231 0160 0B60     		str	r4, [r1, #4]
+ 232 0162 4C60     		.loc 1 178 0
+ 178:firefly_solver.c ****  params.x_ss_2[6] = -1.6510825248767813;
+ 233              	 #238
+ 234 0164 EE23     		lsl	r3, r3, #2
+ 235 0166 9B00     		add	r1, r2, r3
+ 236 0168 D118     		ldr	r3, .L3+220
+ 237 016a BB4B     		ldr	r4, .L3+224
+ 238 016c BB4C     		str	r3, [r1]
+ 239 016e 0B60     		str	r4, [r1, #4]
+ 240 0170 4C60     		.loc 1 179 0
+ 179:firefly_solver.c ****  params.x_ss_2[7] = -0.06565787059365391;
+ 241              	 #240
+ 242 0172 F023     		lsl	r3, r3, #2
+ 243 0174 9B00     		add	r1, r2, r3
+ 244 0176 D118     		ldr	r3, .L3+228
+ 245 0178 B94B     		ldr	r4, .L3+232
+ 246 017a BA4C     		str	r3, [r1]
+ 247 017c 0B60     		str	r4, [r1, #4]
+ 248 017e 4C60     		.loc 1 180 0
+ 180:firefly_solver.c ****  params.u_ss_2[0] = -0.5512951504486665;
+ 249              	 #242
+ 250 0180 F223     		lsl	r3, r3, #2
+ 251 0182 9B00     		add	r1, r2, r3
+ 252 0184 D118     		ldr	r3, .L3+236
+ 253 0186 B84B     		ldr	r4, .L3+240
+ 254 0188 B84C     		str	r3, [r1]
+ 255 018a 0B60     		str	r4, [r1, #4]
+ 256 018c 4C60     		.loc 1 181 0
+ 181:firefly_solver.c ****  params.u_ss_2[1] = 0.8307464872626844;
+ 257              	 #244
+ 258 018e F423     		lsl	r3, r3, #2
+ 259 0190 9B00     		add	r1, r2, r3
+ 260 0192 D118     		ldr	r3, .L3+244
+ 261 0194 B64B     		ldr	r4, .L3+248
+ 262 0196 B74C     		str	r3, [r1]
+ 263 0198 0B60     		str	r4, [r1, #4]
+ 264 019a 4C60     		.loc 1 182 0
+ 182:firefly_solver.c ****  params.u_ss_2[2] = 0.9869848924080182;
+ 265              	 #246
+ 266 019c F623     		lsl	r3, r3, #2
+ 267 019e 9B00     		add	r1, r2, r3
+ 268 01a0 D118     		ldr	r3, .L3+252
+ 269 01a2 B54B     		ldr	r4, .L3+256
+ 270 01a4 B54C     		str	r3, [r1]
+ 271 01a6 0B60     		str	r4, [r1, #4]
+ 272 01a8 4C60     		.loc 1 183 0
+ 183:firefly_solver.c ****  params.x_ss_3[0] = 0.7643716874230573;
+ 273              	 #248
+ 274 01aa F823     		lsl	r3, r3, #2
+ 275 01ac 9B00     		add	r1, r2, r3
+ 276 01ae D118     		ldr	r3, .L3+260
+ 277 01b0 B34B     		ldr	r4, .L3+264
+ 278 01b2 B44C     		str	r3, [r1]
+ 279 01b4 0B60     		str	r4, [r1, #4]
+ 280 01b6 4C60     		.loc 1 184 0
+ 184:firefly_solver.c ****  params.x_ss_3[1] = 0.7567216550196565;
+ 281              	 #250
+ 282 01b8 FA23     		lsl	r3, r3, #2
+ 283 01ba 9B00     		add	r1, r2, r3
+ 284 01bc D118     		ldr	r3, .L3+268
+ 285 01be B24B     		ldr	r4, .L3+272
+ 286 01c0 B24C     		str	r3, [r1]
+ 287 01c2 0B60     		str	r4, [r1, #4]
+ 288 01c4 4C60     		.loc 1 185 0
+ 185:firefly_solver.c ****  params.x_ss_3[2] = -0.5055995034042868;
+ 289              	 #252
+ 290 01c6 FC23     		lsl	r3, r3, #2
+ 291 01c8 9B00     		add	r1, r2, r3
+ 292 01ca D118     		ldr	r3, .L3+276
+ 293 01cc B04B     		ldr	r4, .L3+280
+ 294 01ce B14C     		str	r3, [r1]
+ 295 01d0 0B60     		str	r4, [r1, #4]
+ 296 01d2 4C60     		.loc 1 186 0
+ 186:firefly_solver.c ****  params.x_ss_3[3] = 0.6725392189410702;
+ 297              	 #254
+ 298 01d4 FE23     		lsl	r3, r3, #2
+ 299 01d6 9B00     		add	r1, r2, r3
+ 300 01d8 D118     		ldr	r3, .L3+284
+ 301 01da AF4B     		ldr	r4, .L3+288
+ 302 01dc AF4C     		str	r3, [r1]
+ 303 01de 0B60     		str	r4, [r1, #4]
+ 304 01e0 4C60     		.loc 1 187 0
+ 187:firefly_solver.c ****  params.x_ss_3[4] = -0.6406053441727284;
+ 305              	 #128
+ 306 01e2 8023     		lsl	r3, r3, #3
+ 307 01e4 DB00     		add	r1, r2, r3
+ 308 01e6 D118     		ldr	r3, .L3+292
+ 309 01e8 AD4B     		ldr	r4, .L3+296
+ 310 01ea AE4C     		str	r3, [r1]
+ 311 01ec 0B60     		str	r4, [r1, #4]
+ 312 01ee 4C60     		.loc 1 188 0
+ 188:firefly_solver.c ****  params.x_ss_3[5] = 0.29117547947550015;
+ 313              	 #129
+ 314 01f0 8123     		lsl	r3, r3, #3
+ 315 01f2 DB00     		add	r1, r2, r3
+ 316 01f4 D118     		ldr	r3, .L3+300
+ 317 01f6 AC4B     		ldr	r4, .L3+304
+ 318 01f8 AC4C     		str	r3, [r1]
+ 319 01fa 0B60     		str	r4, [r1, #4]
+ 320 01fc 4C60     		.loc 1 189 0
+ 189:firefly_solver.c ****  params.x_ss_3[6] = -0.6967713677405021;
+ 321              	 #130
+ 322 01fe 8223     		lsl	r3, r3, #3
+ 323 0200 DB00     		add	r1, r2, r3
+ 324 0202 D118     		ldr	r3, .L3+308
+ 325 0204 AA4B     		ldr	r4, .L3+312
+ 326 0206 AB4C     		str	r3, [r1]
+ 327 0208 0B60     		str	r4, [r1, #4]
+ 328 020a 4C60     		.loc 1 190 0
+ 190:firefly_solver.c ****  params.x_ss_3[7] = -0.21941980294587182;
+ 329              	 #131
+ 330 020c 8323     		lsl	r3, r3, #3
+ 331 020e DB00     		add	r1, r2, r3
+ 332 0210 D118     		ldr	r3, .L3+316
+ 333 0212 A94B     		ldr	r4, .L3+320
+ 334 0214 A94C     		str	r3, [r1]
+ 335 0216 0B60     		str	r4, [r1, #4]
+ 336 0218 4C60     		.loc 1 191 0
+ 191:firefly_solver.c ****  params.u_ss_3[0] = -1.753884276680243;
+ 337              	 #132
+ 338 021a 8423     		lsl	r3, r3, #3
+ 339 021c DB00     		add	r1, r2, r3
+ 340 021e D118     		ldr	r3, .L3+324
+ 341 0220 A74B     		ldr	r4, .L3+328
+ 342 0222 A84C     		str	r3, [r1]
+ 343 0224 0B60     		str	r4, [r1, #4]
+ 344 0226 4C60     		.loc 1 192 0
+ 192:firefly_solver.c ****  params.u_ss_3[1] = -1.0292983112626475;
+ 345              	 #133
+ 346 0228 8523     		lsl	r3, r3, #3
+ 347 022a DB00     		add	r1, r2, r3
+ 348 022c D118     		ldr	r3, .L3+332
+ 349 022e A64B     		ldr	r4, .L3+336
+ 350 0230 A64C     		str	r3, [r1]
+ 351 0232 0B60     		str	r4, [r1, #4]
+ 352 0234 4C60     		.loc 1 193 0
+ 193:firefly_solver.c ****  params.u_ss_3[2] = 1.8864104246942706;
+ 353              	 #134
+ 354 0236 8623     		lsl	r3, r3, #3
+ 355 0238 DB00     		add	r1, r2, r3
+ 356 023a D118     		ldr	r3, .L3+340
+ 357 023c A44B     		ldr	r4, .L3+344
+ 358 023e A54C     		str	r3, [r1]
+ 359 0240 0B60     		str	r4, [r1, #4]
+ 360 0242 4C60     		.loc 1 194 0
+ 194:firefly_solver.c ****  params.x_ss_4[0] = -1.077663182579704;
+ 361              	 #135
+ 362 0244 8723     		lsl	r3, r3, #3
+ 363 0246 DB00     		add	r1, r2, r3
+ 364 0248 D118     		ldr	r3, .L3+348
+ 365 024a A34B     		ldr	r4, .L3+352
+ 366 024c A34C     		str	r3, [r1]
+ 367 024e 0B60     		str	r4, [r1, #4]
+ 368 0250 4C60     		.loc 1 195 0
+ 195:firefly_solver.c ****  params.x_ss_4[1] = 0.7659100437893209;
+ 369              	 #136
+ 370 0252 8823     		lsl	r3, r3, #3
+ 371 0254 DB00     		add	r1, r2, r3
+ 372 0256 D118     		ldr	r3, .L3+356
+ 373 0258 A14B     		ldr	r4, .L3+360
+ 374 025a A24C     		str	r3, [r1]
+ 375 025c 0B60     		str	r4, [r1, #4]
+ 376 025e 4C60     		.loc 1 196 0
+ 196:firefly_solver.c ****  params.x_ss_4[2] = 0.6019074328549583;
+ 377              	 #137
+ 378 0260 8923     		lsl	r3, r3, #3
+ 379 0262 DB00     		add	r1, r2, r3
+ 380 0264 D118     		ldr	r3, .L3+364
+ 381 0266 A04B     		ldr	r4, .L3+368
+ 382 0268 A04C     		str	r3, [r1]
+ 383 026a 0B60     		str	r4, [r1, #4]
+ 384 026c 4C60     		.loc 1 197 0
+ 197:firefly_solver.c ****  params.x_ss_4[3] = 0.8957565577499285;
+ 385              	 #138
+ 386 026e 8A23     		lsl	r3, r3, #3
+ 387 0270 DB00     		add	r1, r2, r3
+ 388 0272 D118     		ldr	r3, .L3+372
+ 389 0274 9E4B     		ldr	r4, .L3+376
+ 390 0276 9F4C     		str	r3, [r1]
+ 391 0278 0B60     		str	r4, [r1, #4]
+ 392 027a 4C60     		.loc 1 198 0
+ 198:firefly_solver.c ****  params.x_ss_4[4] = -0.09964555746227477;
+ 393              	 #139
+ 394 027c 8B23     		lsl	r3, r3, #3
+ 395 027e DB00     		add	r1, r2, r3
+ 396 0280 D118     		ldr	r3, .L3+380
+ 397 0282 9D4B     		ldr	r4, .L3+384
+ 398 0284 9D4C     		str	r3, [r1]
+ 399 0286 0B60     		str	r4, [r1, #4]
+ 400 0288 4C60     		.loc 1 199 0
+ 199:firefly_solver.c ****  params.x_ss_4[5] = 0.38665509840745127;
+ 401              	 #140
+ 402 028a 8C23     		lsl	r3, r3, #3
+ 403 028c DB00     		add	r1, r2, r3
+ 404 028e D118     		ldr	r3, .L3+388
+ 405 0290 9B4B     		ldr	r4, .L3+392
+ 406 0292 9C4C     		str	r3, [r1]
+ 407 0294 0B60     		str	r4, [r1, #4]
+ 408 0296 4C60     		.loc 1 200 0
+ 200:firefly_solver.c ****  params.x_ss_4[6] = -1.7321223042686946;
+ 409              	 #141
+ 410 0298 8D23     		lsl	r3, r3, #3
+ 411 029a DB00     		add	r1, r2, r3
+ 412 029c D118     		ldr	r3, .L3+396
+ 413 029e 9A4B     		ldr	r4, .L3+400
+ 414 02a0 9A4C     		str	r3, [r1]
+ 415 02a2 0B60     		str	r4, [r1, #4]
+ 416 02a4 4C60     		.loc 1 201 0
+ 201:firefly_solver.c ****  params.x_ss_4[7] = -1.7097514487110663;
+ 417              	 #142
+ 418 02a6 8E23     		lsl	r3, r3, #3
+ 419 02a8 DB00     		add	r1, r2, r3
+ 420 02aa D118     		ldr	r3, .L3+404
+ 421 02ac 984B     		ldr	r4, .L3+408
+ 422 02ae 994C     		str	r3, [r1]
+ 423 02b0 0B60     		str	r4, [r1, #4]
+ 424 02b2 4C60     		.loc 1 202 0
+ 202:firefly_solver.c ****  params.u_ss_4[0] = -1.2040958948116867;
+ 425              	 #143
+ 426 02b4 8F23     		lsl	r3, r3, #3
+ 427 02b6 DB00     		add	r1, r2, r3
+ 428 02b8 D118     		ldr	r3, .L3+412
+ 429 02ba 974B     		ldr	r4, .L3+416
+ 430 02bc 974C     		str	r3, [r1]
+ 431 02be 0B60     		str	r4, [r1, #4]
+ 432 02c0 4C60     		.loc 1 203 0
+ 203:firefly_solver.c ****  params.u_ss_4[1] = -1.3925560119658358;
+ 433              	 #144
+ 434 02c2 9023     		lsl	r3, r3, #3
+ 435 02c4 DB00     		add	r1, r2, r3
+ 436 02c6 D118     		ldr	r3, .L3+420
+ 437 02c8 954B     		ldr	r4, .L3+424
+ 438 02ca 964C     		str	r3, [r1]
+ 439 02cc 0B60     		str	r4, [r1, #4]
+ 440 02ce 4C60     		.loc 1 204 0
+ 204:firefly_solver.c ****  params.u_ss_4[2] = -1.5995826216742213;
+ 441              	 #145
+ 442 02d0 9123     		lsl	r3, r3, #3
+ 443 02d2 DB00     		add	r1, r2, r3
+ 444 02d4 D118     		ldr	r3, .L3+428
+ 445 02d6 944B     		ldr	r4, .L3+432
+ 446 02d8 944C     		str	r3, [r1]
+ 447 02da 0B60     		str	r4, [r1, #4]
+ 448 02dc 4C60     		.loc 1 205 0
+ 205:firefly_solver.c ****  params.x_ss_5[0] = -1.4828245415645833;
+ 449              	 #146
+ 450 02de 9223     		lsl	r3, r3, #3
+ 451 02e0 DB00     		add	r1, r2, r3
+ 452 02e2 D118     		ldr	r3, .L3+436
+ 453 02e4 924B     		ldr	r4, .L3+440
+ 454 02e6 934C     		str	r3, [r1]
+ 455 02e8 0B60     		str	r4, [r1, #4]
+ 456 02ea 4C60     		.loc 1 206 0
+ 206:firefly_solver.c ****  params.x_ss_5[1] = 0.21311092723061398;
+ 457              	 #147
+ 458 02ec 9323     		lsl	r3, r3, #3
+ 459 02ee DB00     		add	r1, r2, r3
+ 460 02f0 D118     		ldr	r3, .L3+444
+ 461 02f2 914B     		ldr	r4, .L3+448
+ 462 02f4 914C     		str	r3, [r1]
+ 463 02f6 0B60     		str	r4, [r1, #4]
+ 464 02f8 4C60     		.loc 1 207 0
+ 207:firefly_solver.c ****  params.x_ss_5[2] = -1.248740700304487;
+ 465              	 #148
+ 466 02fa 9423     		lsl	r3, r3, #3
+ 467 02fc DB00     		add	r1, r2, r3
+ 468 02fe D118     		ldr	r3, .L3+452
+ 469 0300 8F4B     		ldr	r4, .L3+456
+ 470 0302 904C     		str	r3, [r1]
+ 471 0304 0B60     		str	r4, [r1, #4]
+ 472 0306 4C60     		.loc 1 208 0
+ 208:firefly_solver.c ****  params.x_ss_5[3] = 1.808404972124833;
+ 473              	 #149
+ 474 0308 9523     		lsl	r3, r3, #3
+ 475 030a DB00     		add	r1, r2, r3
+ 476 030c D118     		ldr	r3, .L3+460
+ 477 030e 8E4B     		ldr	r4, .L3+464
+ 478 0310 8E4C     		str	r3, [r1]
+ 479 0312 0B60     		str	r4, [r1, #4]
+ 480 0314 4C60     		.loc 1 209 0
+ 209:firefly_solver.c ****  params.x_ss_5[4] = 0.7264471152297065;
+ 481              	 #150
+ 482 0316 9623     		lsl	r3, r3, #3
+ 483 0318 DB00     		add	r1, r2, r3
+ 484 031a D118     		ldr	r3, .L3+468
+ 485 031c 8C4B     		ldr	r4, .L3+472
+ 486 031e 8D4C     		str	r3, [r1]
+ 487 0320 0B60     		str	r4, [r1, #4]
+ 488 0322 4C60     		.loc 1 210 0
+ 210:firefly_solver.c ****  params.x_ss_5[5] = 0.16407869343908477;
+ 489              	 #151
+ 490 0324 9723     		lsl	r3, r3, #3
+ 491 0326 DB00     		add	r1, r2, r3
+ 492 0328 D118     		ldr	r3, .L3+476
+ 493 032a 8B4B     		ldr	r4, .L3+480
+ 494 032c 8B4C     		str	r3, [r1]
+ 495 032e 0B60     		str	r4, [r1, #4]
+ 496 0330 4C60     		.loc 1 211 0
+ 211:firefly_solver.c ****  params.x_ss_5[6] = 0.8287224032315907;
+ 497              	 #152
+ 498 0332 9823     		lsl	r3, r3, #3
+ 499 0334 DB00     		add	r1, r2, r3
+ 500 0336 D118     		ldr	r3, .L3+484
+ 501 0338 894B     		ldr	r4, .L3+488
+ 502 033a 8A4C     		str	r3, [r1]
+ 503 033c 0B60     		str	r4, [r1, #4]
+ 504 033e 4C60     		.loc 1 212 0
+ 212:firefly_solver.c ****  params.x_ss_5[7] = -0.9444533161899464;
+ 505              	 #153
+ 506 0340 9923     		lsl	r3, r3, #3
+ 507 0342 DB00     		add	r1, r2, r3
+ 508 0344 D118     		ldr	r3, .L3+492
+ 509 0346 884B     		ldr	r4, .L3+496
+ 510 0348 884C     		str	r3, [r1]
+ 511 034a 0B60     		str	r4, [r1, #4]
+ 512 034c 4C60     		.loc 1 213 0
+ 213:firefly_solver.c ****  params.u_ss_5[0] = 1.7069027370149112;
+ 513              	 #154
+ 514 034e 9A23     		lsl	r3, r3, #3
+ 515 0350 DB00     		add	r1, r2, r3
+ 516 0352 D118     		ldr	r3, .L3+500
+ 517 0354 864B     		ldr	r4, .L3+504
+ 518 0356 874C     		str	r3, [r1]
+ 519 0358 0B60     		str	r4, [r1, #4]
+ 520 035a 4C60     		.loc 1 214 0
+ 214:firefly_solver.c ****  params.u_ss_5[1] = 1.3567722311998827;
+ 521              	 #155
+ 522 035c 9B23     		lsl	r3, r3, #3
+ 523 035e DB00     		add	r1, r2, r3
+ 524 0360 D118     		ldr	r3, .L3+508
+ 525 0362 854B     		ldr	r4, .L3+512
+ 526 0364 854C     		str	r3, [r1]
+ 527 0366 0B60     		str	r4, [r1, #4]
+ 528 0368 4C60     		.loc 1 215 0
+ 215:firefly_solver.c ****  params.u_ss_5[2] = 0.9052779937121489;
+ 529              	 #156
+ 530 036a 9C23     		lsl	r3, r3, #3
+ 531 036c DB00     		add	r1, r2, r3
+ 532 036e D118     		ldr	r3, .L3+516
+ 533 0370 834B     		ldr	r4, .L3+520
+ 534 0372 844C     		str	r3, [r1]
+ 535 0374 0B60     		str	r4, [r1, #4]
+ 536 0376 4C60     		b	.L4
+ 537 0378 06E1     	.L5:
+ 538              		.align	2
+ 539 037a 0000     	.L3:
+ 540              		.word	params
+ 541 037c 00000000 		.word	0
+ 542 0380 00000000 		.word	0
+ 543 0384 00000000 		.word	-1073957694
+ 544 0388 C2B4FCBF 		.word	-415209452
+ 545 038c 146840E7 		.word	-1076998612
+ 546 0390 2C4ECEBF 		.word	327680608
+ 547 0394 60028813 		.word	-1073867134
+ 548 0398 8216FEBF 		.word	383141934
+ 549 039c 2E48D616 		.word	-1077536268
+ 550 03a0 F419C6BF 		.word	-1560331872
+ 551 03a4 A039FFA2 		.word	1071847206
+ 552 03a8 2617E33F 		.word	-210566944
+ 553 03ac E00073F3 		.word	-1075029369
+ 554 03b0 875AECBF 		.word	1515612068
+ 555 03b4 A467565A 		.word	1072074629
+ 556 03b8 858FE63F 		.word	1205982772
+ 557 03bc 34D6E147 		.word	1071071945
+ 558 03c0 C942D73F 		.word	490324976
+ 559 03c4 F0C3391D 		.word	1069997116
+ 560 03c8 3CDCC63F 		.word	1887278672
+ 561 03cc 50967D70 		.word	1072820397
+ 562 03d0 ADF0F13F 		.word	1451909764
+ 563 03d4 84628A56 		.word	-1075263212
+ 564 03d8 14C9E8BF 		.word	1809903168
+ 565 03dc 40EEE06B 		.word	1071882999
+ 566 03e0 F7A2E33F 		.word	-325575032
+ 567 03e4 881E98EC 		.word	1070439757
+ 568 03e8 4D9DCD3F 		.word	-307556448
+ 569 03ec A00FABED 		.word	-1075726274
+ 570 03f0 3EB8E1BF 		.word	-274641028
+ 571 03f4 7C4FA1EF 		.word	-1074685772
+ 572 03f8 B498F1BF 		.word	-42381562
+ 573 03fc 064F79FD 		.word	-1076367793
+ 574 0400 4FEED7BF 		.word	-1912747624
+ 575 0404 98C9FD8D 		.word	-1077948896
+ 576 0408 20CEBFBF 		.word	-1606655840
+ 577 040c A0603CA0 		.word	-1074951760
+ 578 0410 B089EDBF 		.word	1178532676
+ 579 0414 44FB3E46 		.word	-1075140984
+ 580 0418 88A6EABF 		.word	-859893932
+ 581 041c 540FBFCC 		.word	-1077564896
+ 582 0420 20AAC5BF 		.word	-701830768
+ 583 0424 90E92AD6 		.word	1073156860
+ 584 0428 FC12F73F 		.word	-716362124
+ 585 042c 742E4DD5 		.word	1070994603
+ 586 0430 AB14D63F 		.word	-1679830408
+ 587 0434 78D2DF9B 		.word	-1075071317
+ 588 0438 ABB6EBBF 		.word	1929721356
+ 589 043c 0C360573 		.word	-1075025093
+ 590 0440 3B6BECBF 		.word	-1442605620
+ 591 0444 CC9503AA 		.word	-1077462074
+ 592 0448 C63BC7BF 		.word	2066738144
+ 593 044c E0EB2F7B 		.word	-1074603378
+ 594 0450 8EDAF2BF 		.word	-1846913580
+ 595 0454 D455EA91 		.word	-1074586468
+ 596 0458 9C1CF3BF 		.word	2004706884
+ 597 045c 44667D77 		.word	1068285545
+ 598 0460 69BEAC3F 		.word	-682723072
+ 599 0464 00794ED7 		.word	-1074107691
+ 600 0468 D56AFABF 		.word	-2106229646
+ 601 046c 727C7582 		.word	-1078931724
+ 602 0470 F4CEB0BF 		.word	1189919744
+ 603 0474 00BCEC46 		.word	-1075731403
+ 604 0478 35A4E1BF 		.word	-1171006848
+ 605 047c 80DA33BA 		.word	1072338297
+ 606 0480 7995EA3F 		.word	-1472074644
+ 607 0484 6CEC41A8 		.word	1072665953
+ 608 0488 6195EF3F 		.word	1464941448
+ 609 048c 883B5157 		.word	1072199099
+ 610 0490 BB75E83F 		.word	-1662055108
+ 611 0494 3C0DEF9C 		.word	1072183056
+ 612 0498 1037E83F 		.word	1427079260
+ 613 049c 5C800F55 		.word	-1075827233
+ 614 04a0 DF2DE0BF 		.word	41933084
+ 615 04a4 1CD97F02 		.word	1072006512
+ 616 04a8 7085E53F 		.word	-137092336
+ 617 04ac 1023D4F7 		.word	-1075544106
+ 618 04b0 D67FE4BF 		.word	-950293616
+ 619 04b4 90AB5BC7 		.word	1070768798
+ 620 04b8 9EA2D23F 		.word	2054136864
+ 621 04bc 20A46F7A 		.word	-1075426317
+ 622 04c0 F34BE6BF 		.word	2007466552
+ 623 04c4 3882A777 		.word	-1077144078
+ 624 04c8 F215CCBF 		.word	-1226856704
+ 625 04cc 00A7DFB6 		.word	-1073999896
+ 626 04d0 E80FFCBF 		.word	-174786862
+ 627 04d4 D2F694F5 		.word	-1074759679
+ 628 04d8 0178F0BF 		.word	-2121582668
+ 629 04dc B4378B81 		.word	1073622716
+ 630 04e0 BC2EFE3F 		.word	-1299295384
+ 631 04e4 68538EB2 		.word	-1074708965
+ 632 04e8 1B3EF1BF 		.word	-1076590694
+ 633 04ec 9A87D4BF 		.word	1072202325
+ 634 04f0 5582E83F 		.word	-944236268
+ 635 04f4 1419B8C7 		.word	1071858387
+ 636 04f8 D342E33F 		.word	1617599108
+ 637 04fc 849A6A60 		.word	1072474633
+ 638 0500 09AAEC3F 		.word	-1474898736
+ 639 0504 D0D416A8 		.word	-1078361505
+ 640 0508 5F82B9BF 		.word	176029216
+ 641 050c 20FE7D0A 		.word	1071169269
+ 642 0510 F5BED83F 		.word	111114096
+ 643 0514 70779F06 		.word	-1074022715
+ 644 0518 C5B6FBBF 		.word	-526902934
+ 645 051c 6A1998E0 		.word	-1074046172
+ 646 0520 245BFBBF 		.word	1439173340
+ 647 0524 DC0AC855 		.word	-1074576390
+ 648 0528 FA43F3BF 		.word	244804800
+ 649 052c C06C970E 		.word	-1074378776
+ 650 0530 E847F6BF 		.word	-804004614
+ 651 0534 FADC13D0 		.word	-1074161693
+ 652 0538 E397F9BF 		.word	-227183720
+ 653 053c 987375F2 		.word	-1074284122
+ 654 0540 A6B9F7BF 		.word	972791300
+ 655 0544 049EFB39 		.word	1070286648
+ 656 0548 3847CB3F 		.word	124786608
+ 657 054c B0177007 		.word	-1074529577
+ 658 0550 D7FAF3BF 		.word	-2024808740
+ 659 0554 DCDE4F87 		.word	1073540922
+ 660 0558 3AEFFC3F 		.word	223556350
+ 661 055c FE32530D 		.word	1072119566
+ 662 0560 0E3FE73F 		.word	88468636
+ 663 0564 9CEC4505 		.word	1069875335
+ 664 0568 8700C53F 		.word	-685422432
+ 665 056c A04825D7 		.word	1072334052
+ 666 0570 E484EA3F 		.word	-664079524
+ 667 0574 5CF36AD8 		.word	-1074906890
+ 668 0578 F638EEBF 		.word	691293792
+ 669 057c 604E3429 		.word	1073434489
+ 670 0580 794FFB3F 		.word	1049553202
+ 671 0584 32E98E3E 	.L4:
+ 672              		.loc 1 216 0
+ 216:firefly_solver.c ****  params.x_ss_6[0] = -0.07904017565835986;
+ 673              	3, #3
+ 674 0588 9D23     		add	r1, r2, r3
+ 675 058a DB00     		ldr	r3, .L6+8
+ 676 058c D118     		ldr	r4, .L6+12
+ 677 058e E04C     		str	r3, [r1]
+ 678 0590 DE4B     		str	r4, [r1, #4]
+ 679 0592 0B60     		.loc 1 218 0
+ 680 0594 4C60     		mov	r3, #159
+ 217:firefly_solver.c ****  params.x_ss_6[1] = 1.3684127435065871;
+ 681              	 r3, #3
+ 682 0596 9E23     		add	r1, r2, r3
+ 683 0598 DB00     		ldr	r3, .L6+16
+ 684 059a D118     		ldr	r4, .L6+20
+ 685 059c DD4B     		str	r3, [r1]
+ 686 059e DE4C     		str	r4, [r1, #4]
+ 687 05a0 0B60     		.loc 1 219 0
+ 688 05a2 4C60     		mov	r3, #160
+ 218:firefly_solver.c ****  params.x_ss_6[2] = 0.979009293697437;
+ 689              	 r3, #3
+ 690 05a4 9F23     		add	r1, r2, r3
+ 691 05a6 DB00     		ldr	r3, .L6+24
+ 692 05a8 D118     		ldr	r4, .L6+28
+ 693 05aa DC4B     		str	r3, [r1]
+ 694 05ac DC4C     		str	r4, [r1, #4]
+ 695 05ae 0B60     		.loc 1 220 0
+ 696 05b0 4C60     		mov	r3, #161
+ 219:firefly_solver.c ****  params.x_ss_6[3] = 0.6413036255984501;
+ 697              	 r3, #3
+ 698 05b2 A023     		add	r1, r2, r3
+ 699 05b4 DB00     		ldr	r3, .L6+32
+ 700 05b6 D118     		ldr	r4, .L6+36
+ 701 05b8 DA4B     		str	r3, [r1]
+ 702 05ba DB4C     		str	r4, [r1, #4]
+ 703 05bc 0B60     		.loc 1 221 0
+ 704 05be 4C60     		mov	r3, #162
+ 220:firefly_solver.c ****  params.x_ss_6[4] = 1.6559010680237511;
+ 705              	 r3, #3
+ 706 05c0 A123     		add	r1, r2, r3
+ 707 05c2 DB00     		ldr	r3, .L6+40
+ 708 05c4 D118     		ldr	r4, .L6+44
+ 709 05c6 D94B     		str	r3, [r1]
+ 710 05c8 D94C     		str	r4, [r1, #4]
+ 711 05ca 0B60     		.loc 1 222 0
+ 712 05cc 4C60     		mov	r3, #163
+ 221:firefly_solver.c ****  params.x_ss_6[5] = 0.5346622551502991;
+ 713              	 r3, #3
+ 714 05ce A223     		add	r1, r2, r3
+ 715 05d0 DB00     		ldr	r3, .L6+48
+ 716 05d2 D118     		ldr	r4, .L6+52
+ 717 05d4 D74B     		str	r3, [r1]
+ 718 05d6 D84C     		str	r4, [r1, #4]
+ 719 05d8 0B60     		.loc 1 223 0
+ 720 05da 4C60     		mov	r3, #164
+ 222:firefly_solver.c ****  params.x_ss_6[6] = -0.5362376605895625;
+ 721              	 r3, #3
+ 722 05dc A323     		add	r1, r2, r3
+ 723 05de DB00     		ldr	r3, .L6+56
+ 724 05e0 D118     		ldr	r4, .L6+60
+ 725 05e2 D64B     		str	r3, [r1]
+ 726 05e4 D64C     		str	r4, [r1, #4]
+ 727 05e6 0B60     		.loc 1 224 0
+ 728 05e8 4C60     		mov	r3, #165
+ 223:firefly_solver.c ****  params.x_ss_6[7] = 0.2113782926017822;
+ 729              	 r3, #3
+ 730 05ea A423     		add	r1, r2, r3
+ 731 05ec DB00     		ldr	r3, .L6+64
+ 732 05ee D118     		ldr	r4, .L6+68
+ 733 05f0 D44B     		str	r3, [r1]
+ 734 05f2 D54C     		str	r4, [r1, #4]
+ 735 05f4 0B60     		.loc 1 225 0
+ 736 05f6 4C60     		mov	r3, #166
+ 224:firefly_solver.c ****  params.u_ss_6[0] = -1.2144776931994525;
+ 737              	 r3, #3
+ 738 05f8 A523     		add	r1, r2, r3
+ 739 05fa DB00     		ldr	r3, .L6+72
+ 740 05fc D118     		ldr	r4, .L6+76
+ 741 05fe D34B     		str	r3, [r1]
+ 742 0600 D34C     		str	r4, [r1, #4]
+ 743 0602 0B60     		.loc 1 226 0
+ 744 0604 4C60     		mov	r3, #167
+ 225:firefly_solver.c ****  params.u_ss_6[1] = -1.2317108144255875;
+ 745              	 r3, #3
+ 746 0606 A623     		add	r1, r2, r3
+ 747 0608 DB00     		ldr	r3, .L6+80
+ 748 060a D118     		ldr	r4, .L6+84
+ 749 060c D14B     		str	r3, [r1]
+ 750 060e D24C     		str	r4, [r1, #4]
+ 751 0610 0B60     		.loc 1 227 0
+ 752 0612 4C60     		mov	r3, #168
+ 226:firefly_solver.c ****  params.u_ss_6[2] = 0.9026784957312834;
+ 753              	 r3, #3
+ 754 0614 A723     		add	r1, r2, r3
+ 755 0616 DB00     		ldr	r3, .L6+88
+ 756 0618 D118     		ldr	r4, .L6+92
+ 757 061a D04B     		str	r3, [r1]
+ 758 061c D04C     		str	r4, [r1, #4]
+ 759 061e 0B60     		.loc 1 228 0
+ 760 0620 4C60     		mov	r3, #169
+ 227:firefly_solver.c ****  params.x_ss_7[0] = 1.1397468137245244;
+ 761              	 r3, #3
+ 762 0622 A823     		add	r1, r2, r3
+ 763 0624 DB00     		ldr	r3, .L6+96
+ 764 0626 D118     		ldr	r4, .L6+100
+ 765 0628 CE4B     		str	r3, [r1]
+ 766 062a CF4C     		str	r4, [r1, #4]
+ 767 062c 0B60     		.loc 1 229 0
+ 768 062e 4C60     		mov	r3, #170
+ 228:firefly_solver.c ****  params.x_ss_7[1] = 1.8883934547350631;
+ 769              	 r3, #3
+ 770 0630 A923     		add	r1, r2, r3
+ 771 0632 DB00     		ldr	r3, .L6+104
+ 772 0634 D118     		ldr	r4, .L6+108
+ 773 0636 CD4B     		str	r3, [r1]
+ 774 0638 CD4C     		str	r4, [r1, #4]
+ 775 063a 0B60     		.loc 1 230 0
+ 776 063c 4C60     		mov	r3, #171
+ 229:firefly_solver.c ****  params.x_ss_7[2] = 1.4038856681660068;
+ 777              	 r3, #3
+ 778 063e AA23     		add	r1, r2, r3
+ 779 0640 DB00     		ldr	r3, .L6+112
+ 780 0642 D118     		ldr	r4, .L6+116
+ 781 0644 CB4B     		str	r3, [r1]
+ 782 0646 CC4C     		str	r4, [r1, #4]
+ 783 0648 0B60     		.loc 1 231 0
+ 784 064a 4C60     		mov	r3, #172
+ 230:firefly_solver.c ****  params.x_ss_7[3] = 0.17437730638329096;
+ 785              	 r3, #3
+ 786 064c AB23     		add	r1, r2, r3
+ 787 064e DB00     		ldr	r3, .L6+120
+ 788 0650 D118     		ldr	r4, .L6+124
+ 789 0652 CA4B     		str	r3, [r1]
+ 790 0654 CA4C     		str	r4, [r1, #4]
+ 791 0656 0B60     		.loc 1 232 0
+ 792 0658 4C60     		mov	r3, #173
+ 231:firefly_solver.c ****  params.x_ss_7[4] = -1.6408365219077408;
+ 793              	 r3, #3
+ 794 065a AC23     		add	r1, r2, r3
+ 795 065c DB00     		ldr	r3, .L6+128
+ 796 065e D118     		ldr	r4, .L6+132
+ 797 0660 C84B     		str	r3, [r1]
+ 798 0662 C94C     		str	r4, [r1, #4]
+ 799 0664 0B60     		.loc 1 233 0
+ 800 0666 4C60     		mov	r3, #174
+ 232:firefly_solver.c ****  params.x_ss_7[5] = -0.04450702153554875;
+ 801              	 r3, #3
+ 802 0668 AD23     		add	r1, r2, r3
+ 803 066a DB00     		ldr	r3, .L6+136
+ 804 066c D118     		ldr	r4, .L6+140
+ 805 066e C74B     		str	r3, [r1]
+ 806 0670 C74C     		str	r4, [r1, #4]
+ 807 0672 0B60     		.loc 1 234 0
+ 808 0674 4C60     		mov	r3, #175
+ 233:firefly_solver.c ****  params.x_ss_7[6] = 1.7117453902485025;
+ 809              	 r3, #3
+ 810 0676 AE23     		add	r1, r2, r3
+ 811 0678 DB00     		ldr	r3, .L6+144
+ 812 067a D118     		ldr	r4, .L6+148
+ 813 067c C54B     		str	r3, [r1]
+ 814 067e C64C     		str	r4, [r1, #4]
+ 815 0680 0B60     		.loc 1 235 0
+ 816 0682 4C60     		mov	r3, #176
+ 234:firefly_solver.c ****  params.x_ss_7[7] = 1.1504727980139053;
+ 817              	 r3, #3
+ 818 0684 AF23     		add	r1, r2, r3
+ 819 0686 DB00     		ldr	r3, .L6+152
+ 820 0688 D118     		ldr	r4, .L6+156
+ 821 068a C44B     		str	r3, [r1]
+ 822 068c C44C     		str	r4, [r1, #4]
+ 823 068e 0B60     		.loc 1 236 0
+ 824 0690 4C60     		mov	r3, #177
+ 235:firefly_solver.c ****  params.u_ss_7[0] = -0.05962309578364744;
+ 825              	 r3, #3
+ 826 0692 B023     		add	r1, r2, r3
+ 827 0694 DB00     		ldr	r3, .L6+160
+ 828 0696 D118     		ldr	r4, .L6+164
+ 829 0698 C24B     		str	r3, [r1]
+ 830 069a C34C     		str	r4, [r1, #4]
+ 831 069c 0B60     		.loc 1 237 0
+ 832 069e 4C60     		mov	r3, #178
+ 236:firefly_solver.c ****  params.u_ss_7[1] = -0.1788825540764547;
+ 833              	 r3, #3
+ 834 06a0 B123     		add	r1, r2, r3
+ 835 06a2 DB00     		ldr	r3, .L6+168
+ 836 06a4 D118     		ldr	r4, .L6+172
+ 837 06a6 C14B     		str	r3, [r1]
+ 838 06a8 C14C     		str	r4, [r1, #4]
+ 839 06aa 0B60     		.loc 1 238 0
+ 840 06ac 4C60     		mov	r3, #179
+ 237:firefly_solver.c ****  params.u_ss_7[2] = -1.1280569263625857;
+ 841              	 r3, #3
+ 842 06ae B223     		add	r1, r2, r3
+ 843 06b0 DB00     		ldr	r3, .L6+176
+ 844 06b2 D118     		ldr	r4, .L6+180
+ 845 06b4 BF4B     		str	r3, [r1]
+ 846 06b6 C04C     		str	r4, [r1, #4]
+ 847 06b8 0B60     		.loc 1 239 0
+ 848 06ba 4C60     		mov	r3, #180
+ 238:firefly_solver.c ****  params.x_ss_8[0] = -1.2911464767927057;
+ 849              	 r3, #3
+ 850 06bc B323     		add	r1, r2, r3
+ 851 06be DB00     		ldr	r3, .L6+184
+ 852 06c0 D118     		ldr	r4, .L6+188
+ 853 06c2 BE4B     		str	r3, [r1]
+ 854 06c4 BE4C     		str	r4, [r1, #4]
+ 855 06c6 0B60     		.loc 1 240 0
+ 856 06c8 4C60     		mov	r3, #181
+ 239:firefly_solver.c ****  params.x_ss_8[1] = -1.7055053231225696;
+ 857              	 r3, #3
+ 858 06ca B423     		add	r1, r2, r3
+ 859 06cc DB00     		ldr	r3, .L6+192
+ 860 06ce D118     		ldr	r4, .L6+196
+ 861 06d0 BC4B     		str	r3, [r1]
+ 862 06d2 BD4C     		str	r4, [r1, #4]
+ 863 06d4 0B60     		.loc 1 241 0
+ 864 06d6 4C60     		mov	r3, #182
+ 240:firefly_solver.c ****  params.x_ss_8[2] = 1.56957275034837;
+ 865              	 r3, #3
+ 866 06d8 B523     		add	r1, r2, r3
+ 867 06da DB00     		ldr	r3, .L6+200
+ 868 06dc D118     		ldr	r4, .L6+204
+ 869 06de BB4B     		str	r3, [r1]
+ 870 06e0 BB4C     		str	r4, [r1, #4]
+ 871 06e2 0B60     		.loc 1 242 0
+ 872 06e4 4C60     		mov	r3, #183
+ 241:firefly_solver.c ****  params.x_ss_8[3] = 0.5607064675962357;
+ 873              	 r3, #3
+ 874 06e6 B623     		add	r1, r2, r3
+ 875 06e8 DB00     		ldr	r3, .L6+208
+ 876 06ea D118     		ldr	r4, .L6+212
+ 877 06ec B94B     		str	r3, [r1]
+ 878 06ee BA4C     		str	r4, [r1, #4]
+ 879 06f0 0B60     		.loc 1 243 0
+ 880 06f2 4C60     		mov	r3, #184
+ 242:firefly_solver.c ****  params.x_ss_8[4] = -1.4266707301147146;
+ 881              	 r3, #3
+ 882 06f4 B723     		add	r1, r2, r3
+ 883 06f6 DB00     		ldr	r3, .L6+216
+ 884 06f8 D118     		ldr	r4, .L6+220
+ 885 06fa B84B     		str	r3, [r1]
+ 886 06fc B84C     		str	r4, [r1, #4]
+ 887 06fe 0B60     		.loc 1 244 0
+ 888 0700 4C60     		mov	r3, #185
+ 243:firefly_solver.c ****  params.x_ss_8[5] = -0.3434923211351708;
+ 889              	 r3, #3
+ 890 0702 B823     		add	r1, r2, r3
+ 891 0704 DB00     		ldr	r3, .L6+224
+ 892 0706 D118     		ldr	r4, .L6+228
+ 893 0708 B64B     		str	r3, [r1]
+ 894 070a B74C     		str	r4, [r1, #4]
+ 895 070c 0B60     		.loc 1 245 0
+ 896 070e 4C60     		mov	r3, #186
+ 244:firefly_solver.c ****  params.x_ss_8[6] = -1.8035643024085055;
+ 897              	 r3, #3
+ 898 0710 B923     		add	r1, r2, r3
+ 899 0712 DB00     		ldr	r3, .L6+232
+ 900 0714 D118     		ldr	r4, .L6+236
+ 901 0716 B54B     		str	r3, [r1]
+ 902 0718 B54C     		str	r4, [r1, #4]
+ 903 071a 0B60     		.loc 1 246 0
+ 904 071c 4C60     		mov	r3, #187
+ 245:firefly_solver.c ****  params.x_ss_8[7] = -1.1625066019105454;
+ 905              	 r3, #3
+ 906 071e BA23     		add	r1, r2, r3
+ 907 0720 DB00     		ldr	r3, .L6+240
+ 908 0722 D118     		ldr	r4, .L6+244
+ 909 0724 B34B     		str	r3, [r1]
+ 910 0726 B44C     		str	r4, [r1, #4]
+ 911 0728 0B60     		.loc 1 247 0
+ 912 072a 4C60     		mov	r3, #188
+ 246:firefly_solver.c ****  params.u_ss_8[0] = 0.9228324965161532;
+ 913              	 r3, #3
+ 914 072c BB23     		add	r1, r2, r3
+ 915 072e DB00     		ldr	r3, .L6+248
+ 916 0730 D118     		ldr	r4, .L6+252
+ 917 0732 B24B     		str	r3, [r1]
+ 918 0734 B24C     		str	r4, [r1, #4]
+ 919 0736 0B60     		.loc 1 248 0
+ 920 0738 4C60     		mov	r3, #189
+ 247:firefly_solver.c ****  params.u_ss_8[1] = 0.6044910817663975;
+ 921              	 r3, #3
+ 922 073a BC23     		add	r1, r2, r3
+ 923 073c DB00     		ldr	r3, .L6+256
+ 924 073e D118     		ldr	r4, .L6+260
+ 925 0740 B04B     		str	r3, [r1]
+ 926 0742 B14C     		str	r4, [r1, #4]
+ 927 0744 0B60     		.loc 1 249 0
+ 928 0746 4C60     		mov	r3, #190
+ 248:firefly_solver.c ****  params.u_ss_8[2] = -0.0840868104920891;
+ 929              	 r3, #3
+ 930 0748 BD23     		add	r1, r2, r3
+ 931 074a DB00     		ldr	r3, .L6+264
+ 932 074c D118     		ldr	r4, .L6+268
+ 933 074e AF4B     		str	r3, [r1]
+ 934 0750 AF4C     		str	r4, [r1, #4]
+ 935 0752 0B60     		.loc 1 250 0
+ 936 0754 4C60     		mov	r3, #191
+ 249:firefly_solver.c ****  params.x_ss_9[0] = -0.900877978017443;
+ 937              	 r3, #3
+ 938 0756 BE23     		add	r1, r2, r3
+ 939 0758 DB00     		ldr	r3, .L6+272
+ 940 075a D118     		ldr	r4, .L6+276
+ 941 075c AD4B     		str	r3, [r1]
+ 942 075e AE4C     		str	r4, [r1, #4]
+ 943 0760 0B60     		.loc 1 251 0
+ 944 0762 4C60     		mov	r3, #192
+ 250:firefly_solver.c ****  params.x_ss_9[1] = 0.608892500264739;
+ 945              	 r3, #3
+ 946 0764 BF23     		add	r1, r2, r3
+ 947 0766 DB00     		ldr	r3, .L6+280
+ 948 0768 D118     		ldr	r4, .L6+284
+ 949 076a AC4B     		str	r3, [r1]
+ 950 076c AC4C     		str	r4, [r1, #4]
+ 951 076e 0B60     		.loc 1 252 0
+ 952 0770 4C60     		mov	r3, #193
+ 251:firefly_solver.c ****  params.x_ss_9[2] = 1.8257980452695217;
+ 953              	 r3, #3
+ 954 0772 C023     		add	r1, r2, r3
+ 955 0774 DB00     		ldr	r3, .L6+288
+ 956 0776 D118     		ldr	r4, .L6+292
+ 957 0778 AA4B     		str	r3, [r1]
+ 958 077a AB4C     		str	r4, [r1, #4]
+ 959 077c 0B60     		.loc 1 253 0
+ 960 077e 4C60     		mov	r3, #194
+ 252:firefly_solver.c ****  params.x_ss_9[3] = -0.25791777529922877;
+ 961              	 r3, #3
+ 962 0780 C123     		add	r1, r2, r3
+ 963 0782 DB00     		ldr	r3, .L6+296
+ 964 0784 D118     		ldr	r4, .L6+300
+ 965 0786 A94B     		str	r3, [r1]
+ 966 0788 A94C     		str	r4, [r1, #4]
+ 967 078a 0B60     		.loc 1 254 0
+ 968 078c 4C60     		mov	r3, #195
+ 253:firefly_solver.c ****  params.x_ss_9[4] = -1.7194699796493191;
+ 969              	 r3, #3
+ 970 078e C223     		add	r1, r2, r3
+ 971 0790 DB00     		ldr	r3, .L6+304
+ 972 0792 D118     		ldr	r4, .L6+308
+ 973 0794 A74B     		str	r3, [r1]
+ 974 0796 A84C     		str	r4, [r1, #4]
+ 975 0798 0B60     		.loc 1 255 0
+ 976 079a 4C60     		mov	r3, #196
+ 254:firefly_solver.c ****  params.x_ss_9[5] = -1.7690740487081298;
+ 977              	 r3, #3
+ 978 079c C323     		add	r1, r2, r3
+ 979 079e DB00     		ldr	r3, .L6+312
+ 980 07a0 D118     		ldr	r4, .L6+316
+ 981 07a2 A64B     		str	r3, [r1]
+ 982 07a4 A64C     		str	r4, [r1, #4]
+ 983 07a6 0B60     		.loc 1 256 0
+ 984 07a8 4C60     		mov	r3, #197
+ 255:firefly_solver.c ****  params.x_ss_9[6] = -1.6685159248097703;
+ 985              	 r3, #3
+ 986 07aa C423     		add	r1, r2, r3
+ 987 07ac DB00     		ldr	r3, .L6+320
+ 988 07ae D118     		ldr	r4, .L6+324
+ 989 07b0 A44B     		str	r3, [r1]
+ 990 07b2 A54C     		str	r4, [r1, #4]
+ 991 07b4 0B60     		.loc 1 257 0
+ 992 07b6 4C60     		mov	r3, #198
+ 256:firefly_solver.c ****  params.x_ss_9[7] = 1.8388287490128845;
+ 993              	 r3, #3
+ 994 07b8 C523     		add	r1, r2, r3
+ 995 07ba DB00     		ldr	r3, .L6+328
+ 996 07bc D118     		ldr	r4, .L6+332
+ 997 07be A34B     		str	r3, [r1]
+ 998 07c0 A34C     		str	r4, [r1, #4]
+ 999 07c2 0B60     		.loc 1 258 0
+ 1000 07c4 4C60     		mov	r3, #199
+ 257:firefly_solver.c ****  params.u_ss_9[0] = 0.16304334474597537;
+ 1001              	 r3, #3
+ 1002 07c6 C623     		add	r1, r2, r3
+ 1003 07c8 DB00     		ldr	r3, .L6+336
+ 1004 07ca D118     		ldr	r4, .L6+340
+ 1005 07cc A14B     		str	r3, [r1]
+ 1006 07ce A24C     		str	r4, [r1, #4]
+ 1007 07d0 0B60     		.loc 1 259 0
+ 1008 07d2 4C60     		mov	r3, #200
+ 258:firefly_solver.c ****  params.u_ss_9[1] = 1.3498497306788897;
+ 1009              	 r3, #3
+ 1010 07d4 C723     		add	r1, r2, r3
+ 1011 07d6 DB00     		ldr	r3, .L6+344
+ 1012 07d8 D118     		ldr	r4, .L6+348
+ 1013 07da A04B     		str	r3, [r1]
+ 1014 07dc A04C     		str	r4, [r1, #4]
+ 1015 07de 0B60     		.loc 1 260 0
+ 1016 07e0 4C60     		mov	r3, #201
+ 259:firefly_solver.c ****  params.u_ss_9[2] = -1.3198658230514613;
+ 1017              	 r3, #3
+ 1018 07e2 C823     		add	r1, r2, r3
+ 1019 07e4 DB00     		ldr	r3, .L6+352
+ 1020 07e6 D118     		ldr	r4, .L6+356
+ 1021 07e8 9E4B     		str	r3, [r1]
+ 1022 07ea 9F4C     		str	r4, [r1, #4]
+ 1023 07ec 0B60     		.loc 1 261 0
+ 1024 07ee 4C60     		mov	r3, #202
+ 260:firefly_solver.c ****  params.x_ss_10[0] = -0.9586197090843394;
+ 1025              	 r3, #3
+ 1026 07f0 C923     		add	r1, r2, r3
+ 1027 07f2 DB00     		ldr	r3, .L6+360
+ 1028 07f4 D118     		ldr	r4, .L6+364
+ 1029 07f6 9D4B     		str	r3, [r1]
+ 1030 07f8 9D4C     		str	r4, [r1, #4]
+ 1031 07fa 0B60     		.loc 1 262 0
+ 1032 07fc 4C60     		mov	r3, #203
+ 261:firefly_solver.c ****  params.x_ss_10[1] = 0.7679100474913709;
+ 1033              	 r3, #3
+ 1034 07fe CA23     		add	r1, r2, r3
+ 1035 0800 DB00     		ldr	r3, .L6+368
+ 1036 0802 D118     		ldr	r4, .L6+372
+ 1037 0804 9B4B     		str	r3, [r1]
+ 1038 0806 9C4C     		str	r4, [r1, #4]
+ 1039 0808 0B60     		.loc 1 263 0
+ 1040 080a 4C60     		mov	r3, #204
+ 262:firefly_solver.c ****  params.x_ss_10[2] = 1.5822813125679343;
+ 1041              	 r3, #3
+ 1042 080c CB23     		add	r1, r2, r3
+ 1043 080e DB00     		ldr	r3, .L6+376
+ 1044 0810 D118     		ldr	r4, .L6+380
+ 1045 0812 9A4B     		str	r3, [r1]
+ 1046 0814 9A4C     		str	r4, [r1, #4]
+ 1047 0816 0B60     		.loc 1 264 0
+ 1048 0818 4C60     		mov	r3, #205
+ 263:firefly_solver.c ****  params.x_ss_10[3] = -0.6372460621593619;
+ 1049              	 r3, #3
+ 1050 081a CC23     		add	r1, r2, r3
+ 1051 081c DB00     		ldr	r3, .L6+384
+ 1052 081e D118     		ldr	r4, .L6+388
+ 1053 0820 984B     		str	r3, [r1]
+ 1054 0822 994C     		str	r4, [r1, #4]
+ 1055 0824 0B60     		.loc 1 265 0
+ 1056 0826 4C60     		mov	r3, #206
+ 264:firefly_solver.c ****  params.x_ss_10[4] = -1.741307208038867;
+ 1057              	 r3, #3
+ 1058 0828 CD23     		add	r1, r2, r3
+ 1059 082a DB00     		ldr	r3, .L6+392
+ 1060 082c D118     		ldr	r4, .L6+396
+ 1061 082e 974B     		str	r3, [r1]
+ 1062 0830 974C     		str	r4, [r1, #4]
+ 1063 0832 0B60     		.loc 1 266 0
+ 1064 0834 4C60     		mov	r3, #207
+ 265:firefly_solver.c ****  params.x_ss_10[5] = 1.456478677642575;
+ 1065              	 r3, #3
+ 1066 0836 CE23     		add	r1, r2, r3
+ 1067 0838 DB00     		ldr	r3, .L6+400
+ 1068 083a D118     		ldr	r4, .L6+404
+ 1069 083c 954B     		str	r3, [r1]
+ 1070 083e 964C     		str	r4, [r1, #4]
+ 1071 0840 0B60     		.loc 1 267 0
+ 1072 0842 4C60     		mov	r3, #208
+ 266:firefly_solver.c ****  params.x_ss_10[6] = -0.8365102166820959;
+ 1073              	 r3, #3
+ 1074 0844 CF23     		add	r1, r2, r3
+ 1075 0846 DB00     		ldr	r3, .L6+408
+ 1076 0848 D118     		ldr	r4, .L6+412
+ 1077 084a 944B     		str	r3, [r1]
+ 1078 084c 944C     		str	r4, [r1, #4]
+ 1079 084e 0B60     		.loc 1 268 0
+ 1080 0850 4C60     		mov	r3, #209
+ 267:firefly_solver.c ****  params.x_ss_10[7] = 0.9643296255982503;
+ 1081              	 r3, #3
+ 1082 0852 D023     		add	r1, r2, r3
+ 1083 0854 DB00     		ldr	r3, .L6+416
+ 1084 0856 D118     		ldr	r4, .L6+420
+ 1085 0858 924B     		str	r3, [r1]
+ 1086 085a 934C     		str	r4, [r1, #4]
+ 1087 085c 0B60     		.loc 1 269 0
+ 1088 085e 4C60     		mov	r3, #210
+ 268:firefly_solver.c ****  params.u_ss_10[0] = -1.367865381194024;
+ 1089              	 r3, #3
+ 1090 0860 D123     		add	r1, r2, r3
+ 1091 0862 DB00     		ldr	r3, .L6+424
+ 1092 0864 D118     		ldr	r4, .L6+428
+ 1093 0866 914B     		str	r3, [r1]
+ 1094 0868 914C     		str	r4, [r1, #4]
+ 1095 086a 0B60     		.loc 1 270 0
+ 1096 086c 4C60     		mov	r3, #211
+ 269:firefly_solver.c ****  params.u_ss_10[1] = 0.7798537405635035;
+ 1097              	 r3, #3
+ 1098 086e D223     		add	r1, r2, r3
+ 1099 0870 DB00     		ldr	r3, .L6+432
+ 1100 0872 D118     		ldr	r4, .L6+436
+ 1101 0874 8F4B     		str	r3, [r1]
+ 1102 0876 904C     		str	r4, [r1, #4]
+ 1103 0878 0B60     		.loc 1 271 0
+ 1104 087a 4C60     		mov	r3, #212
+ 270:firefly_solver.c ****  params.u_ss_10[2] = 1.3656784761245926;
+ 1105              	 r3, #3
+ 1106 087c D323     		add	r1, r2, r3
+ 1107 087e DB00     		ldr	r3, .L6+440
+ 1108 0880 D118     		ldr	r4, .L6+444
+ 1109 0882 8E4B     		str	r3, [r1]
+ 1110 0884 8E4C     		str	r4, [r1, #4]
+ 1111 0886 0B60     		.loc 1 272 0
+ 1112 0888 4C60     		mov	r3, #213
+ 271:firefly_solver.c ****  params.x_ss_11[0] = 0.9086083149868371;
+ 1113              	 r3, #3
+ 1114 088a D423     		add	r1, r2, r3
+ 1115 088c DB00     		ldr	r3, .L6+448
+ 1116 088e D118     		ldr	r4, .L6+452
+ 1117 0890 8C4B     		str	r3, [r1]
+ 1118 0892 8D4C     		str	r4, [r1, #4]
+ 1119 0894 0B60     		.loc 1 273 0
+ 1120 0896 4C60     		mov	r3, #214
+ 272:firefly_solver.c ****  params.x_ss_11[1] = -0.5635699005460344;
+ 1121              	 r3, #3
+ 1122 0898 D523     		add	r1, r2, r3
+ 1123 089a DB00     		ldr	r3, .L6+456
+ 1124 089c D118     		ldr	r4, .L6+460
+ 1125 089e 8B4B     		str	r3, [r1]
+ 1126 08a0 8B4C     		str	r4, [r1, #4]
+ 1127 08a2 0B60     		.loc 1 274 0
+ 1128 08a4 4C60     		mov	r3, #215
+ 273:firefly_solver.c ****  params.x_ss_11[2] = 0.9067590059607915;
+ 1129              	 r3, #3
+ 1130 08a6 D623     		add	r1, r2, r3
+ 1131 08a8 DB00     		ldr	r3, .L6+464
+ 1132 08aa D118     		ldr	r4, .L6+468
+ 1133 08ac 894B     		str	r3, [r1]
+ 1134 08ae 8A4C     		str	r4, [r1, #4]
+ 1135 08b0 0B60     		.loc 1 275 0
+ 1136 08b2 4C60     		mov	r3, #216
+ 274:firefly_solver.c ****  params.x_ss_11[3] = -1.4421315032701587;
+ 1137              	 r3, #3
+ 1138 08b4 D723     		add	r1, r2, r3
+ 1139 08b6 DB00     		ldr	r3, .L6+472
+ 1140 08b8 D118     		ldr	r4, .L6+476
+ 1141 08ba 884B     		str	r3, [r1]
+ 1142 08bc 884C     		str	r4, [r1, #4]
+ 1143 08be 0B60     		.loc 1 276 0
+ 1144 08c0 4C60     		mov	r3, #217
+ 275:firefly_solver.c ****  params.x_ss_11[4] = -0.7447235390671119;
+ 1145              	 r3, #3
+ 1146 08c2 D823     		add	r1, r2, r3
+ 1147 08c4 DB00     		ldr	r3, .L6+480
+ 1148 08c6 D118     		ldr	r4, .L6+484
+ 1149 08c8 864B     		str	r3, [r1]
+ 1150 08ca 874C     		str	r4, [r1, #4]
+ 1151 08cc 0B60     		.loc 1 277 0
+ 1152 08ce 4C60     		mov	r3, #218
+ 276:firefly_solver.c ****  params.x_ss_11[5] = -0.32166897326822186;
+ 1153              	 r3, #3
+ 1154 08d0 D923     		add	r1, r2, r3
+ 1155 08d2 DB00     		ldr	r3, .L6+488
+ 1156 08d4 D118     		ldr	r4, .L6+492
+ 1157 08d6 854B     		str	r3, [r1]
+ 1158 08d8 854C     		str	r4, [r1, #4]
+ 1159 08da 0B60     		.loc 1 278 0
+ 1160 08dc 4C60     		mov	r3, #219
+ 277:firefly_solver.c ****  params.x_ss_11[6] = 1.5088481557772684;
+ 1161              	 r3, #3
+ 1162 08de DA23     		add	r1, r2, r3
+ 1163 08e0 DB00     		ldr	r3, .L6+496
+ 1164 08e2 D118     		ldr	r4, .L6+500
+ 1165 08e4 834B     		str	r3, [r1]
+ 1166 08e6 844C     		str	r4, [r1, #4]
+ 1167 08e8 0B60     		.loc 1 279 0
+ 1168 08ea 4C60     		mov	r3, #220
+ 278:firefly_solver.c ****  params.x_ss_11[7] = -1.385039165715428;
+ 1169              	 r3, #3
+ 1170 08ec DB23     		add	r1, r2, r3
+ 1171 08ee DB00     		ldr	r3, .L6+504
+ 1172 08f0 D118     		ldr	r4, .L6+508
+ 1173 08f2 824B     		str	r3, [r1]
+ 1174 08f4 824C     		str	r4, [r1, #4]
+ 1175 08f6 0B60     		b	.L7
+ 1176 08f8 4C60     	.L8:
+ 279:firefly_solver.c ****  params.u_ss_11[0] = 1.5204991609972622;
+ 1177              	2
+ 1178 08fa DC23     	.L6:
+ 1179 08fc DB00     		.word	1073067350
+ 1180 08fe D118     		.word	-862847556
+ 1181 0900 804B     		.word	1072494601
+ 1182 0902 814C     		.word	-1910962288
+ 1183 0904 0B60     		.word	-1078707206
+ 1184 0906 4C60     		.word	428200704
+ 1185 0908 00E1     		.word	1073079556
+ 1186              		.word	-1026775656
+ 1187 090a 0000     		.word	1072649227
+ 1188              		.word	1281172284
+ 1189 090c 56B5F53F 		.word	1071941007
+ 1190 0910 BCFD91CC 		.word	777522400
+ 1191 0914 09F8EC3F 		.word	1073381010
+ 1192 0918 9007198E 		.word	508112124
+ 1193 091c FA3BB4BF 		.word	1071717364
+ 1194 0920 00D38519 		.word	76076584
+ 1195 0924 04E5F53F 		.word	-1075762981
+ 1196 0928 98A5CCC2 		.word	-505170952
+ 1197 092c 0B54EF3F 		.word	1070272113
+ 1198 0930 3C235D4C 		.word	-1561883536
+ 1199 0934 8F85E43F 		.word	-1074565504
+ 1200 0938 E00C582E 		.word	694171122
+ 1201 093c 927EFA3F 		.word	-1074547434
+ 1202 0940 FC2C491E 		.word	1713464854
+ 1203 0944 F41BE13F 		.word	1072489150
+ 1204 0948 28D68804 		.word	54459552
+ 1205 094c DB28E1BF 		.word	1072839783
+ 1206 0950 F8B3E3E1 		.word	665496622
+ 1207 0954 710ECB3F 		.word	1073624796
+ 1208 0958 708CE7A2 		.word	237049010
+ 1209 095c 806EF3BF 		.word	1073116752
+ 1210 0960 F2356029 		.word	-780039768
+ 1211 0964 16B5F3BF 		.word	1069961726
+ 1212 0968 16662166 		.word	-569747488
+ 1213 096c BEE2EC3F 		.word	-1074118435
+ 1214 0970 A0FC3E03 		.word	-872754830
+ 1215 0974 673CF23F 		.word	-1079588449
+ 1216 0978 2EACAA27 		.word	-740292992
+ 1217 097c DC36FE3F 		.word	1073439567
+ 1218 0980 B214210E 		.word	576922400
+ 1219 0984 5076F63F 		.word	1072851030
+ 1220 0988 A88981D1 		.word	707167348
+ 1221 098c FE51C63F 		.word	-1079081237
+ 1222 0990 E0570ADE 		.word	485768896
+ 1223 0994 DD40FABF 		.word	-1077484129
+ 1224 0998 72D1FACB 		.word	-1614108064
+ 1225 099c 9FC9A6BF 		.word	-1074656123
+ 1226 09a0 8006E0D3 		.word	1802243760
+ 1227 09a4 4F63FB3F 		.word	-1074485111
+ 1228 09a8 20236322 		.word	893565318
+ 1229 09ac 5668F23F 		.word	-1074050625
+ 1230 09b0 7484262A 		.word	-216042990
+ 1231 09b4 EB86AEBF 		.word	1073290488
+ 1232 09b8 C03EF41C 		.word	1358366268
+ 1233 09bc 9FE5C6BF 		.word	1071771982
+ 1234 09c0 60AACA9F 		.word	-1331730284
+ 1235 09c4 850CF2BF 		.word	-1074343004
+ 1236 09c8 B00E6C6B 		.word	-1342173986
+ 1237 09cc 89A8F4BF 		.word	-1076495417
+ 1238 09d0 86B94235 		.word	929888472
+ 1239 09d4 BF49FBBF 		.word	-1073947802
+ 1240 09d8 12721FF3 		.word	1039220170
+ 1241 09dc F81CF93F 		.word	-1074620000
+ 1242 09e0 3C06F750 		.word	-2050396118
+ 1243 09e4 4EF1E13F 		.word	1072531416
+ 1244 09e8 94689FB0 		.word	67576344
+ 1245 09ec A4D3F6BF 		.word	1071863805
+ 1246 09f0 DE0C00B0 		.word	-1369628288
+ 1247 09f4 C7FBD5BF 		.word	-1078622538
+ 1248 09f8 D8F86C37 		.word	-1793677792
+ 1249 09fc 66DBFCBF 		.word	-1074998274
+ 1250 0a00 CA3DF13D 		.word	229158996
+ 1251 0a04 A099F2BF 		.word	1071873036
+ 1252 0a08 2A70C985 		.word	535647696
+ 1253 0a0c D887ED3F 		.word	1073559160
+ 1254 0a10 18220704 		.word	47745150
+ 1255 0a14 FD57E33F 		.word	-1076854343
+ 1256 0a18 80215DAE 		.word	-1904351320
+ 1257 0a1c B686B5BF 		.word	-1074035982
+ 1258 0a20 20A61695 		.word	-200228092
+ 1259 0a24 FED3ECBF 		.word	-1073983968
+ 1260 0a28 54B0A80D 		.word	-1762232916
+ 1261 0a2c 0C7CE33F 		.word	-1074089411
+ 1262 0a30 D055ED1F 		.word	-1054958516
+ 1263 0a34 7836FD3F 		.word	1073572823
+ 1264 0a38 7E88D802 		.word	-1312864410
+ 1265 0a3c B981D0BF 		.word	1069866650
+ 1266 0a40 A8E77D8E 		.word	-1262364560
+ 1267 0a44 F282FBBF 		.word	1073060092
+ 1268 0a48 04C310F4 		.word	133987292
+ 1269 0a4c 204EFCBF 		.word	-1074454997
+ 1270 0a50 AC75F696 		.word	-1609444466
+ 1271 0a54 3DB2FABF 		.word	-1074877181
+ 1272 0a58 4C9C1EC1 		.word	1031417672
+ 1273 0a5c D76BFD3F 		.word	1072206520
+ 1274 0a60 6647BFB1 		.word	394778892
+ 1275 0a64 9ADEC43F 		.word	1073303814
+ 1276 0a68 70D8C1B4 		.word	900256216
+ 1277 0a6c FC98F53F 		.word	-1075551151
+ 1278 0a70 DC7BFC07 		.word	-628140556
+ 1279 0a74 2B1EF5BF 		.word	-1074013084
+ 1280 0a78 8ED311A0 		.word	-227733928
+ 1281 0a7c 03ADEEBF 		.word	1073171900
+ 1282 0a80 482F7A3D 		.word	-1778598610
+ 1283 0a84 B892E83F 		.word	-1075133263
+ 1284 0a88 0CD98717 		.word	317549656
+ 1285 0a8c 0651F93F 		.word	1072618441
+ 1286 0a90 D8D1A835 		.word	-846183196
+ 1287 0a94 5164E4BF 		.word	-1074404666
+ 1288 0a98 F4558FDA 		.word	-816254648
+ 1289 0a9c 64DCFBBF 		.word	1072231567
+ 1290 0aa0 580E6DF2 		.word	-722713148
+ 1291 0aa4 BC4DF73F 		.word	1073076689
+ 1292 0aa8 2EBDFC95 		.word	-1401100706
+ 1293 0aac B1C4EABF 		.word	1072501585
+ 1294 0ab0 586CED12 		.word	-1095254132
+ 1295 0ab4 C9DBEE3F 		.word	-1075705661
+ 1296 0ab8 E44490CD 		.word	-1099211336
+ 1297 0abc C6E2F5BF 		.word	1072497707
+ 1298 0ac0 48F158CF 		.word	1988005868
+ 1299 0ac4 8FF4E83F 		.word	-1074326792
+ 1300 0ac8 C445ECD4 		.word	2075212276
+ 1301 0acc D1D9F53F 		.word	-1075325754
+ 1302 0ad0 5EE67CAC 		.word	1973115156
+ 1303 0ad4 5113ED3F 		.word	-1076586951
+ 1304 0ad8 8CBFB7BE 		.word	1981074264
+ 1305 0adc C308E2BF 		.word	1073226813
+ 1306 0ae0 B85D7BBE 		.word	-155510866
+ 1307 0ae4 2B04ED3F 	.L7:
+ 1308 0ae8 EC8F7E76 		.loc 1 280 0
+ 1309 0aec F812F7BF 		mov	r3, #221
+ 1310 0af0 F439B17B 		lsl	r3, r3, #3
+ 1311 0af4 C6D4E7BF 		add	r1, r2, r3
+ 1312 0af8 14599B75 		ldr	r4, .L9+4
+ 1313 0afc 3996D4BF 		ldr	r3, .L9
+ 1314 0b00 58CB1476 		str	r3, [r1]
+ 1315 0b04 3D24F83F 		str	r4, [r1, #4]
+ 1316 0b08 AE17BBF6 		.loc 1 281 0
+ 1317              		mov	r3, #222
+ 280:firefly_solver.c ****  params.u_ss_11[1] = 1.1958572768832156;
+ 1318              	dd	r1, r2, r3
+ 1319 0b0c DD23     		ldr	r3, .L9+16
+ 1320 0b0e DB00     		ldr	r4, .L9+20
+ 1321 0b10 D118     		str	r3, [r1]
+ 1322 0b12 DE4C     		str	r4, [r1, #4]
+ 1323 0b14 DC4B     		.loc 1 283 0
+ 1324 0b16 0B60     		mov	r3, #224
+ 1325 0b18 4C60     		lsl	r3, r3, #3
+ 281:firefly_solver.c ****  params.u_ss_11[2] = 1.8864971883119228;
+ 1326              	 r2, r3
+ 1327 0b1a DE23     		ldr	r3, .L9+24
+ 1328 0b1c DB00     		ldr	r4, .L9+28
+ 1329 0b1e D118     		str	r3, [r1]
+ 1330 0b20 DB4B     		str	r4, [r1, #4]
+ 1331 0b22 DC4C     		.loc 1 284 0
+ 1332 0b24 0B60     		mov	r3, #225
+ 1333 0b26 4C60     		lsl	r3, r3, #3
+ 282:firefly_solver.c ****  params.x_ss_12[0] = -0.5291880667861584;
+ 1334              	 r2, r3
+ 1335 0b28 DF23     		ldr	r3, .L9+32
+ 1336 0b2a DB00     		ldr	r4, .L9+36
+ 1337 0b2c D118     		str	r3, [r1]
+ 1338 0b2e DA4B     		str	r4, [r1, #4]
+ 1339 0b30 DA4C     		.loc 1 285 0
+ 1340 0b32 0B60     		mov	r3, #226
+ 1341 0b34 4C60     		lsl	r3, r3, #3
+ 283:firefly_solver.c ****  params.x_ss_12[1] = -1.1802409243688836;
+ 1342              	 r2, r3
+ 1343 0b36 E023     		ldr	r3, .L9+40
+ 1344 0b38 DB00     		ldr	r4, .L9+44
+ 1345 0b3a D118     		str	r3, [r1]
+ 1346 0b3c D84B     		str	r4, [r1, #4]
+ 1347 0b3e D94C     		.loc 1 286 0
+ 1348 0b40 0B60     		mov	r3, #227
+ 1349 0b42 4C60     		lsl	r3, r3, #3
+ 284:firefly_solver.c ****  params.x_ss_12[2] = -1.037718718661604;
+ 1350              	 r2, r3
+ 1351 0b44 E123     		ldr	r3, .L9+48
+ 1352 0b46 DB00     		ldr	r4, .L9+52
+ 1353 0b48 D118     		str	r3, [r1]
+ 1354 0b4a D74B     		str	r4, [r1, #4]
+ 1355 0b4c D74C     		.loc 1 287 0
+ 1356 0b4e 0B60     		mov	r3, #228
+ 1357 0b50 4C60     		lsl	r3, r3, #3
+ 285:firefly_solver.c ****  params.x_ss_12[3] = 1.3114512056856835;
+ 1358              	 r2, r3
+ 1359 0b52 E223     		ldr	r3, .L9+56
+ 1360 0b54 DB00     		ldr	r4, .L9+60
+ 1361 0b56 D118     		str	r3, [r1]
+ 1362 0b58 D54B     		str	r4, [r1, #4]
+ 1363 0b5a D64C     		.loc 1 288 0
+ 1364 0b5c 0B60     		mov	r3, #229
+ 1365 0b5e 4C60     		lsl	r3, r3, #3
+ 286:firefly_solver.c ****  params.x_ss_12[4] = 1.8609125943756615;
+ 1366              	 r2, r3
+ 1367 0b60 E323     		ldr	r3, .L9+64
+ 1368 0b62 DB00     		ldr	r4, .L9+68
+ 1369 0b64 D118     		str	r3, [r1]
+ 1370 0b66 D44B     		str	r4, [r1, #4]
+ 1371 0b68 D44C     		.loc 1 289 0
+ 1372 0b6a 0B60     		mov	r3, #230
+ 1373 0b6c 4C60     		lsl	r3, r3, #3
+ 287:firefly_solver.c ****  params.x_ss_12[5] = 0.7952399935216938;
+ 1374              	 r2, r3
+ 1375 0b6e E423     		ldr	r3, .L9+72
+ 1376 0b70 DB00     		ldr	r4, .L9+76
+ 1377 0b72 D118     		str	r3, [r1]
+ 1378 0b74 D24B     		str	r4, [r1, #4]
+ 1379 0b76 D34C     		.loc 1 290 0
+ 1380 0b78 0B60     		mov	r3, #231
+ 1381 0b7a 4C60     		lsl	r3, r3, #3
+ 288:firefly_solver.c ****  params.x_ss_12[6] = -0.07001183290468038;
+ 1382              	 r2, r3
+ 1383 0b7c E523     		ldr	r3, .L9+80
+ 1384 0b7e DB00     		ldr	r4, .L9+84
+ 1385 0b80 D118     		str	r3, [r1]
+ 1386 0b82 D14B     		str	r4, [r1, #4]
+ 1387 0b84 D14C     		.loc 1 291 0
+ 1388 0b86 0B60     		mov	r3, #232
+ 1389 0b88 4C60     		lsl	r3, r3, #3
+ 289:firefly_solver.c ****  params.x_ss_12[7] = -0.8518009412754686;
+ 1390              	 r2, r3
+ 1391 0b8a E623     		ldr	r3, .L9+88
+ 1392 0b8c DB00     		ldr	r4, .L9+92
+ 1393 0b8e D118     		str	r3, [r1]
+ 1394 0b90 CF4B     		str	r4, [r1, #4]
+ 1395 0b92 D04C     		.loc 1 292 0
+ 1396 0b94 0B60     		mov	r3, #233
+ 1397 0b96 4C60     		lsl	r3, r3, #3
+ 290:firefly_solver.c ****  params.u_ss_12[0] = 1.3347515373726386;
+ 1398              	 r2, r3
+ 1399 0b98 E723     		ldr	r3, .L9+96
+ 1400 0b9a DB00     		ldr	r4, .L9+100
+ 1401 0b9c D118     		str	r3, [r1]
+ 1402 0b9e CE4B     		str	r4, [r1, #4]
+ 1403 0ba0 CE4C     		.loc 1 293 0
+ 1404 0ba2 0B60     		mov	r3, #234
+ 1405 0ba4 4C60     		lsl	r3, r3, #3
+ 291:firefly_solver.c ****  params.u_ss_12[1] = 1.4887180335977037;
+ 1406              	 r2, r3
+ 1407 0ba6 E823     		ldr	r3, .L9+104
+ 1408 0ba8 DB00     		ldr	r4, .L9+108
+ 1409 0baa D118     		str	r3, [r1]
+ 1410 0bac CC4B     		str	r4, [r1, #4]
+ 1411 0bae CD4C     		.loc 1 294 0
+ 1412 0bb0 0B60     		mov	r3, #235
+ 1413 0bb2 4C60     		lsl	r3, r3, #3
+ 292:firefly_solver.c ****  params.u_ss_12[2] = -1.6314736327976336;
+ 1414              	 r2, r3
+ 1415 0bb4 E923     		ldr	r3, .L9+112
+ 1416 0bb6 DB00     		ldr	r4, .L9+116
+ 1417 0bb8 D118     		str	r3, [r1]
+ 1418 0bba CB4B     		str	r4, [r1, #4]
+ 1419 0bbc CB4C     		.loc 1 295 0
+ 1420 0bbe 0B60     		mov	r3, #236
+ 1421 0bc0 4C60     		lsl	r3, r3, #3
+ 293:firefly_solver.c ****  params.x_ss_13[0] = -1.1362021159208933;
+ 1422              	 r2, r3
+ 1423 0bc2 EA23     		ldr	r3, .L9+120
+ 1424 0bc4 DB00     		ldr	r4, .L9+124
+ 1425 0bc6 D118     		str	r3, [r1]
+ 1426 0bc8 C94B     		str	r4, [r1, #4]
+ 1427 0bca CA4C     		.loc 1 296 0
+ 1428 0bcc 0B60     		mov	r3, #237
+ 1429 0bce 4C60     		lsl	r3, r3, #3
+ 294:firefly_solver.c ****  params.x_ss_13[1] = 1.327044361831466;
+ 1430              	 r2, r3
+ 1431 0bd0 EB23     		ldr	r3, .L9+128
+ 1432 0bd2 DB00     		ldr	r4, .L9+132
+ 1433 0bd4 D118     		str	r3, [r1]
+ 1434 0bd6 C84B     		str	r4, [r1, #4]
+ 1435 0bd8 C84C     		.loc 1 297 0
+ 1436 0bda 0B60     		mov	r3, #238
+ 1437 0bdc 4C60     		lsl	r3, r3, #3
+ 295:firefly_solver.c ****  params.x_ss_13[2] = 1.3932155883179842;
+ 1438              	 r2, r3
+ 1439 0bde EC23     		ldr	r3, .L9+136
+ 1440 0be0 DB00     		ldr	r4, .L9+140
+ 1441 0be2 D118     		str	r3, [r1]
+ 1442 0be4 C64B     		str	r4, [r1, #4]
+ 1443 0be6 C74C     		.loc 1 298 0
+ 1444 0be8 0B60     		mov	r3, #239
+ 1445 0bea 4C60     		lsl	r3, r3, #3
+ 296:firefly_solver.c ****  params.x_ss_13[3] = -0.7413880049440107;
+ 1446              	 r2, r3
+ 1447 0bec ED23     		ldr	r3, .L9+144
+ 1448 0bee DB00     		ldr	r4, .L9+148
+ 1449 0bf0 D118     		str	r3, [r1]
+ 1450 0bf2 C54B     		str	r4, [r1, #4]
+ 1451 0bf4 C54C     		.loc 1 299 0
+ 1452 0bf6 0B60     		mov	r3, #240
+ 1453 0bf8 4C60     		lsl	r3, r3, #3
+ 297:firefly_solver.c ****  params.x_ss_13[4] = -0.8828216126125747;
+ 1454              	 r2, r3
+ 1455 0bfa EE23     		ldr	r3, .L9+152
+ 1456 0bfc DB00     		ldr	r4, .L9+156
+ 1457 0bfe D118     		str	r3, [r1]
+ 1458 0c00 C34B     		str	r4, [r1, #4]
+ 1459 0c02 C44C     		.loc 1 300 0
+ 1460 0c04 0B60     		mov	r3, #241
+ 1461 0c06 4C60     		lsl	r3, r3, #3
+ 298:firefly_solver.c ****  params.x_ss_13[5] = -0.27673991192616;
+ 1462              	 r2, r3
+ 1463 0c08 EF23     		ldr	r3, .L9+160
+ 1464 0c0a DB00     		ldr	r4, .L9+164
+ 1465 0c0c D118     		str	r3, [r1]
+ 1466 0c0e C24B     		str	r4, [r1, #4]
+ 1467 0c10 C24C     		.loc 1 301 0
+ 1468 0c12 0B60     		mov	r3, #242
+ 1469 0c14 4C60     		lsl	r3, r3, #3
+ 299:firefly_solver.c ****  params.x_ss_13[6] = 0.15778600105866714;
+ 1470              	 r2, r3
+ 1471 0c16 F023     		ldr	r3, .L9+168
+ 1472 0c18 DB00     		ldr	r4, .L9+172
+ 1473 0c1a D118     		str	r3, [r1]
+ 1474 0c1c C04B     		str	r4, [r1, #4]
+ 1475 0c1e C14C     		.loc 1 302 0
+ 1476 0c20 0B60     		mov	r3, #243
+ 1477 0c22 4C60     		lsl	r3, r3, #3
+ 300:firefly_solver.c ****  params.x_ss_13[7] = -1.6177327399735457;
+ 1478              	 r2, r3
+ 1479 0c24 F123     		ldr	r3, .L9+176
+ 1480 0c26 DB00     		ldr	r4, .L9+180
+ 1481 0c28 D118     		str	r3, [r1]
+ 1482 0c2a BF4B     		str	r4, [r1, #4]
+ 1483 0c2c BF4C     		.loc 1 303 0
+ 1484 0c2e 0B60     		mov	r3, #244
+ 1485 0c30 4C60     		lsl	r3, r3, #3
+ 301:firefly_solver.c ****  params.u_ss_13[0] = 1.3476485548544606;
+ 1486              	 r2, r3
+ 1487 0c32 F223     		ldr	r3, .L9+184
+ 1488 0c34 DB00     		ldr	r4, .L9+188
+ 1489 0c36 D118     		str	r3, [r1]
+ 1490 0c38 BD4B     		str	r4, [r1, #4]
+ 1491 0c3a BE4C     		.loc 1 304 0
+ 1492 0c3c 0B60     		mov	r3, #245
+ 1493 0c3e 4C60     		lsl	r3, r3, #3
+ 302:firefly_solver.c ****  params.u_ss_13[1] = 0.13893948140528378;
+ 1494              	 r2, r3
+ 1495 0c40 F323     		ldr	r3, .L9+192
+ 1496 0c42 DB00     		ldr	r4, .L9+196
+ 1497 0c44 D118     		str	r3, [r1]
+ 1498 0c46 BC4B     		str	r4, [r1, #4]
+ 1499 0c48 BC4C     		.loc 1 305 0
+ 1500 0c4a 0B60     		mov	r3, #246
+ 1501 0c4c 4C60     		lsl	r3, r3, #3
+ 303:firefly_solver.c ****  params.u_ss_13[2] = 1.0998712601636944;
+ 1502              	 r2, r3
+ 1503 0c4e F423     		ldr	r3, .L9+200
+ 1504 0c50 DB00     		ldr	r4, .L9+204
+ 1505 0c52 D118     		str	r3, [r1]
+ 1506 0c54 BA4B     		str	r4, [r1, #4]
+ 1507 0c56 BB4C     		.loc 1 306 0
+ 1508 0c58 0B60     		mov	r3, #247
+ 1509 0c5a 4C60     		lsl	r3, r3, #3
+ 304:firefly_solver.c ****  params.x_ss_14[0] = -1.0766549376946926;
+ 1510              	 r2, r3
+ 1511 0c5c F523     		ldr	r3, .L9+208
+ 1512 0c5e DB00     		ldr	r4, .L9+212
+ 1513 0c60 D118     		str	r3, [r1]
+ 1514 0c62 B94B     		str	r4, [r1, #4]
+ 1515 0c64 B94C     		.loc 1 307 0
+ 1516 0c66 0B60     		mov	r3, #248
+ 1517 0c68 4C60     		lsl	r3, r3, #3
+ 305:firefly_solver.c ****  params.x_ss_14[1] = 1.8611734044254629;
+ 1518              	 r2, r3
+ 1519 0c6a F623     		ldr	r3, .L9+216
+ 1520 0c6c DB00     		ldr	r4, .L9+220
+ 1521 0c6e D118     		str	r3, [r1]
+ 1522 0c70 B74B     		str	r4, [r1, #4]
+ 1523 0c72 B84C     		.loc 1 308 0
+ 1524 0c74 0B60     		mov	r3, #249
+ 1525 0c76 4C60     		lsl	r3, r3, #3
+ 306:firefly_solver.c ****  params.x_ss_14[2] = 1.0041092292735172;
+ 1526              	 r2, r3
+ 1527 0c78 F723     		ldr	r3, .L9+224
+ 1528 0c7a DB00     		ldr	r4, .L9+228
+ 1529 0c7c D118     		str	r3, [r1]
+ 1530 0c7e B64B     		str	r4, [r1, #4]
+ 1531 0c80 B64C     		.loc 1 309 0
+ 1532 0c82 0B60     		mov	r3, #250
+ 1533 0c84 4C60     		lsl	r3, r3, #3
+ 307:firefly_solver.c ****  params.x_ss_14[3] = -0.6276245424321543;
+ 1534              	 r2, r3
+ 1535 0c86 F823     		ldr	r3, .L9+232
+ 1536 0c88 DB00     		ldr	r4, .L9+236
+ 1537 0c8a D118     		str	r3, [r1]
+ 1538 0c8c B44B     		str	r4, [r1, #4]
+ 1539 0c8e B54C     		.loc 1 310 0
+ 1540 0c90 0B60     		mov	r3, #251
+ 1541 0c92 4C60     		lsl	r3, r3, #3
+ 308:firefly_solver.c ****  params.x_ss_14[4] = 1.794110587839819;
+ 1542              	 r2, r3
+ 1543 0c94 F923     		ldr	r3, .L9+240
+ 1544 0c96 DB00     		ldr	r4, .L9+244
+ 1545 0c98 D118     		str	r3, [r1]
+ 1546 0c9a B34B     		str	r4, [r1, #4]
+ 1547 0c9c B34C     		.loc 1 311 0
+ 1548 0c9e 0B60     		mov	r3, #252
+ 1549 0ca0 4C60     		lsl	r3, r3, #3
+ 309:firefly_solver.c ****  params.x_ss_14[5] = 0.8020471158650913;
+ 1550              	 r2, r3
+ 1551 0ca2 FA23     		ldr	r3, .L9+248
+ 1552 0ca4 DB00     		ldr	r4, .L9+252
+ 1553 0ca6 D118     		str	r3, [r1]
+ 1554 0ca8 B14B     		str	r4, [r1, #4]
+ 1555 0caa B24C     		.loc 1 312 0
+ 1556 0cac 0B60     		mov	r3, #253
+ 1557 0cae 4C60     		lsl	r3, r3, #3
+ 310:firefly_solver.c ****  params.x_ss_14[6] = 1.362244341944948;
+ 1558              	 r2, r3
+ 1559 0cb0 FB23     		ldr	r3, .L9+256
+ 1560 0cb2 DB00     		ldr	r4, .L9+260
+ 1561 0cb4 D118     		str	r3, [r1]
+ 1562 0cb6 B04B     		str	r4, [r1, #4]
+ 1563 0cb8 B04C     		.loc 1 313 0
+ 1564 0cba 0B60     		mov	r3, #254
+ 1565 0cbc 4C60     		lsl	r3, r3, #3
+ 311:firefly_solver.c ****  params.x_ss_14[7] = -1.8180107765765245;
+ 1566              	 r2, r3
+ 1567 0cbe FC23     		ldr	r3, .L9+264
+ 1568 0cc0 DB00     		ldr	r4, .L9+268
+ 1569 0cc2 D118     		str	r3, [r1]
+ 1570 0cc4 AE4B     		str	r4, [r1, #4]
+ 1571 0cc6 AF4C     		.loc 1 314 0
+ 1572 0cc8 0B60     		mov	r3, #255
+ 1573 0cca 4C60     		lsl	r3, r3, #3
+ 312:firefly_solver.c ****  params.u_ss_14[0] = -1.7774338357932473;
+ 1574              	 r2, r3
+ 1575 0ccc FD23     		ldr	r3, .L9+272
+ 1576 0cce DB00     		ldr	r4, .L9+276
+ 1577 0cd0 D118     		str	r3, [r1]
+ 1578 0cd2 AD4B     		str	r4, [r1, #4]
+ 1579 0cd4 AD4C     		.loc 1 315 0
+ 1580 0cd6 0B60     		mov	r3, #128
+ 1581 0cd8 4C60     		lsl	r3, r3, #4
+ 313:firefly_solver.c ****  params.u_ss_14[1] = 0.9709490941985153;
+ 1582              	 r2, r3
+ 1583 0cda FE23     		ldr	r3, .L9+280
+ 1584 0cdc DB00     		ldr	r4, .L9+284
+ 1585 0cde D118     		str	r3, [r1]
+ 1586 0ce0 AB4B     		str	r4, [r1, #4]
+ 1587 0ce2 AC4C     		.loc 1 316 0
+ 1588 0ce4 0B60     		ldr	r3, .L9+288
+ 1589 0ce6 4C60     		add	r1, r2, r3
+ 314:firefly_solver.c ****  params.u_ss_14[2] = -0.7812542682064318;
+ 1590              	 .L9+292
+ 1591 0ce8 FF23     		ldr	r4, .L9+296
+ 1592 0cea DB00     		str	r3, [r1]
+ 1593 0cec D118     		str	r4, [r1, #4]
+ 1594 0cee AA4B     		.loc 1 317 0
+ 1595 0cf0 AA4C     		mov	r3, #129
+ 1596 0cf2 0B60     		lsl	r3, r3, #4
+ 1597 0cf4 4C60     		add	r1, r2, r3
+ 315:firefly_solver.c ****  params.x_ss_15[0] = 0.0671374633729811;
+ 1598              	 .L9+300
+ 1599 0cf6 8023     		ldr	r4, .L9+304
+ 1600 0cf8 1B01     		str	r3, [r1]
+ 1601 0cfa D118     		str	r4, [r1, #4]
+ 1602 0cfc A84B     		.loc 1 318 0
+ 1603 0cfe A94C     		ldr	r3, .L9+308
+ 1604 0d00 0B60     		add	r1, r2, r3
+ 1605 0d02 4C60     		ldr	r3, .L9+312
+ 316:firefly_solver.c ****  params.x_ss_15[1] = -1.374950305314906;
+ 1606              	 .L9+316
+ 1607 0d04 A84B     		str	r3, [r1]
+ 1608 0d06 D118     		str	r4, [r1, #4]
+ 1609 0d08 A84B     		.loc 1 319 0
+ 1610 0d0a A94C     		mov	r3, #130
+ 1611 0d0c 0B60     		lsl	r3, r3, #4
+ 1612 0d0e 4C60     		add	r1, r2, r3
+ 317:firefly_solver.c ****  params.x_ss_15[2] = 1.9118096386279388;
+ 1613              	, .L9+320
+ 1614 0d10 8123     		ldr	r4, .L9+324
+ 1615 0d12 1B01     		str	r3, [r1]
+ 1616 0d14 D118     		str	r4, [r1, #4]
+ 1617 0d16 A74B     		.loc 1 320 0
+ 1618 0d18 A74C     		ldr	r3, .L9+328
+ 1619 0d1a 0B60     		add	r1, r2, r3
+ 1620 0d1c 4C60     		ldr	r3, .L9+332
+ 318:firefly_solver.c ****  params.x_ss_15[3] = 0.011004190697677885;
+ 1621              	 .L9+336
+ 1622 0d1e A74B     		str	r3, [r1]
+ 1623 0d20 D118     		str	r4, [r1, #4]
+ 1624 0d22 A74B     		.loc 1 321 0
+ 1625 0d24 A74C     		mov	r3, #131
+ 1626 0d26 0B60     		lsl	r3, r3, #4
+ 1627 0d28 4C60     		add	r1, r2, r3
+ 319:firefly_solver.c ****  params.x_ss_15[4] = 1.3160043138989015;
+ 1628              	, .L9+340
+ 1629 0d2a 8223     		ldr	r4, .L9+344
+ 1630 0d2c 1B01     		str	r3, [r1]
+ 1631 0d2e D118     		str	r4, [r1, #4]
+ 1632 0d30 A54B     		.loc 1 322 0
+ 1633 0d32 A64C     		ldr	r3, .L9+348
+ 1634 0d34 0B60     		add	r1, r2, r3
+ 1635 0d36 4C60     		ldr	r3, .L9+352
+ 320:firefly_solver.c ****  params.x_ss_15[5] = -1.7038488148800144;
+ 1636              	 .L9+356
+ 1637 0d38 A54B     		str	r3, [r1]
+ 1638 0d3a D118     		str	r4, [r1, #4]
+ 1639 0d3c A54B     		.loc 1 323 0
+ 1640 0d3e A64C     		mov	r3, #132
+ 1641 0d40 0B60     		lsl	r3, r3, #4
+ 1642 0d42 4C60     		add	r1, r2, r3
+ 321:firefly_solver.c ****  params.x_ss_15[6] = -0.08433819112864738;
+ 1643              	, .L9+360
+ 1644 0d44 8323     		ldr	r4, .L9+364
+ 1645 0d46 1B01     		str	r3, [r1]
+ 1646 0d48 D118     		str	r4, [r1, #4]
+ 1647 0d4a A44B     		.loc 1 324 0
+ 1648 0d4c A44C     		ldr	r3, .L9+368
+ 1649 0d4e 0B60     		add	r1, r2, r3
+ 1650 0d50 4C60     		ldr	r3, .L9+372
+ 322:firefly_solver.c ****  params.x_ss_15[7] = -1.7508820783768964;
+ 1651              	 .L9+376
+ 1652 0d52 A44B     		str	r3, [r1]
+ 1653 0d54 D118     		str	r4, [r1, #4]
+ 1654 0d56 A44B     		.loc 1 325 0
+ 1655 0d58 A44C     		mov	r3, #133
+ 1656 0d5a 0B60     		lsl	r3, r3, #4
+ 1657 0d5c 4C60     		add	r1, r2, r3
+ 323:firefly_solver.c ****  params.u_ss_15[0] = 1.536965724350949;
+ 1658              	, .L9+380
+ 1659 0d5e 8423     		ldr	r4, .L9+384
+ 1660 0d60 1B01     		str	r3, [r1]
+ 1661 0d62 D118     		str	r4, [r1, #4]
+ 1662 0d64 A24B     		.loc 1 326 0
+ 1663 0d66 A34C     		ldr	r3, .L9+388
+ 1664 0d68 0B60     		add	r1, r2, r3
+ 1665 0d6a 4C60     		ldr	r3, .L9+392
+ 324:firefly_solver.c ****  params.u_ss_15[1] = -0.21675928514816478;
+ 1666              	 .L9+396
+ 1667 0d6c A24B     		str	r3, [r1]
+ 1668 0d6e D118     		str	r4, [r1, #4]
+ 1669 0d70 A24B     		.loc 1 327 0
+ 1670 0d72 A34C     		mov	r3, #134
+ 1671 0d74 0B60     		lsl	r3, r3, #4
+ 1672 0d76 4C60     		add	r1, r2, r3
+ 325:firefly_solver.c ****  params.u_ss_15[2] = -1.725800326952653;
+ 1673              	, .L9+400
+ 1674 0d78 8523     		ldr	r4, .L9+404
+ 1675 0d7a 1B01     		str	r3, [r1]
+ 1676 0d7c D118     		str	r4, [r1, #4]
+ 1677 0d7e A14B     		.loc 1 328 0
+ 1678 0d80 A14C     		ldr	r3, .L9+408
+ 1679 0d82 0B60     		add	r1, r2, r3
+ 1680 0d84 4C60     		ldr	r3, .L9+412
+ 326:firefly_solver.c ****  params.x_ss_16[0] = -1.6940148707361717;
+ 1681              	 .L9+416
+ 1682 0d86 A14B     		str	r3, [r1]
+ 1683 0d88 D118     		str	r4, [r1, #4]
+ 1684 0d8a A14B     		.loc 1 329 0
+ 1685 0d8c A14C     		mov	r3, #135
+ 1686 0d8e 0B60     		lsl	r3, r3, #4
+ 1687 0d90 4C60     		add	r1, r2, r3
+ 327:firefly_solver.c ****  params.x_ss_16[1] = 0.15517063201268;
+ 1688              	, .L9+420
+ 1689 0d92 8623     		ldr	r4, .L9+424
+ 1690 0d94 1B01     		str	r3, [r1]
+ 1691 0d96 D118     		str	r4, [r1, #4]
+ 1692 0d98 9F4B     		.loc 1 330 0
+ 1693 0d9a A04C     		ldr	r3, .L9+428
+ 1694 0d9c 0B60     		add	r1, r2, r3
+ 1695 0d9e 4C60     		ldr	r3, .L9+432
+ 328:firefly_solver.c ****  params.x_ss_16[2] = -1.697734381979077;
+ 1696              	 .L9+436
+ 1697 0da0 9F4B     		str	r3, [r1]
+ 1698 0da2 D118     		str	r4, [r1, #4]
+ 1699 0da4 9F4B     		.loc 1 331 0
+ 1700 0da6 A04C     		mov	r3, #136
+ 1701 0da8 0B60     		lsl	r3, r3, #4
+ 1702 0daa 4C60     		add	r1, r2, r3
+ 329:firefly_solver.c ****  params.x_ss_16[3] = -1.264910727950229;
+ 1703              	, .L9+440
+ 1704 0dac 8723     		ldr	r4, .L9+444
+ 1705 0dae 1B01     		str	r3, [r1]
+ 1706 0db0 D118     		str	r4, [r1, #4]
+ 1707 0db2 9E4B     		.loc 1 332 0
+ 1708 0db4 9E4C     		ldr	r3, .L9+448
+ 1709 0db6 0B60     		add	r1, r2, r3
+ 1710 0db8 4C60     		ldr	r3, .L9+452
+ 330:firefly_solver.c ****  params.x_ss_16[4] = -0.2545716633339441;
+ 1711              	 .L9+456
+ 1712 0dba 9E4B     		str	r3, [r1]
+ 1713 0dbc D118     		str	r4, [r1, #4]
+ 1714 0dbe 9E4B     		.loc 1 333 0
+ 1715 0dc0 9E4C     		mov	r3, #137
+ 1716 0dc2 0B60     		lsl	r3, r3, #4
+ 1717 0dc4 4C60     		add	r1, r2, r3
+ 331:firefly_solver.c ****  params.x_ss_16[5] = -0.008868675926170244;
+ 1718              	, .L9+460
+ 1719 0dc6 8823     		ldr	r4, .L9+464
+ 1720 0dc8 1B01     		str	r3, [r1]
+ 1721 0dca D118     		str	r4, [r1, #4]
+ 1722 0dcc 9C4B     		.loc 1 334 0
+ 1723 0dce 9D4C     		ldr	r3, .L9+468
+ 1724 0dd0 0B60     		add	r1, r2, r3
+ 1725 0dd2 4C60     		ldr	r3, .L9+472
+ 332:firefly_solver.c ****  params.x_ss_16[6] = 0.3332476609670296;
+ 1726              	 .L9+476
+ 1727 0dd4 9C4B     		str	r3, [r1]
+ 1728 0dd6 D118     		str	r4, [r1, #4]
+ 1729 0dd8 9C4B     		.loc 1 335 0
+ 1730 0dda 9D4C     		mov	r3, #138
+ 1731 0ddc 0B60     		lsl	r3, r3, #4
+ 1732 0dde 4C60     		add	r1, r2, r3
+ 333:firefly_solver.c ****  params.x_ss_16[7] = 0.48205072561962936;
+ 1733              	, .L9+480
+ 1734 0de0 8923     		ldr	r4, .L9+484
+ 1735 0de2 1B01     		str	r3, [r1]
+ 1736 0de4 D118     		str	r4, [r1, #4]
+ 1737 0de6 9B4B     		.loc 1 336 0
+ 1738 0de8 9B4C     		ldr	r3, .L9+488
+ 1739 0dea 0B60     		add	r1, r2, r3
+ 1740 0dec 4C60     		ldr	r3, .L9+492
+ 334:firefly_solver.c ****  params.u_ss_16[0] = -0.5087540014293261;
+ 1741              	 .L9+496
+ 1742 0dee 9B4B     		str	r3, [r1]
+ 1743 0df0 D118     		str	r4, [r1, #4]
+ 1744 0df2 9B4B     		.loc 1 337 0
+ 1745 0df4 9B4C     		mov	r3, #139
+ 1746 0df6 0B60     		lsl	r3, r3, #4
+ 1747 0df8 4C60     		add	r1, r2, r3
+ 335:firefly_solver.c ****  params.u_ss_16[1] = 0.4749463319223195;
+ 1748              	, .L9+500
+ 1749 0dfa 8A23     		ldr	r4, .L9+504
+ 1750 0dfc 1B01     		str	r3, [r1]
+ 1751 0dfe D118     		str	r4, [r1, #4]
+ 1752 0e00 994B     		.loc 1 338 0
+ 1753 0e02 9A4C     		ldr	r3, .L9+508
+ 1754 0e04 0B60     		add	r1, r2, r3
+ 1755 0e06 4C60     		ldr	r3, .L9+512
+ 336:firefly_solver.c ****  params.u_ss_16[2] = -1.371021366459455;
+ 1756              	 .L9+516
+ 1757 0e08 994B     		str	r3, [r1]
+ 1758 0e0a D118     		str	r4, [r1, #4]
+ 1759 0e0c 994B     		.loc 1 339 0
+ 1760 0e0e 9A4C     		mov	r3, #140
+ 1761 0e10 0B60     		lsl	r3, r3, #4
+ 1762 0e12 4C60     		add	r1, r2, r3
+ 337:firefly_solver.c ****  params.x_ss_17[0] = -0.8979660982652256;
+ 1763              	, .L9+520
+ 1764 0e14 8B23     		ldr	r4, .L9+524
+ 1765 0e16 1B01     		str	r3, [r1]
+ 1766 0e18 D118     		str	r4, [r1, #4]
+ 1767 0e1a 984B     		.loc 1 340 0
+ 1768 0e1c 984C     		ldr	r3, .L9+528
+ 1769 0e1e 0B60     		add	r1, r2, r3
+ 1770 0e20 4C60     		ldr	r3, .L9+532
+ 338:firefly_solver.c ****  params.x_ss_17[1] = 1.194873082385242;
+ 1771              	 .L9+536
+ 1772 0e22 984B     		str	r3, [r1]
+ 1773 0e24 D118     		str	r4, [r1, #4]
+ 1774 0e26 984B     		.loc 1 341 0
+ 1775 0e28 984C     		mov	r3, #141
+ 1776 0e2a 0B60     		lsl	r3, r3, #4
+ 1777 0e2c 4C60     		add	r1, r2, r3
+ 339:firefly_solver.c ****  params.x_ss_17[2] = -1.3876427970939353;
+ 1778              	, .L9+540
+ 1779 0e2e 8C23     		ldr	r4, .L9+544
+ 1780 0e30 1B01     		str	r3, [r1]
+ 1781 0e32 D118     		str	r4, [r1, #4]
+ 1782 0e34 964B     		.loc 1 342 0
+ 1783 0e36 974C     		ldr	r3, .L9+548
+ 1784 0e38 0B60     		add	r1, r2, r3
+ 1785 0e3a 4C60     		ldr	r3, .L9+552
+ 340:firefly_solver.c ****  params.x_ss_17[3] = -1.106708108457053;
+ 1786              	 .L9+556
+ 1787 0e3c 964B     		str	r3, [r1]
+ 1788 0e3e D118     		str	r4, [r1, #4]
+ 1789 0e40 964B     		.loc 1 343 0
+ 1790 0e42 974C     		mov	r3, #142
+ 1791 0e44 0B60     		lsl	r3, r3, #4
+ 1792 0e46 4C60     		add	r1, r2, r3
+ 341:firefly_solver.c ****  params.x_ss_17[4] = -1.0280872812241797;
+ 1793              	, .L9+560
+ 1794 0e48 8D23     		ldr	r4, .L9+564
+ 1795 0e4a 1B01     		str	r3, [r1]
+ 1796 0e4c D118     		str	r4, [r1, #4]
+ 1797 0e4e 954B     		.loc 1 344 0
+ 1798 0e50 954C     		ldr	r3, .L9+568
+ 1799 0e52 0B60     		add	r1, r2, r3
+ 1800 0e54 4C60     		ldr	r3, .L9+572
+ 342:firefly_solver.c ****  params.x_ss_17[5] = -0.08197078070773234;
+ 1801              	 .L9+576
+ 1802 0e56 954B     		str	r3, [r1]
+ 1803 0e58 D118     		str	r4, [r1, #4]
+ 1804 0e5a 954B     		.loc 1 345 0
+ 1805 0e5c 954C     		mov	r3, #143
+ 1806 0e5e 0B60     		lsl	r3, r3, #4
+ 1807 0e60 4C60     		add	r1, r2, r3
+ 343:firefly_solver.c ****  params.x_ss_17[6] = -1.9970179118324083;
+ 1808              	, .L9+580
+ 1809 0e62 8E23     		ldr	r4, .L9+584
+ 1810 0e64 1B01     		b	.L10
+ 1811 0e66 D118     	.L11:
+ 1812 0e68 934B     		.align	2
+ 1813 0e6a 944C     	.L9:
+ 1814 0e6c 0B60     		.word	-1074386658
+ 1815 0e6e 4C60     		.word	-737749880
+ 344:firefly_solver.c ****  params.x_ss_17[7] = -1.878754557910134;
+ 1816              	073239030
+ 1817 0e70 934B     		.word	-308198842
+ 1818 0e72 D118     		.word	1072898619
+ 1819 0e74 934B     		.word	1030642234
+ 1820 0e76 944C     		.word	1073622807
+ 1821 0e78 0B60     		.word	-1392723192
+ 1822 0e7a 4C60     		.word	-1075777765
+ 345:firefly_solver.c ****  params.u_ss_17[0] = -0.15380739340877803;
+ 1823              	-804719136
+ 1824 0e7c 8F23     		.word	-1074601404
+ 1825 0e7e 1B01     		.word	1320749802
+ 1826 0e80 D118     		.word	-1074750850
+ 1827 0e82 924B     		.word	-244214804
+ 1828 0e84 924C     		.word	1073019828
+ 1829 0e86 25E1     		.word	1114342456
+ 1830              		.word	1073595980
+ 1831              		.word	1222176124
+ 1832              		.word	1072263835
+ 1833 0e88 1E29F6BF 		.word	613725088
+ 1834 0e8c 88D406D4 		.word	-1078858677
+ 1835 0e90 F653F83F 		.word	-1532454080
+ 1836 0e94 4642A1ED 		.word	-1075101196
+ 1837 0e98 3B22F33F 		.word	204430700
+ 1838 0e9c 3A5A6E3D 		.word	1073044260
+ 1839 0ea0 172FFE3F 		.word	1838469564
+ 1840 0ea4 08BBFCAC 		.word	1073205706
+ 1841 0ea8 1BEFE0BF 		.word	3426292
+ 1842 0eac E0F508D0 		.word	-1074128252
+ 1843 0eb0 44E2F2BF 		.word	412249908
+ 1844 0eb4 EA0AB94E 		.word	-1074647582
+ 1845 0eb8 7E9AF0BF 		.word	1159228280
+ 1846 0ebc EC9371F1 		.word	1073036178
+ 1847 0ec0 B4FBF43F 		.word	-563706764
+ 1848 0ec4 38846B42 		.word	1073105564
+ 1849 0ec8 4CC6FD3F 		.word	1841407608
+ 1850 0ecc 7CEDD848 		.word	-1075332749
+ 1851 0ed0 9B72E93F 		.word	1448882916
+ 1852 0ed4 A0B39424 		.word	-1075036141
+ 1853 0ed8 4BECB1BF 		.word	474738568
+ 1854 0edc 409BA8A4 		.word	-1076775397
+ 1855 0ee0 F441EBBF 		.word	1372463416
+ 1856 0ee4 6C5D2F0C 		.word	1069822548
+ 1857 0ee8 245BF53F 		.word	-383245328
+ 1858 0eec BCD1946D 		.word	-1074142661
+ 1859 0ef0 CAD1F73F 		.word	-1178751624
+ 1860 0ef4 F4473400 		.word	1073057783
+ 1861 0ef8 841AFABF 		.word	-296116216
+ 1862 0efc 346F9218 		.word	1069664452
+ 1863 0f00 E22DF2BF 		.word	-664722576
+ 1864 0f04 786B1845 		.word	1072797970
+ 1865 0f08 923BF53F 		.word	-1690080772
+ 1866 0f0c 748466DE 		.word	-1074710022
+ 1867 0f10 9C4AF63F 		.word	-2027447258
+ 1868 0f14 78A6C16D 		.word	1073596253
+ 1869 0f18 73B9E7BF 		.word	-1014819880
+ 1870 0f1c E4325C56 		.word	1072697556
+ 1871 0f20 1340ECBF 		.word	-690653472
+ 1872 0f24 88EF4B1C 		.word	-1075571328
+ 1873 0f28 1BB6D1BF 		.word	276641752
+ 1874 0f2c 3821CE51 		.word	1073525933
+ 1875 0f30 5432C43F 		.word	1304616614
+ 1876 0f34 F02328E9 		.word	1072278110
+ 1877 0f38 3BE2F9BF 		.word	-1232094228
+ 1878 0f3c 78ADBDB9 		.word	1073073088
+ 1879 0f40 F78FF53F 		.word	-1189279598
+ 1880 0f44 08A059EE 		.word	-1073932654
+ 1881 0f48 C4C8C13F 		.word	2010300270
+ 1882 0f4c 702361D8 		.word	-1073975202
+ 1883 0f50 1299F13F 		.word	1983419076
+ 1884 0f54 FC69439B 		.word	1072632323
+ 1885 0f58 FA39F1BF 		.word	-709543180
+ 1886 0f5c 269C2787 		.word	2056
+ 1887 0f60 5DC7FD3F 		.word	-1075249144
+ 1888 0f64 D81383C3 		.word	-210119872
+ 1889 0f68 D410F03F 		.word	1068576747
+ 1890 0f6c E076D5D6 		.word	-1182401952
+ 1891 0f70 8015E4BF 		.word	2072
+ 1892 0f74 D8377D10 		.word	-1074397237
+ 1893 0f78 ADB4FC3F 		.word	-466665880
+ 1894 0f7c A6DEC24D 		.word	1073649349
+ 1895 0f80 5EAAE93F 		.word	-1272882580
+ 1896 0f84 ECBB8FB6 		.word	2088
+ 1897 0f88 C0CBF53F 		.word	1065781597
+ 1898 0f8c 92081DB9 		.word	2035475456
+ 1899 0f90 9216FDBF 		.word	1073024602
+ 1900 0f94 6EBFD277 		.word	-1978043518
+ 1901 0f98 5E70FCBF 		.word	2104
+ 1902 0f9c C4923876 		.word	-1074052362
+ 1903 0fa0 0312EF3F 		.word	-107753746
+ 1904 0fa4 F43AB5D5 		.word	-1078618320
+ 1905 0fa8 08080000 		.word	213093088
+ 1906 0fac 0800E9BF 		.word	2120
+ 1907 0fb0 40D379F3 		.word	-1074003044
+ 1908 0fb4 EB2FB13F 		.word	-316899298
+ 1909 0fb8 60FA85B9 		.word	1073256297
+ 1910 0fbc 18080000 		.word	1595052158
+ 1911 0fc0 CBFFF5BF 		.word	2136
+ 1912 0fc4 683E2FE4 		.word	-1077166396
+ 1913 0fc8 C596FE3F 		.word	-1402443504
+ 1914 0fcc 6C5A21B4 		.word	-1074029344
+ 1915 0fd0 28080000 		.word	-843382520
+ 1916 0fd4 5D89863F 		.word	2152
+ 1917 0fd8 00E45279 		.word	-1074062673
+ 1918 0fdc 5A0EF53F 		.word	1447820814
+ 1919 0fe0 8273198A 		.word	1069800609
+ 1920 0fe4 38080000 		.word	-1696225936
+ 1921 0fe8 F642FBBF 		.word	2168
+ 1922 0fec EECE93F9 		.word	-1074058773
+ 1923 0ff0 3097B5BF 		.word	-2030153334
+ 1924 0ff4 E08AB30C 		.word	-1074512621
+ 1925 0ff8 48080000 		.word	135167514
+ 1926 0ffc 9C03FCBF 		.word	2184
+ 1927 1000 1E801CED 		.word	-1076868378
+ 1928 1004 6997F83F 		.word	-232751944
+ 1929 1008 7E90125F 		.word	-1081988675
+ 1930 100c 58080000 		.word	-2004981504
+ 1931 1010 C4BECBBF 		.word	2200
+ 1932 1014 106968AC 		.word	1070945261
+ 1933 1018 E09CFBBF 		.word	-11232816
+ 1934 101c 0801BBCD 		.word	1071569387
+ 1935 1020 68080000 		.word	1231235328
+ 1936 1024 AF1AFBBF 		.word	2216
+ 1937 1028 0EFE4B56 		.word	-1075820618
+ 1938 102c A1DCC33F 		.word	2025530260
+ 1939 1030 70A5E59A 		.word	1071539589
+ 1940 1034 78080000 		.word	1287489944
+ 1941 1038 EB29FBBF 		.word	2232
+ 1942 103c 8A51FE86 		.word	-1074401356
+ 1943 1040 133DF4BF 		.word	431028270
+ 1944 1044 1A7E0E08 		.word	-1075004381
+ 1945 1048 88080000 		.word	1713301600
+ 1946 104c E64AD0BF 		.word	2248
+ 1947 1050 B87C20F2 		.word	1072897587
+ 1948 1054 BD2982BF 		.word	1018917372
+ 1949 1058 00697E88 		.word	-1074383928
+ 1950 105c 98080000 		.word	-285161904
+ 1951 1060 ED53D53F 		.word	2264
+ 1952 1064 D09954FF 		.word	-1074678509
+ 1953 1068 EBD9DE3F 		.word	-1883199438
+ 1954 106c 00296349 		.word	-1074760949
+ 1955 1070 A8080000 		.word	-1507546726
+ 1956 1074 B647E0BF 		.word	2280
+ 1957 1078 9423BB78 		.word	-1078658039
+ 1958 107c 8565DE3F 		.word	2120091456
+ 1959 1080 9889BD4C 		.word	-1073744951
+ 1960 1084 B8080000 		.word	231574240
+ 1961 1088 B4EFF5BF 	.L10:
+ 1962 108c 2EF8B019 		str	r3, [r1]
+ 1963 1090 23BCECBF 		str	r4, [r1, #4]
+ 1964 1094 60E81E66 		.loc 1 346 0
+ 1965 1098 C8080000 		ldr	r3, .L12
+ 1966 109c 331EF33F 		add	r1, r2, r3
+ 1967 10a0 FC71BB3C 		ldr	r3, .L12+4
+ 1968 10a4 C833F6BF 		ldr	r4, .L12+8
+ 1969 10a8 50C600EF 		str	r3, [r1]
+ 1970 10ac D8080000 		str	r4, [r1, #4]
+ 1971 10b0 13B5F1BF 		.loc 1 347 0
+ 1972 10b4 32A8C08F 		mov	r3, #144
+ 1973 10b8 0B73F0BF 		lsl	r3, r3, #4
+ 1974 10bc 9AA924A6 		add	r1, r2, r3
+ 1975 10c0 E8080000 		ldr	r3, .L12+12
+ 1976 10c4 09FCB4BF 		ldr	r4, .L12+16
+ 1977 10c8 40075E7E 		str	r3, [r1]
+ 1978 10cc C9F3FFBF 		str	r4, [r1, #4]
+ 1979 10d0 E08ACD0D 		.loc 1 348 0
+ 1980              		ldr	r3, .L12+20
+ 1981 10d4 0B60     		add	r1, r2, r3
+ 1982 10d6 4C60     		ldr	r3, .L12+24
+ 346:firefly_solver.c ****  params.u_ss_17[1] = -1.349917260533923;
+ 1983              	r	r4, [r1, #4]
+ 1984 10d8 4B4B     		.loc 1 350 0
+ 1985 10da D118     		ldr	r3, .L12+40
+ 1986 10dc 4B4B     		add	r1, r2, r3
+ 1987 10de 4C4C     		ldr	r3, .L12+44
+ 1988 10e0 0B60     		ldr	r4, .L12+48
+ 1989 10e2 4C60     		str	r3, [r1]
+ 347:firefly_solver.c ****  params.u_ss_17[2] = 0.7180072150931407;
+ 1990              	, [r1, #4]
+ 1991 10e4 9023     		.loc 1 351 0
+ 1992 10e6 1B01     		mov	r3, #146
+ 1993 10e8 D118     		lsl	r3, r3, #4
+ 1994 10ea 4A4B     		add	r1, r2, r3
+ 1995 10ec 4A4C     		ldr	r3, .L12+52
+ 1996 10ee 0B60     		ldr	r4, .L12+56
+ 1997 10f0 4C60     		str	r3, [r1]
+ 348:firefly_solver.c ****  params.x_ss_18[0] = 1.1808183487065538;
+ 1998              	 [r1, #4]
+ 1999 10f2 4A4B     		.loc 1 352 0
+ 2000 10f4 D118     		ldr	r3, .L12+60
+ 2001 10f6 4A4B     		add	r1, r2, r3
+ 2002 10f8 4A4C     		ldr	r3, .L12+64
+ 2003 10fa 0B60     		ldr	r4, .L12+68
+ 2004 10fc 4C60     		str	r3, [r1]
+ 349:firefly_solver.c ****  params.x_ss_18[1] = 0.31265343495084075;
+ 2005              	, [r1, #4]
+ 2006 10fe 9123     		.loc 1 353 0
+ 2007 1100 1B01     		mov	r3, #147
+ 2008 1102 D118     		lsl	r3, r3, #4
+ 2009 1104 484B     		add	r1, r2, r3
+ 2010 1106 494C     		ldr	r3, .L12+72
+ 2011 1108 0B60     		ldr	r4, .L12+76
+ 2012 110a 4C60     		str	r3, [r1]
+ 350:firefly_solver.c ****  params.x_ss_18[2] = 0.7790599086928229;
+ 2013              	 [r1, #4]
+ 2014 110c 484B     		.loc 1 354 0
+ 2015 110e D118     		ldr	r3, .L12+80
+ 2016 1110 484B     		add	r1, r2, r3
+ 2017 1112 494C     		ldr	r3, .L12+84
+ 2018 1114 0B60     		ldr	r4, .L12+88
+ 2019 1116 4C60     		str	r3, [r1]
+ 351:firefly_solver.c ****  params.x_ss_18[3] = -0.4361679370644853;
+ 2020              	, [r1, #4]
+ 2021 1118 9223     		.loc 1 355 0
+ 2022 111a 1B01     		mov	r3, #148
+ 2023 111c D118     		lsl	r3, r3, #4
+ 2024 111e 474B     		add	r1, r2, r3
+ 2025 1120 474C     		ldr	r3, .L12+92
+ 2026 1122 0B60     		ldr	r4, .L12+96
+ 2027 1124 4C60     		str	r3, [r1]
+ 352:firefly_solver.c ****  params.x_ss_18[4] = -1.8148151880282066;
+ 2028              	 [r1, #4]
+ 2029 1126 474B     		.loc 1 356 0
+ 2030 1128 D118     		ldr	r3, .L12+100
+ 2031 112a 474B     		add	r1, r2, r3
+ 2032 112c 474C     		ldr	r3, .L12+104
+ 2033 112e 0B60     		ldr	r4, .L12+108
+ 2034 1130 4C60     		str	r3, [r1]
+ 353:firefly_solver.c ****  params.x_ss_18[5] = -0.24231386948140266;
+ 2035              	, [r1, #4]
+ 2036 1132 9323     		.loc 1 357 0
+ 2037 1134 1B01     		mov	r3, #149
+ 2038 1136 D118     		lsl	r3, r3, #4
+ 2039 1138 454B     		add	r1, r2, r3
+ 2040 113a 464C     		ldr	r3, .L12+112
+ 2041 113c 0B60     		ldr	r4, .L12+116
+ 2042 113e 4C60     		str	r3, [r1]
+ 354:firefly_solver.c ****  params.x_ss_18[6] = -0.5120787511622411;
+ 2043              	 [r1, #4]
+ 2044 1140 454B     		.loc 1 358 0
+ 2045 1142 D118     		ldr	r3, .L12+120
+ 2046 1144 454B     		add	r1, r2, r3
+ 2047 1146 464C     		ldr	r3, .L12+124
+ 2048 1148 0B60     		ldr	r4, .L12+128
+ 2049 114a 4C60     		str	r3, [r1]
+ 355:firefly_solver.c ****  params.x_ss_18[7] = 0.3880129688013203;
+ 2050              	, [r1, #4]
+ 2051 114c 9423     		.loc 1 359 0
+ 2052 114e 1B01     		mov	r3, #150
+ 2053 1150 D118     		lsl	r3, r3, #4
+ 2054 1152 444B     		add	r1, r2, r3
+ 2055 1154 444C     		ldr	r3, .L12+132
+ 2056 1156 0B60     		ldr	r4, .L12+136
+ 2057 1158 4C60     		str	r3, [r1]
+ 356:firefly_solver.c ****  params.u_ss_18[0] = -1.4631273212038676;
+ 2058              	 [r1, #4]
+ 2059 115a 444B     		.loc 1 360 0
+ 2060 115c D118     		ldr	r3, .L12+140
+ 2061 115e 444B     		add	r1, r2, r3
+ 2062 1160 444C     		ldr	r3, .L12+144
+ 2063 1162 0B60     		ldr	r4, .L12+148
+ 2064 1164 4C60     		str	r3, [r1]
+ 357:firefly_solver.c ****  params.u_ss_18[1] = -1.0891484131126563;
+ 2065              	, [r1, #4]
+ 2066 1166 9523     		.loc 1 361 0
+ 2067 1168 1B01     		mov	r3, #151
+ 2068 116a D118     		lsl	r3, r3, #4
+ 2069 116c 424B     		add	r1, r2, r3
+ 2070 116e 434C     		ldr	r3, .L12+152
+ 2071 1170 0B60     		ldr	r4, .L12+156
+ 2072 1172 4C60     		str	r3, [r1]
+ 358:firefly_solver.c ****  params.u_ss_18[2] = 1.2591296661091191;
+ 2073              	 [r1, #4]
+ 2074 1174 424B     		.loc 1 362 0
+ 2075 1176 D118     		ldr	r3, .L12+160
+ 2076 1178 424B     		add	r1, r2, r3
+ 2077 117a 434C     		ldr	r3, .L12+164
+ 2078 117c 0B60     		ldr	r4, .L12+168
+ 2079 117e 4C60     		str	r3, [r1]
+ 359:firefly_solver.c ****  params.x_ss_19[0] = -0.9426978934391474;
+ 2080              	, [r1, #4]
+ 2081 1180 9623     		.loc 1 363 0
+ 2082 1182 1B01     		mov	r3, #152
+ 2083 1184 D118     		lsl	r3, r3, #4
+ 2084 1186 414B     		add	r1, r2, r3
+ 2085 1188 414C     		ldr	r3, .L12+172
+ 2086 118a 0B60     		ldr	r4, .L12+176
+ 2087 118c 4C60     		str	r3, [r1]
+ 360:firefly_solver.c ****  params.x_ss_19[1] = -0.358719180371347;
+ 2088              	 [r1, #4]
+ 2089 118e 414B     		.loc 1 364 0
+ 2090 1190 D118     		ldr	r3, .L12+180
+ 2091 1192 414B     		add	r1, r2, r3
+ 2092 1194 414C     		ldr	r3, .L12+184
+ 2093 1196 0B60     		ldr	r4, .L12+188
+ 2094 1198 4C60     		str	r3, [r1]
+ 361:firefly_solver.c ****  params.x_ss_19[2] = 1.7438887059831263;
+ 2095              	, [r1, #4]
+ 2096 119a 9723     		.loc 1 365 0
+ 2097 119c 1B01     		mov	r3, #153
+ 2098 119e D118     		lsl	r3, r3, #4
+ 2099 11a0 3F4B     		add	r1, r2, r3
+ 2100 11a2 404C     		ldr	r3, .L12+192
+ 2101 11a4 0B60     		ldr	r4, .L12+196
+ 2102 11a6 4C60     		str	r3, [r1]
+ 362:firefly_solver.c ****  params.x_ss_19[3] = -0.8977901479165817;
+ 2103              	 [r1, #4]
+ 2104 11a8 3F4B     		.loc 1 366 0
+ 2105 11aa D118     		ldr	r3, .L12+200
+ 2106 11ac 3F4B     		add	r1, r2, r3
+ 2107 11ae 404C     		ldr	r3, .L12+204
+ 2108 11b0 0B60     		ldr	r4, .L12+208
+ 2109 11b2 4C60     		str	r3, [r1]
+ 363:firefly_solver.c ****  params.x_ss_19[4] = -1.4188401645857445;
+ 2110              	, [r1, #4]
+ 2111 11b4 9823     		.loc 1 367 0
+ 2112 11b6 1B01     		mov	r3, #154
+ 2113 11b8 D118     		lsl	r3, r3, #4
+ 2114 11ba 3E4B     		add	r1, r2, r3
+ 2115 11bc 3E4C     		ldr	r3, .L12+212
+ 2116 11be 0B60     		ldr	r4, .L12+216
+ 2117 11c0 4C60     		str	r3, [r1]
+ 364:firefly_solver.c ****  params.x_ss_19[5] = 0.8080805173258092;
+ 2118              	 [r1, #4]
+ 2119 11c2 3E4B     		.loc 1 368 0
+ 2120 11c4 D118     		ldr	r3, .L12+220
+ 2121 11c6 3E4B     		add	r2, r2, r3
+ 2122 11c8 3E4C     		ldr	r3, .L12+224
+ 2123 11ca 0B60     		ldr	r4, .L12+228
+ 2124 11cc 4C60     		.loc 1 557 0
+ 365:firefly_solver.c ****  params.x_ss_19[6] = 0.2682662017650985;
+ 2125              	eeded for prologue
+ 2126 11ce 9923     		.loc 1 368 0
+ 2127 11d0 1B01     		str	r3, [r2]
+ 2128 11d2 D118     		str	r4, [r2, #4]
+ 2129 11d4 3C4B     		.loc 1 557 0
+ 2130 11d6 3D4C     		pop	{r4}
+ 2131 11d8 0B60     		pop	{r0}
+ 2132 11da 4C60     		bx	r0
+ 366:firefly_solver.c ****  params.x_ss_19[7] = 0.44637534218638786;
+ 2133              	align	2
+ 2134 11dc 3C4B     	.L12:
+ 2135 11de D118     		.word	2296
+ 2136 11e0 3C4B     		.word	-1073868960
+ 2137 11e2 3D4C     		.word	-260639332
+ 2138 11e4 0B60     		.word	-1077694475
+ 2139 11e6 4C60     		.word	-297177280
+ 367:firefly_solver.c ****  /* Make this a diagonal PSD matrix, even though it's not diagonal. */
+ 2140              	2312
+ 2141 11e8 9A23     		.word	-1074423486
+ 2142 11ea 1B01     		.word	-681260760
+ 2143 11ec D118     		.word	1072101866
+ 2144 11ee 3B4B     		.word	1147387672
+ 2145 11f0 3B4C     		.word	2328
+ 2146 11f2 0B60     		.word	1072882849
+ 2147 11f4 4C60     		.word	-941399608
+ 368:firefly_solver.c ****  /*
+ 2148              	070858883
+ 2149 11f6 3B4B     		.word	-1920588896
+ 2150 11f8 D218     		.word	2344
+ 2151 11fa 3B4B     		.word	1072229903
+ 2152 11fc 3B4C     		.word	196000708
+ 369:firefly_solver.c ****  params.P[0] = 428.621;
+ 370:firefly_solver.c ****   params.P[8] = 0;
+ 371:firefly_solver.c ****   params.P[16] = 0;
+ 372:firefly_solver.c ****   params.P[24] = 108.103;
+ 373:firefly_solver.c ****   params.P[32] = 0;
+ 374:firefly_solver.c ****   params.P[40] = 0;
+ 375:firefly_solver.c ****   params.P[48] = 0;
+ 376:firefly_solver.c ****   params.P[56] = 108.491;
+ 377:firefly_solver.c ****   params.P[1] = 0;
+ 378:firefly_solver.c ****   params.P[9] = 427.748;
+ 379:firefly_solver.c ****   params.P[17] = 0;
+ 380:firefly_solver.c ****   params.P[25] = 0;
+ 381:firefly_solver.c ****   params.P[33] = 107.214;
+ 382:firefly_solver.c ****   params.P[41] = 0;
+ 383:firefly_solver.c ****   params.P[49] = -106.405;
+ 384:firefly_solver.c ****   params.P[57] = 0;
+ 385:firefly_solver.c ****   params.P[2] = 0;
+ 386:firefly_solver.c ****   params.P[10] = 0;
+ 387:firefly_solver.c ****   params.P[18] = 563.584;
+ 388:firefly_solver.c ****   params.P[26] = 0;
+ 389:firefly_solver.c ****   params.P[34] = 0;
+ 390:firefly_solver.c ****   params.P[42] = 111.51;
+ 391:firefly_solver.c ****   params.P[50] = 0;
+ 392:firefly_solver.c ****   params.P[58] = 0;
+ 393:firefly_solver.c ****   params.P[3] = 108.103;
+ 394:firefly_solver.c ****   params.P[11] = 0;
+ 395:firefly_solver.c ****   params.P[19] = 0;
+ 396:firefly_solver.c ****   params.P[27] = 109.174;
+ 397:firefly_solver.c ****   params.P[35] = 0;
+ 398:firefly_solver.c ****   params.P[43] = 0;
+ 399:firefly_solver.c ****   params.P[51] = 0;
+ 400:firefly_solver.c ****   params.P[59] = 108.329;
+ 401:firefly_solver.c ****   params.P[4] = 0;
+ 402:firefly_solver.c ****   params.P[12] = 107.214;
+ 403:firefly_solver.c ****   params.P[20] = 0;
+ 404:firefly_solver.c ****   params.P[28] = 0;
+ 405:firefly_solver.c ****   params.P[36] = 108.248;
+ 406:firefly_solver.c ****   params.P[44] = 0;
+ 407:firefly_solver.c ****   params.P[52] = -105.983;
+ 408:firefly_solver.c ****   params.P[60] = 0;
+ 409:firefly_solver.c ****   params.P[5] = 0;
+ 410:firefly_solver.c ****   params.P[13] = 0;
+ 411:firefly_solver.c ****   params.P[21] = 111.51;
+ 412:firefly_solver.c ****   params.P[29] = 0;
+ 413:firefly_solver.c ****   params.P[37] = 0;
+ 414:firefly_solver.c ****   params.P[45] = 111.486;
+ 415:firefly_solver.c ****   params.P[53] = 0;
+ 416:firefly_solver.c ****   params.P[61] = 0;
+ 417:firefly_solver.c ****   params.P[6] = 0;
+ 418:firefly_solver.c ****   params.P[14] = -106.405;
+ 419:firefly_solver.c ****   params.P[22] = 0;
+ 420:firefly_solver.c ****   params.P[30] = 0;
+ 421:firefly_solver.c ****   params.P[38] = -105.983;
+ 422:firefly_solver.c ****   params.P[46] = 0;
+ 423:firefly_solver.c ****   params.P[54] = 176.989;
+ 424:firefly_solver.c ****   params.P[62] = 0;
+ 425:firefly_solver.c ****   params.P[7] = 108.491;
+ 426:firefly_solver.c ****   params.P[15] = 0;
+ 427:firefly_solver.c ****   params.P[23] = 0;
+ 428:firefly_solver.c ****   params.P[31] = 108.329;
+ 429:firefly_solver.c ****   params.P[39] = 0;
+ 430:firefly_solver.c ****   params.P[47] = 0;
+ 431:firefly_solver.c ****   params.P[55] = 0;
+ 432:firefly_solver.c ****   params.P[63] = 182.576;
+ 433:firefly_solver.c ****   params.A[0] = 1;
+ 434:firefly_solver.c ****   params.A[1] = 0;
+ 435:firefly_solver.c ****   params.A[2] = 0;
+ 436:firefly_solver.c ****   params.A[3] = 0;
+ 437:firefly_solver.c ****   params.A[4] = 0;
+ 438:firefly_solver.c ****   params.A[5] = 0;
+ 439:firefly_solver.c ****   params.A[6] = 0;
+ 440:firefly_solver.c ****   params.A[7] = 0;
+ 441:firefly_solver.c ****   params.A[8] = 0;
+ 442:firefly_solver.c ****   params.A[9] = 1;
+ 443:firefly_solver.c ****   params.A[10] = 0;
+ 444:firefly_solver.c ****   params.A[11] = 0;
+ 445:firefly_solver.c ****   params.A[12] = 0;
+ 446:firefly_solver.c ****   params.A[13] = 0;
+ 447:firefly_solver.c ****   params.A[14] = 0;
+ 448:firefly_solver.c ****   params.A[15] = 0;
+ 449:firefly_solver.c ****   params.A[16] = 0;
+ 450:firefly_solver.c ****   params.A[17] = 0;
+ 451:firefly_solver.c ****   params.A[18] = 1;
+ 452:firefly_solver.c ****   params.A[19] = 0;
+ 453:firefly_solver.c ****   params.A[20] = 0;
+ 454:firefly_solver.c ****   params.A[21] = 0;
+ 455:firefly_solver.c ****   params.A[22] = 0;
+ 456:firefly_solver.c ****   params.A[23] = 0;
+ 457:firefly_solver.c ****   params.A[24] = 0.09995;
+ 458:firefly_solver.c ****   params.A[25] = 0;
+ 459:firefly_solver.c ****   params.A[26] = 0;
+ 460:firefly_solver.c ****   params.A[27] = 0.999;
+ 461:firefly_solver.c ****   params.A[28] = 0;
+ 462:firefly_solver.c ****   params.A[29] = 0;
+ 463:firefly_solver.c ****   params.A[30] = 0;
+ 464:firefly_solver.c ****   params.A[31] = 0;
+ 465:firefly_solver.c ****   params.A[32] = 0;
+ 466:firefly_solver.c ****   params.A[33] = 0.09995;
+ 467:firefly_solver.c ****   params.A[34] = 0;
+ 468:firefly_solver.c ****   params.A[35] = 0;
+ 469:firefly_solver.c ****   params.A[36] = 0.999;
+ 470:firefly_solver.c ****   params.A[37] = 0;
+ 471:firefly_solver.c ****   params.A[38] = 0;
+ 472:firefly_solver.c ****   params.A[39] = 0;
+ 473:firefly_solver.c ****   params.A[40] = 0;
+ 474:firefly_solver.c ****   params.A[41] = 0;
+ 475:firefly_solver.c ****   params.A[42] = 0.1;
+ 476:firefly_solver.c ****   params.A[43] = 0;
+ 477:firefly_solver.c ****   params.A[44] = 0;
+ 478:firefly_solver.c ****   params.A[45] = 1;
+ 479:firefly_solver.c ****   params.A[46] = 0;
+ 480:firefly_solver.c ****   params.A[47] = 0;
+ 481:firefly_solver.c ****   params.A[48] = 0;
+ 482:firefly_solver.c ****   params.A[49] = -0.0430852;
+ 483:firefly_solver.c ****   params.A[50] = 0;
+ 484:firefly_solver.c ****   params.A[51] = 0;
+ 485:firefly_solver.c ****   params.A[52] = -0.807829;
+ 486:firefly_solver.c ****   params.A[53] = 0;
+ 487:firefly_solver.c ****   params.A[54] = 0.67032;
+ 488:firefly_solver.c ****   params.A[55] = 0;
+ 489:firefly_solver.c ****   params.A[56] = 0.0431908;
+ 490:firefly_solver.c ****   params.A[57] = 0;
+ 491:firefly_solver.c ****   params.A[58] = 0;
+ 492:firefly_solver.c ****   params.A[59] = 0.810794;
+ 493:firefly_solver.c ****   params.A[60] = 0;
+ 494:firefly_solver.c ****   params.A[61] = 0;
+ 495:firefly_solver.c ****   params.A[62] = 0;
+ 496:firefly_solver.c ****   params.A[63] = 0.675598;
+ 497:firefly_solver.c ****   params.B[0] = 0;
+ 498:firefly_solver.c ****   params.B[1] = -0.005261;
+ 499:firefly_solver.c ****   params.B[2] = 0;
+ 500:firefly_solver.c ****   params.B[3] = 0;
+ 501:firefly_solver.c ****   params.B[4] = -0.153652;
+ 502:firefly_solver.c ****   params.B[5] = 0;
+ 503:firefly_solver.c ****   params.B[6] = 0.297306;
+ 504:firefly_solver.c ****   params.B[7] = 0;
+ 505:firefly_solver.c ****   params.B[8] = 0.00516734;
+ 506:firefly_solver.c ****   params.B[9] = 0;
+ 507:firefly_solver.c ****   params.B[10] = 0;
+ 508:firefly_solver.c ****   params.B[11] = 0.151006;
+ 509:firefly_solver.c ****   params.B[12] = 0;
+ 510:firefly_solver.c ****   params.B[13] = 0;
+ 511:firefly_solver.c ****   params.B[14] = 0;
+ 512:firefly_solver.c ****   params.B[15] = 0.292535;
+ 513:firefly_solver.c ****   params.B[16] = 0;
+ 514:firefly_solver.c ****   params.B[17] = 0;
+ 515:firefly_solver.c ****   params.B[18] = 0.00495;
+ 516:firefly_solver.c ****   params.B[19] = 0;
+ 517:firefly_solver.c ****   params.B[20] = 0;
+ 518:firefly_solver.c ****   params.B[21] = 0.1;
+ 519:firefly_solver.c ****   params.B[22] = 0;
+ 520:firefly_solver.c ****   params.B[23] = 0;
+ 521:firefly_solver.c ****   params.Bd[0] = 0.00494836;
+ 522:firefly_solver.c ****   params.Bd[1] = 0;
+ 523:firefly_solver.c ****   params.Bd[2] = 0;
+ 524:firefly_solver.c ****   params.Bd[3] = 0.0999505;
+ 525:firefly_solver.c ****   params.Bd[4] = 0;
+ 526:firefly_solver.c ****   params.Bd[5] = 0;
+ 527:firefly_solver.c ****   params.Bd[6] = 0;
+ 528:firefly_solver.c ****   params.Bd[7] = 0;
+ 529:firefly_solver.c ****   params.Bd[8] = 0;
+ 530:firefly_solver.c ****   params.Bd[9] = 0.00494836;
+ 531:firefly_solver.c ****   params.Bd[10] = 0;
+ 532:firefly_solver.c ****   params.Bd[11] = 0;
+ 533:firefly_solver.c ****   params.Bd[12] = 0.0999505;
+ 534:firefly_solver.c ****   params.Bd[13] = 0;
+ 535:firefly_solver.c ****   params.Bd[14] = 0;
+ 536:firefly_solver.c ****   params.Bd[15] = 0;
+ 537:firefly_solver.c ****   params.Bd[16] = 0;
+ 538:firefly_solver.c ****   params.Bd[17] = 0;
+ 539:firefly_solver.c ****   params.Bd[18] = 0.00495;
+ 540:firefly_solver.c ****   params.Bd[19] = 0;
+ 541:firefly_solver.c ****   params.Bd[20] = 0;
+ 542:firefly_solver.c ****   params.Bd[21] = 0.1;
+ 543:firefly_solver.c ****   params.Bd[22] = 0;
+ 544:firefly_solver.c ****   params.Bd[23] = 0;
+ 545:firefly_solver.c ****   params.d[0] = -1.214148157218884;
+ 546:firefly_solver.c ****   params.d[1] = 1.6818776980374155;
+ 547:firefly_solver.c ****   params.d[2] = -0.30341101038214635;
+ 548:firefly_solver.c ****   params.u_min[0] = -0.436332;
+ 549:firefly_solver.c ****   params.u_min[1] = -0.436332;
+ 550:firefly_solver.c ****   params.u_min[2] = -4.8066;
+ 551:firefly_solver.c ****   params.u_max[0] = 0.436332;
+ 552:firefly_solver.c ****   params.u_max[1] = 0.436332;
+ 553:firefly_solver.c ****   params.u_max[2] = 10.1934;
+ 554:firefly_solver.c ****   */
+ 555:firefly_solver.c **** }
+ 556:firefly_solver.c **** ...
+ 2153              	d	-1076106708
+ 2154              		.word	-330277320
+ 2155              		.word	2360
+ 2156 11fe 1360     		.word	-1073936005
+ 2157 1200 5460     		.word	-1500653564
+ 2158              		.word	-1076952028
+ 2159 1202 10BC     		.word	275061088
+ 2160 1204 01BC     		.word	2376
+ 2161 1206 0047     		.word	-1075813646
+ 2162              		.word	-98108236
+ 2163              		.word	1071174964
+ 2164              		.word	1490762760
+ 2165 1208 F8080000 		.word	2392
+ 2166 120c 600FFEBF 		.word	-1074304776
+ 2167 1210 9CF576F0 		.word	833046130
+ 2168 1214 F5AFC3BF 		.word	-1074696922
+ 2169 1218 406F49EE 		.word	-487787954
+ 2170 121c 08090000 		.word	2408
+ 2171 1220 4299F5BF 		.word	1072964965
+ 2172 1224 28C964D7 		.word	638962438
+ 2173 1228 EAF9E63F 		.word	-1074910572
+ 2174 122c 18BF6344 		.word	-976582384
+ 2175 1230 18090000 		.word	2424
+ 2176 1234 A1E4F23F 		.word	-1076431551
+ 2177 1238 C861E3C7 		.word	1258890400
+ 2178 123c 8302D43F 		.word	1073473271
+ 2179 1240 A023868D 		.word	-671024376
+ 2180 1244 28090000 		.word	2440
+ 2181 1248 0FEEE83F 		.word	-1075004750
+ 2182 124c C4BBAE0B 		.word	1736384648
+ 2183 1250 2CEADBBF 		.word	-1074351215
+ 2184 1254 385E50EC 		.word	-1097704900
+ 2185 1258 38090000 		.word	2456
+ 2186 125c 7B09FDBF 		.word	1072290763
+ 2187 1260 04D88DA6 		.word	-1404149984
+ 2188 1264 2404CFBF 		.word	1070672710
+ 2189 1268 60196510 		.word	13435344
+ 2190 126c 48090000 		.word	2472
+ 2191 1270 F262E0BF 		.word	1071419753
+ 2192 1274 B4FC26FA 		.word	-501507288
+ 2193 1278 34D5D83F 	.LFE3:
+ 2195 1280 58090000 		.align	2
+ 2196 1284 F868F7BF 		.global	init_solver
+ 2197 1288 7246A731 		.code 16
+ 2198 128c 266DF1BF 		.thumb_func
+ 2200 1294 68090000 	init_solver:
+ 2201 1298 6525F43F 	.LFB2:
+ 2202 129c 06CB1526 		.loc 1 15 0
+ 2203 12a0 942AEEBF 		push	{lr}
+ 2204 12a4 1089CAC5 	.LCFI1:
+ 2205 12a8 78090000 	.LVL0:
+ 2206 12ac 41F5D6BF 		.loc 1 22 0
+ 2207 12b0 A024094B 		bl	set_defaults
+ 2208 12b4 F7E6FB3F 	.LVL1:
+ 2209 12b8 08FB00D8 		.loc 1 23 0
+ 2210 12bc 88090000 		bl	setup_indexing
+ 2211 12c0 B2BAECBF 		.loc 1 24 0
+ 2212 12c4 88207F67 		bl	load_default_data
+ 2213 12c8 91B3F6BF 		.loc 1 26 0
+ 2214 12cc 3C5A92BE 		ldr	r2, .L16
+ 2215 12d0 98090000 		mov	r3, #1
+ 2216 12d4 CBDBE93F 		str	r3, [r2, #44]
+ 2217 12d8 205F4EAC 		.loc 1 27 0
+ 2218 12dc 462BD13F 		bl	solve
+ 2219 12e0 D001CD00 		.loc 1 49 0
+ 2220 12e4 A8090000 		mov	r0, #0
+ 2221 12e8 6991DC3F 		@ sp needed for prologue
+ 2222 12ec 289B1BE2 		pop	{r1}
+ 2223              		bx	r1
+ 2224              	.L17:
+ 2225              		.align	2
+ 2226              	.L16:
+ 2227              		.word	settings
+ 2228              	.LFE2:
+ 2230              		.comm	vars,380,4
+ 2231              		.comm	params,4120,4
+ 2232              		.comm	work,129104,4
+ 2233 12f0 00B5     		.comm	settings,64,4
+ 2234              		.section	.debug_frame,"",%progbits
+ 2235              	.Lframe0:
+ 2236              		.4byte	.LECIE0-.LSCIE0
+ 2237 12f2 FFF7FEFF 	.LSCIE0:
+ 2238              		.4byte	0xffffffff
+ 2239              		.byte	0x1
+ 2240 12f6 FFF7FEFF 		.ascii	"\000"
+ 2241              		.uleb128 0x1
+ 2242 12fa FFF7FEFF 		.sleb128 -4
+ 2243              		.byte	0xe
+ 2244 12fe 044A     		.byte	0xc
+ 2245 1300 0123     		.uleb128 0xd
+ 2246 1302 D362     		.uleb128 0x0
+ 2247              		.align	2
+ 2248 1304 FFF7FEFF 	.LECIE0:
+ 2249              	.LSFDE0:
+ 2250 1308 0020     		.4byte	.LEFDE0-.LASFDE0
+ 2251              	.LASFDE0:
+ 2252 130a 02BC     		.4byte	.Lframe0
+ 2253 130c 0847     		.4byte	.LFB3
+ 2254              		.4byte	.LFE3-.LFB3
+ 2255 130e 0000     		.byte	0x4
+ 2256              		.4byte	.LCFI0-.LFB3
+ 2257 1310 00000000 		.byte	0xe
+ 2258              		.uleb128 0x8
+ 2259              		.byte	0x84
+ 2260              		.uleb128 0x2
+ 2261              		.byte	0x8e
+ 2262              		.uleb128 0x1
+ 2263              		.align	2
+ 2311              		.2byte	0x1
+DEFINED SYMBOLS
+                            *ABS*:00000000 firefly_solver.c
+C:\Users\XY\AppData\Local\Temp/ccmsaaaa.s:1      .text:00000000 $t
+C:\Users\XY\AppData\Local\Temp/ccmsaaaa.s:16     .text:00000000 load_default_data
+C:\Users\XY\AppData\Local\Temp/ccmsaaaa.s:541    .text:0000037c $d
+                            *COM*:00001018 params
+C:\Users\XY\AppData\Local\Temp/ccmsaaaa.s:674    .text:00000588 $t
+C:\Users\XY\AppData\Local\Temp/ccmsaaaa.s:1189   .text:0000090c $d
+C:\Users\XY\AppData\Local\Temp/ccmsaaaa.s:1319   .text:00000b0c $t
+C:\Users\XY\AppData\Local\Temp/ccmsaaaa.s:1833   .text:00000e88 $d
+C:\Users\XY\AppData\Local\Temp/ccmsaaaa.s:1981   .text:000010d4 $t
+C:\Users\XY\AppData\Local\Temp/ccmsaaaa.s:2165   .text:00001208 $d
+C:\Users\XY\AppData\Local\Temp/ccmsaaaa.s:2230   .text:000012f0 init_solver
+C:\Users\XY\AppData\Local\Temp/ccmsaaaa.s:2227   .text:000012f0 $t
+C:\Users\XY\AppData\Local\Temp/ccmsaaaa.s:2257   .text:00001310 $d
+                            *COM*:00000040 settings
+                            *COM*:0000017c vars
+                            *COM*:0001f850 work
+
+UNDEFINED SYMBOLS
+set_defaults
+setup_indexing
+solve

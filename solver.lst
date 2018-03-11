@@ -1,0 +1,3359 @@
+   1              		.file	"solver.c"
+   9              	.Ltext0:
+  10              		.global	__muldf3
+  11              		.global	__adddf3
+  12              		.align	2
+  13              		.global	eval_gap
+  15              	eval_gap:
+  16              	.LFB2:
+  17              		.file 1 "solver.c"
+   1:solver.c      **** /* Produced by CVXGEN, 2018-02-26 09:21:34 -0500.  */
+   2:solver.c      **** /* CVXGEN is Copyright (C) 2006-2017 Jacob Mattingley, jem@cvxgen.com. */
+   3:solver.c      **** /* The code in this file is Copyright (C) 2006-2017 Jacob Mattingley. */
+   4:solver.c      **** /* CVXGEN, or solvers produced by CVXGEN, cannot be used for commercial */
+   5:solver.c      **** /* applications without prior written permission from Jacob Mattingley. */
+   6:solver.c      **** 
+   7:solver.c      **** /* Filename: solver.c. */
+   8:solver.c      **** /* Description: Main solver file. */
+   9:solver.c      **** #include "solver.h"
+  10:solver.c      **** double eval_gap(void) {
+  18              	unction supports interworking.
+  19              		@ args = 0, pretend = 0, frame = 0
+  20              		@ frame_needed = 0, uses_anonymous_args = 0
+  21              		.loc 1 15 0
+  11:solver.c      ****  double gap;
+  12:solver.c      ****   gap = 0;
+  13:solver.c      ****   for (i = 0; i < 114; i++)
+  14:solver.c      ****     gap += work.z[i]*work.s[i];
+  15:solver.c      ****   return gap;
+  22              		r2, #17408
+  23 0000 112BA0E3 		ldr	r1, .L8
+  24 0004 64109FE5 		mov	r3, r2
+  25 0008 0230A0E1 		add	r3, r3, #232
+  26 000c E83083E2 		add	r2, r2, #236
+  27 0010 EC2082E2 		.loc 1 10 0
+  28              		stmfd	sp!, {r4, r5, r6, r7, r8, lr}
+  29 0014 F0412DE9 	.LCFI0:
+  30              		.loc 1 15 0
+  31              		ldr	r8, [r1, r3]
+  32 0018 038091E7 		ldr	r7, [r1, r2]
+  33 001c 027091E7 		mov	r5, #0
+  34 0020 0050A0E3 	.LVL0:
+  35              		mov	r6, #0
+  36 0024 0060A0E3 	.LVL1:
+  37              		mov	r4, #0
+  38 0028 0040A0E3 	.L2:
+  39              		add	ip, r8, r4
+  40 002c 04C088E0 		add	r3, r7, r4
+  41 0030 043087E0 		ldmia	r3, {r0-r1}
+  42 0034 030093E8 		ldmia	ip, {r2-r3}
+  43 0038 0C009CE8 		bl	__muldf3
+  44 003c FEFFFFEB 		mov	r2, r0
+  45 0040 0020A0E1 		mov	r3, r1
+  46 0044 0130A0E1 		mov	r0, r5
+  47 0048 0500A0E1 		mov	r1, r6
+  48 004c 0610A0E1 		bl	__adddf3
+  49 0050 FEFFFFEB 		add	r4, r4, #8
+  50 0054 084084E2 		.loc 1 14 0
+  51              		cmp	r4, #912
+  52 0058 390E54E3 		.loc 1 15 0
+  53              		mov	r5, r0
+  54 005c 0050A0E1 		mov	r6, r1
+  55 0060 0160A0E1 		.loc 1 14 0
+  56              		bne	.L2
+  57 0064 F0FFFF1A 		.loc 1 17 0
+  16:solver.c      **** d set_defaults(void) {
+  17:solver.c      ****   settings.resid_tol = 1e-6;
+  58              	
+  59 0068 F041BDE8 		bx	lr
+  60 006c 1EFF2FE1 	.L9:
+  61              		.align	2
+  62              	.L8:
+  63              		.word	work
+  64 0070 00000000 	.LFE2:
+  66              		.align	2
+  67              		.global	set_defaults
+  69              	set_defaults:
+  70              	.LFB3:
+  71              		.loc 1 18 0
+  18:solver.c      **** settings.eps = 1e-4;
+  72              	upports interworking.
+  73              		@ args = 0, pretend = 0, frame = 0
+  74              		@ frame_needed = 0, uses_anonymous_args = 0
+  75              		@ link register save eliminated.
+  76              		.loc 1 19 0
+  19:solver.c      ****  settings.max_iters = 25;
+  77              	r2, .L12+24
+  78 0074 8C209FE5 		.loc 1 23 0
+  20:solver.c      ****  settings.refine_steps = 1;
+  21:solver.c      ****   settings.s_init = 1;
+  22:solver.c      ****   settings.z_init = 1;
+  23:solver.c      ****   settings.debug = 0;
+  79              	ov	r3, #1069547520
+  80 0078 FF35A0E3 		add	r3, r3, #3145728
+  81 007c 033683E2 		.loc 1 18 0
+  82              		str	r4, [sp, #-4]!
+  83 0080 04402DE5 	.LCFI1:
+  84              		.loc 1 23 0
+  85              		mov	r4, #0
+  86 0084 0040A0E3 		.loc 1 24 0
+  24:solver.c      **** ttings.verbose = 1;
+  87              	 [r2, #36]
+  88 0088 243082E5 		str	r4, [r2, #40]
+  89 008c 284082E5 		.loc 1 23 0
+  90              		str	r3, [r2, #28]
+  91 0090 1C3082E5 		str	r4, [r2, #32]
+  92 0094 204082E5 		.loc 1 21 0
+  93              		mov	r3, #25
+  94 0098 1930A0E3 		str	r3, [r2, #16]
+  95 009c 103082E5 		.loc 1 29 0
+  25:solver.c      ****  settings.verbose_refinement = 0;
+  26:solver.c      ****   settings.better_start = 1;
+  27:solver.c      ****   settings.kkt_reg = 1e-7;
+  28:solver.c      **** }
+  29:solver.c      **** void setup_pointers(void) {
+  96              	.L12
+  97 00a0 48308FE2 		ldmia	r3, {r3-r4}
+  98 00a4 180093E8 		str	r3, [r2, #56]
+  99 00a8 383082E5 		str	r4, [r2, #60]
+ 100 00ac 3C4082E5 		.loc 1 19 0
+ 101              		adr	r3, .L12+8
+ 102 00b0 40308FE2 		ldmia	r3, {r3-r4}
+ 103 00b4 180093E8 		stmia	r2, {r3-r4}
+ 104 00b8 180082E8 		.loc 1 20 0
+ 105              		adr	r3, .L12+16
+ 106 00bc 3C308FE2 		ldmia	r3, {r3-r4}
+ 107 00c0 180093E8 		.loc 1 22 0
+ 108              		mov	r1, #1
+ 109 00c4 0110A0E3 		.loc 1 25 0
+ 110              		mov	r0, #0
+ 111 00c8 0000A0E3 		.loc 1 18 0
+ 112              		@ lr needed for prologue
+ 113              		.loc 1 27 0
+ 114              		str	r0, [r2, #48]
+ 115 00cc 300082E5 		.loc 1 28 0
+ 116              		str	r1, [r2, #24]
+ 117 00d0 181082E5 		.loc 1 22 0
+ 118              		str	r1, [r2, #20]
+ 119 00d4 141082E5 		.loc 1 25 0
+ 120              		str	r0, [r2, #52]
+ 121 00d8 340082E5 		.loc 1 26 0
+ 122              		str	r1, [r2, #44]
+ 123 00dc 2C1082E5 		.loc 1 20 0
+ 124              		str	r3, [r2, #8]
+ 125 00e0 083082E5 		str	r4, [r2, #12]
+ 126 00e4 0C4082E5 		.loc 1 30 0
+  30:solver.c      **** k.y = work.x + 263;
+ 127              	.align	2
+ 128 00e8 1000BDE8 	.L12:
+ 129 00ec 1EFF2FE1 		.word	1048238066
+ 130              		.word	-1698910392
+ 131              		.word	1051772663
+ 132              		.word	-1598689907
+ 133 00f0 F2D77A3E 		.word	1058682594
+ 134 00f4 48AFBC9A 		.word	-350469331
+ 135 00f8 F7C6B03E 		.word	settings
+ 136 00fc 8DEDB5A0 	.LFE3:
+ 138 0104 2D431CEB 		.align	2
+ 139 0108 00000000 		.global	setup_pointers
+ 141              	setup_pointers:
+ 142              	.LFB4:
+ 143              		.loc 1 31 0
+ 144              		@ Function supports interworking.
+ 145              		@ args = 0, pretend = 0, frame = 116
+ 146              		@ frame_needed = 0, uses_anonymous_args = 0
+  31:solver.c      ****  work.s = work.x + 469;
+ 147              	 r6, r7, r8, r9, sl, fp, lr}
+ 148              	.LCFI2:
+ 149              		.loc 1 32 0
+ 150              		ldr	r3, .L16
+ 151 010c F04F2DE9 		.loc 1 31 0
+ 152              		sub	sp, sp, #116
+  32:solver.c      ****  work.z = work.x + 583;
+ 153              	:
+ 154 0110 C0339FE5 		.loc 1 72 0
+ 155              		add	r1, r3, #14080
+ 156 0114 74D04DE2 		str	r1, [sp, #0]
+ 157              		.loc 1 42 0
+  33:solver.c      ****  vars.u_0 = work.x + 54;
+  34:solver.c      ****   vars.u_1 = work.x + 57;
+  35:solver.c      ****   vars.u_2 = work.x + 60;
+  36:solver.c      ****   vars.u_3 = work.x + 63;
+  37:solver.c      ****   vars.u_4 = work.x + 66;
+  38:solver.c      ****   vars.u_5 = work.x + 69;
+  39:solver.c      ****   vars.u_6 = work.x + 72;
+  40:solver.c      ****   vars.u_7 = work.x + 75;
+  41:solver.c      ****   vars.u_8 = work.x + 78;
+  42:solver.c      ****   vars.u_9 = work.x + 81;
+  43:solver.c      ****   vars.u_10 = work.x + 84;
+  44:solver.c      ****   vars.u_11 = work.x + 87;
+  45:solver.c      ****   vars.u_12 = work.x + 90;
+  46:solver.c      ****   vars.u_13 = work.x + 93;
+  47:solver.c      ****   vars.u_14 = work.x + 96;
+  48:solver.c      ****   vars.u_15 = work.x + 99;
+  49:solver.c      ****   vars.u_16 = work.x + 102;
+  50:solver.c      ****   vars.u_17 = work.x + 105;
+  51:solver.c      ****   vars.u_18 = work.x + 108;
+  52:solver.c      ****   vars.x_1 = work.x + 111;
+  53:solver.c      ****   vars.x_2 = work.x + 119;
+  54:solver.c      ****   vars.x_3 = work.x + 127;
+  55:solver.c      ****   vars.x_4 = work.x + 135;
+  56:solver.c      ****   vars.x_5 = work.x + 143;
+  57:solver.c      ****   vars.x_6 = work.x + 151;
+  58:solver.c      ****   vars.x_7 = work.x + 159;
+  59:solver.c      ****   vars.x_8 = work.x + 167;
+  60:solver.c      ****   vars.x_9 = work.x + 175;
+  61:solver.c      ****   vars.x_10 = work.x + 183;
+  62:solver.c      ****   vars.x_11 = work.x + 191;
+  63:solver.c      ****   vars.x_12 = work.x + 199;
+  64:solver.c      ****   vars.x_13 = work.x + 207;
+  65:solver.c      ****   vars.x_14 = work.x + 215;
+  66:solver.c      ****   vars.x_15 = work.x + 223;
+  67:solver.c      ****   vars.x_16 = work.x + 231;
+  68:solver.c      ****   vars.x_17 = work.x + 239;
+  69:solver.c      ****   vars.x_18 = work.x + 247;
+  70:solver.c      ****   vars.x_19 = work.x + 255;
+  71:solver.c      **** }
+  72:solver.c      **** void setup_indexed_params(void) {
+ 158              	r1, r3, #12608
+ 159 0118 371C83E2 		str	r1, [sp, #112]
+ 160 011c 00108DE5 		.loc 1 43 0
+ 161              		add	r1, r3, #12672
+ 162 0120 C51D83E2 		str	r1, [sp, #108]
+ 163 0124 70108DE5 		.loc 1 44 0
+ 164              		str	r1, [sp, #104]
+ 165 0128 C61D83E2 		.loc 1 46 0
+ 166 012c 6C108DE5 		add	r1, r3, #12736
+ 167              		str	r1, [sp, #100]
+ 168 0130 68108DE5 		.loc 1 47 0
+ 169              		str	r1, [sp, #96]
+ 170 0134 C71D83E2 		.loc 1 48 0
+ 171 0138 64108DE5 		add	r1, r3, #12800
+ 172              		str	r1, [sp, #92]
+ 173 013c 60108DE5 		.loc 1 49 0
+ 174              		str	r1, [sp, #88]
+ 175 0140 321C83E2 		.loc 1 50 0
+ 176 0144 5C108DE5 		str	r1, [sp, #84]
+ 177              		.loc 1 51 0
+ 178 0148 58108DE5 		add	r1, r3, #12864
+ 179              		str	r1, [sp, #80]
+ 180 014c 54108DE5 		.loc 1 52 0
+ 181              		str	r1, [sp, #76]
+ 182 0150 C91D83E2 		.loc 1 54 0
+ 183 0154 50108DE5 		add	r1, r3, #12928
+ 184              		str	r1, [sp, #72]
+ 185 0158 4C108DE5 		.loc 1 55 0
+ 186              		add	r1, r3, #12992
+ 187 015c CA1D83E2 		str	r1, [sp, #68]
+ 188 0160 48108DE5 		.loc 1 56 0
+ 189              		add	r1, r3, #13056
+ 190 0164 CB1D83E2 		str	r1, [sp, #64]
+ 191 0168 44108DE5 		.loc 1 57 0
+ 192              		add	r1, r3, #13120
+ 193 016c 331C83E2 		str	r1, [sp, #60]
+ 194 0170 40108DE5 		.loc 1 58 0
+ 195              		add	r1, r3, #13184
+ 196 0174 CD1D83E2 		str	r1, [sp, #56]
+ 197 0178 3C108DE5 		.loc 1 59 0
+ 198              		add	r1, r3, #13248
+ 199 017c CE1D83E2 		str	r1, [sp, #52]
+ 200 0180 38108DE5 		.loc 1 60 0
+ 201              		add	r1, r3, #13312
+ 202 0184 CF1D83E2 		str	r1, [sp, #48]
+ 203 0188 34108DE5 		.loc 1 61 0
+ 204              		add	r1, r3, #13376
+ 205 018c 0D1B83E2 		str	r1, [sp, #44]
+ 206 0190 30108DE5 		.loc 1 62 0
+ 207              		add	r1, r3, #13440
+ 208 0194 D11D83E2 		str	r1, [sp, #40]
+ 209 0198 2C108DE5 		.loc 1 63 0
+ 210              		add	r1, r3, #13504
+ 211 019c D21D83E2 		str	r1, [sp, #36]
+ 212 01a0 28108DE5 		.loc 1 64 0
+ 213              		add	r1, r3, #13568
+ 214 01a4 D31D83E2 		str	r1, [sp, #32]
+ 215 01a8 24108DE5 		.loc 1 65 0
+ 216              		add	r1, r3, #13632
+ 217 01ac 351C83E2 		str	r1, [sp, #28]
+ 218 01b0 20108DE5 		.loc 1 66 0
+ 219              		add	r1, r3, #13696
+ 220 01b4 D51D83E2 		str	r1, [sp, #24]
+ 221 01b8 1C108DE5 		.loc 1 67 0
+ 222              		add	r1, r3, #13760
+ 223 01bc D61D83E2 		str	r1, [sp, #20]
+ 224 01c0 18108DE5 		.loc 1 68 0
+ 225              		add	r1, r3, #13824
+ 226 01c4 D71D83E2 		str	r1, [sp, #16]
+ 227 01c8 14108DE5 		.loc 1 69 0
+ 228              		add	r1, r3, #13888
+ 229 01cc 361C83E2 		str	r1, [sp, #12]
+ 230 01d0 10108DE5 		.loc 1 70 0
+ 231              		add	r1, r3, #13952
+ 232 01d4 D91D83E2 		str	r1, [sp, #8]
+ 233 01d8 0C108DE5 		.loc 1 71 0
+ 234              		add	r1, r3, #14016
+ 235 01dc DA1D83E2 		str	r1, [sp, #4]
+ 236 01e0 08108DE5 		.loc 1 42 0
+ 237              		ldr	r1, [sp, #112]
+ 238 01e4 DB1D83E2 		add	r1, r1, #56
+ 239 01e8 04108DE5 		str	r1, [sp, #112]
+ 240              		.loc 1 43 0
+ 241 01ec 70109DE5 		ldr	r1, [sp, #108]
+ 242 01f0 381081E2 		add	r1, r1, #16
+ 243 01f4 70108DE5 		str	r1, [sp, #108]
+ 244              		.loc 1 44 0
+ 245 01f8 6C109DE5 		ldr	r1, [sp, #104]
+ 246 01fc 101081E2 		add	r1, r1, #40
+ 247 0200 6C108DE5 		str	r1, [sp, #104]
+ 248              		.loc 1 46 0
+ 249 0204 68109DE5 		ldr	r1, [sp, #100]
+ 250 0208 281081E2 		add	r1, r1, #24
+ 251 020c 68108DE5 		str	r1, [sp, #100]
+ 252              		.loc 1 47 0
+ 253 0210 64109DE5 		ldr	r1, [sp, #96]
+ 254 0214 181081E2 		add	r1, r1, #48
+ 255 0218 64108DE5 		str	r1, [sp, #96]
+ 256              		.loc 1 48 0
+ 257 021c 60109DE5 		ldr	r1, [sp, #92]
+ 258 0220 301081E2 		add	r1, r1, #8
+ 259 0224 60108DE5 		str	r1, [sp, #92]
+ 260              		.loc 1 49 0
+ 261 0228 5C109DE5 		ldr	r1, [sp, #88]
+ 262 022c 081081E2 		add	r1, r1, #32
+ 263 0230 5C108DE5 		str	r1, [sp, #88]
+ 264              		.loc 1 50 0
+ 265 0234 58109DE5 		ldr	r1, [sp, #84]
+ 266 0238 201081E2 		add	r1, r1, #56
+ 267 023c 58108DE5 		str	r1, [sp, #84]
+ 268              		.loc 1 51 0
+ 269 0240 54109DE5 		ldr	r1, [sp, #80]
+ 270 0244 381081E2 		add	r1, r1, #16
+ 271 0248 54108DE5 		str	r1, [sp, #80]
+ 272              		.loc 1 52 0
+ 273 024c 50109DE5 		ldr	r1, [sp, #76]
+ 274 0250 101081E2 		add	r1, r1, #40
+ 275 0254 50108DE5 		str	r1, [sp, #76]
+ 276              		.loc 1 54 0
+ 277 0258 4C109DE5 		ldr	r1, [sp, #72]
+ 278 025c 281081E2 		add	r1, r1, #24
+ 279 0260 4C108DE5 		str	r1, [sp, #72]
+ 280              		.loc 1 55 0
+ 281 0264 48109DE5 		ldr	r1, [sp, #68]
+ 282 0268 181081E2 		add	r1, r1, #24
+ 283 026c 48108DE5 		str	r1, [sp, #68]
+ 284              		.loc 1 56 0
+ 285 0270 44109DE5 		ldr	r1, [sp, #64]
+ 286 0274 181081E2 		add	r1, r1, #24
+ 287 0278 44108DE5 		str	r1, [sp, #64]
+ 288              		.loc 1 57 0
+ 289 027c 40109DE5 		ldr	r1, [sp, #60]
+ 290 0280 181081E2 		add	r1, r1, #24
+ 291 0284 40108DE5 		str	r1, [sp, #60]
+ 292              		.loc 1 58 0
+ 293 0288 3C109DE5 		ldr	r1, [sp, #56]
+ 294 028c 181081E2 		add	r1, r1, #24
+ 295 0290 3C108DE5 		str	r1, [sp, #56]
+ 296              		.loc 1 59 0
+ 297 0294 38109DE5 		ldr	r1, [sp, #52]
+ 298 0298 181081E2 		add	r1, r1, #24
+ 299 029c 38108DE5 		str	r1, [sp, #52]
+ 300              		.loc 1 60 0
+ 301 02a0 34109DE5 		ldr	r1, [sp, #48]
+ 302 02a4 181081E2 		add	r1, r1, #24
+ 303 02a8 34108DE5 		str	r1, [sp, #48]
+ 304              		.loc 1 61 0
+ 305 02ac 30109DE5 		ldr	r1, [sp, #44]
+ 306 02b0 181081E2 		add	r1, r1, #24
+ 307 02b4 30108DE5 		str	r1, [sp, #44]
+ 308              		.loc 1 62 0
+ 309 02b8 2C109DE5 		ldr	r1, [sp, #40]
+ 310 02bc 181081E2 		add	r1, r1, #24
+ 311 02c0 2C108DE5 		str	r1, [sp, #40]
+ 312              		.loc 1 63 0
+ 313 02c4 28109DE5 		ldr	r1, [sp, #36]
+ 314 02c8 181081E2 		add	r1, r1, #24
+ 315 02cc 28108DE5 		str	r1, [sp, #36]
+ 316              		.loc 1 64 0
+ 317 02d0 24109DE5 		ldr	r1, [sp, #32]
+ 318 02d4 181081E2 		add	r1, r1, #24
+ 319 02d8 24108DE5 		str	r1, [sp, #32]
+ 320              		.loc 1 65 0
+ 321 02dc 20109DE5 		ldr	r1, [sp, #28]
+ 322 02e0 181081E2 		add	r1, r1, #24
+ 323 02e4 20108DE5 		str	r1, [sp, #28]
+ 324              		.loc 1 66 0
+ 325 02e8 1C109DE5 		ldr	r1, [sp, #24]
+ 326 02ec 181081E2 		add	r1, r1, #24
+ 327 02f0 1C108DE5 		str	r1, [sp, #24]
+ 328              		.loc 1 67 0
+ 329 02f4 18109DE5 		ldr	r1, [sp, #20]
+ 330 02f8 181081E2 		add	r1, r1, #24
+ 331 02fc 18108DE5 		str	r1, [sp, #20]
+ 332              		.loc 1 68 0
+ 333 0300 14109DE5 		ldr	r1, [sp, #16]
+ 334 0304 181081E2 		add	r1, r1, #24
+ 335 0308 14108DE5 		str	r1, [sp, #16]
+ 336              		.loc 1 69 0
+ 337 030c 10109DE5 		ldr	r1, [sp, #12]
+ 338 0310 181081E2 		add	r1, r1, #24
+ 339 0314 10108DE5 		str	r1, [sp, #12]
+ 340              		.loc 1 70 0
+ 341 0318 0C109DE5 		ldr	r1, [sp, #8]
+ 342 031c 181081E2 		add	r1, r1, #24
+ 343 0320 0C108DE5 		str	r1, [sp, #8]
+ 344              		.loc 1 71 0
+ 345 0324 08109DE5 		ldr	r1, [sp, #4]
+ 346 0328 181081E2 		add	r1, r1, #24
+ 347 032c 08108DE5 		str	r1, [sp, #4]
+ 348              		.loc 1 72 0
+ 349 0330 04109DE5 		ldr	r1, [sp, #0]
+ 350 0334 181081E2 		.loc 1 32 0
+ 351 0338 04108DE5 		mov	r0, #17408
+ 352              		add	r4, r3, #14144
+ 353 033c 00109DE5 		.loc 1 72 0
+ 354              		add	r1, r1, #24
+ 355 0340 110BA0E3 		str	r1, [sp, #0]
+ 356 0344 DD4D83E2 		.loc 1 32 0
+ 357              		add	r4, r4, #24
+ 358 0348 181081E2 		add	r1, r0, #240
+ 359 034c 00108DE5 		str	r4, [r3, r1]
+ 360              		.loc 1 33 0
+ 361 0350 184084E2 		add	r5, r3, #15808
+ 362 0354 F01080E2 		sub	r1, r1, #240
+ 363 0358 014083E7 		add	r1, r1, #232
+ 364              		add	r5, r5, #8
+ 365 035c F75D83E2 		str	r5, [r3, r1]
+ 366 0360 F01041E2 		.loc 1 34 0
+ 367 0364 E81081E2 		add	r6, r3, #16640
+ 368 0368 085085E2 		sub	r1, r1, #232
+ 369 036c 015083E7 		add	r1, r1, #236
+ 370              		add	r6, r6, #88
+ 371 0370 416C83E2 		.loc 1 35 0
+ 372 0374 E81041E2 		ldr	r2, .L16+4
+ 373 0378 EC1081E2 		.loc 1 34 0
+ 374 037c 586086E2 		str	r6, [r3, r1]
+ 375              		.loc 1 35 0
+ 376 0380 54219FE5 		add	r7, r3, #12480
+ 377              		.loc 1 36 0
+ 378 0384 016083E7 		add	r8, r3, #12480
+ 379              		.loc 1 38 0
+ 380 0388 C37D83E2 		add	sl, r3, #12544
+ 381              		.loc 1 39 0
+ 382 038c C38D83E2 		add	r9, r3, #12544
+ 383              		.loc 1 40 0
+ 384 0390 31AC83E2 		add	fp, r3, #12608
+ 385              		.loc 1 41 0
+ 386 0394 319C83E2 		add	ip, r3, #12608
+ 387              		.loc 1 37 0
+ 388 0398 C5BD83E2 		add	r0, r3, #12544
+ 389              		.loc 1 45 0
+ 390 039c C5CD83E2 		add	lr, r3, #12736
+ 391              		.loc 1 43 0
+ 392 03a0 310C83E2 		add	r1, sp, #108
+ 393              		ldmia	r1, {r1, r3}	@ phole ldm
+ 394 03a4 C7ED83E2 		.loc 1 35 0
+ 395              		add	r7, r7, #16
+ 396 03a8 6C108DE2 		.loc 1 36 0
+ 397 03ac 0A0091E8 		add	r8, r8, #40
+ 398              		.loc 1 38 0
+ 399 03b0 107087E2 		add	sl, sl, #24
+ 400              		.loc 1 39 0
+ 401 03b4 288088E2 		add	r9, r9, #48
+ 402              		.loc 1 40 0
+ 403 03b8 18A08AE2 		add	fp, fp, #8
+ 404              		.loc 1 41 0
+ 405 03bc 309089E2 		add	ip, ip, #32
+ 406              		.loc 1 42 0
+ 407 03c0 08B08BE2 		str	r3, [r2, #80]
+ 408              		.loc 1 35 0
+ 409 03c4 20C08CE2 		str	r7, [r2, #0]
+ 410              		.loc 1 36 0
+ 411 03c8 503082E5 		str	r8, [r2, #8]
+ 412              		.loc 1 37 0
+ 413 03cc 007082E5 		str	r0, [r2, #20]
+ 414              		.loc 1 38 0
+ 415 03d0 088082E5 		str	sl, [r2, #32]
+ 416              		.loc 1 39 0
+ 417 03d4 140082E5 		str	r9, [r2, #44]
+ 418              		.loc 1 40 0
+ 419 03d8 20A082E5 		str	fp, [r2, #56]
+ 420              		.loc 1 41 0
+ 421 03dc 2C9082E5 		str	ip, [r2, #68]
+ 422              		.loc 1 43 0
+ 423 03e0 38B082E5 		str	r1, [r2, #92]
+ 424              		.loc 1 44 0
+ 425 03e4 44C082E5 		add	r1, sp, #100
+ 426              		ldmia	r1, {r1, r3}	@ phole ldm
+ 427 03e8 5C1082E5 		str	r3, [r2, #104]
+ 428              		.loc 1 47 0
+ 429 03ec 64108DE2 		ldr	r3, [sp, #96]
+ 430 03f0 0A0091E8 		.loc 1 46 0
+ 431 03f4 683082E5 		str	r1, [r2, #128]
+ 432              		.loc 1 47 0
+ 433 03f8 60309DE5 		str	r3, [r2, #140]
+ 434              		.loc 1 48 0
+ 435 03fc 801082E5 		ldr	r1, [sp, #92]
+ 436              		.loc 1 49 0
+ 437 0400 8C3082E5 		ldr	r3, [sp, #88]
+ 438              		.loc 1 48 0
+ 439 0404 5C109DE5 		str	r1, [r2, #152]
+ 440              		.loc 1 49 0
+ 441 0408 58309DE5 		str	r3, [r2, #164]
+ 442              		.loc 1 50 0
+ 443 040c 981082E5 		ldr	r1, [sp, #84]
+ 444              		.loc 1 51 0
+ 445 0410 A43082E5 		ldr	r3, [sp, #80]
+ 446              		.loc 1 50 0
+ 447 0414 54109DE5 		str	r1, [r2, #176]
+ 448              		.loc 1 51 0
+ 449 0418 50309DE5 		str	r3, [r2, #188]
+ 450              		.loc 1 52 0
+ 451 041c B01082E5 		ldr	r1, [sp, #76]
+ 452              		.loc 1 53 0
+ 453 0420 BC3082E5 		ldr	r3, .L16+8
+ 454              		.loc 1 52 0
+ 455 0424 4C109DE5 		str	r1, [r2, #200]
+ 456              		.loc 1 53 0
+ 457 0428 B0309FE5 		str	r3, [r2, #212]
+ 458              		.loc 1 54 0
+ 459 042c C81082E5 		ldr	r1, [sp, #72]
+ 460              		.loc 1 55 0
+ 461 0430 D43082E5 		ldr	r3, [sp, #68]
+ 462              		.loc 1 54 0
+ 463 0434 48109DE5 		str	r1, [r2, #4]
+ 464              		.loc 1 55 0
+ 465 0438 44309DE5 		str	r3, [r2, #16]
+ 466              		.loc 1 56 0
+ 467 043c 041082E5 		ldr	r1, [sp, #64]
+ 468              		.loc 1 57 0
+ 469 0440 103082E5 		ldr	r3, [sp, #60]
+ 470              		.loc 1 56 0
+ 471 0444 40109DE5 		str	r1, [r2, #28]
+ 472              		.loc 1 57 0
+ 473 0448 3C309DE5 		str	r3, [r2, #40]
+ 474              		.loc 1 58 0
+ 475 044c 1C1082E5 		ldr	r1, [sp, #56]
+ 476              		.loc 1 59 0
+ 477 0450 283082E5 		ldr	r3, [sp, #52]
+ 478              		.loc 1 58 0
+ 479 0454 38109DE5 		str	r1, [r2, #52]
+ 480              		.loc 1 59 0
+ 481 0458 34309DE5 		str	r3, [r2, #64]
+ 482              		.loc 1 60 0
+ 483 045c 341082E5 		ldr	r1, [sp, #48]
+ 484              		.loc 1 61 0
+ 485 0460 403082E5 		ldr	r3, [sp, #44]
+ 486              		.loc 1 60 0
+ 487 0464 30109DE5 		str	r1, [r2, #76]
+ 488              		.loc 1 45 0
+ 489 0468 2C309DE5 		str	lr, [r2, #116]
+ 490              		.loc 1 61 0
+ 491 046c 4C1082E5 		str	r3, [r2, #88]
+ 492              		.loc 1 62 0
+ 493 0470 74E082E5 		ldr	r1, [sp, #40]
+ 494              		.loc 1 63 0
+ 495 0474 583082E5 		ldr	r3, [sp, #36]
+ 496              		.loc 1 62 0
+ 497 0478 28109DE5 		str	r1, [r2, #100]
+ 498              		.loc 1 64 0
+ 499 047c 24309DE5 		ldr	r1, [sp, #32]
+ 500              		.loc 1 63 0
+ 501 0480 641082E5 		str	r3, [r2, #112]
+ 502              		.loc 1 64 0
+ 503 0484 20109DE5 		str	r1, [r2, #124]
+ 504              		.loc 1 65 0
+ 505 0488 703082E5 		ldr	r3, [sp, #28]
+ 506              		.loc 1 72 0
+ 507 048c 7C1082E5 		ldr	r1, [sp, #0]
+ 508              		.loc 1 65 0
+ 509 0490 1C309DE5 		str	r3, [r2, #136]
+ 510              		.loc 1 72 0
+ 511 0494 00109DE5 		str	r1, [r2, #220]
+ 512              		.loc 1 66 0
+ 513 0498 883082E5 		add	r1, sp, #20
+ 514              		ldmia	r1, {r1, r3}	@ phole ldm
+ 515 049c DC1082E5 		str	r3, [r2, #148]
+ 516              		.loc 1 67 0
+ 517 04a0 14108DE2 		str	r1, [r2, #160]
+ 518 04a4 0A0091E8 		.loc 1 68 0
+ 519 04a8 943082E5 		add	r1, sp, #12
+ 520              		ldmia	r1, {r1, r3}	@ phole ldm
+ 521 04ac A01082E5 		str	r3, [r2, #172]
+ 522              		.loc 1 69 0
+ 523 04b0 0C108DE2 		str	r1, [r2, #184]
+ 524 04b4 0A0091E8 		.loc 1 70 0
+ 525 04b8 AC3082E5 		ldmib	sp, {r1, r3}	@ phole ldm
+ 526              		str	r3, [r2, #196]
+ 527 04bc B81082E5 		.loc 1 71 0
+ 528              		str	r1, [r2, #208]
+ 529 04c0 0A009DE9 		.loc 1 73 0
+ 530 04c4 C43082E5 		add	sp, sp, #116
+ 531              		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 532 04c8 D01082E5 		bx	lr
+  73:solver.c      **** rameters */
+ 533              	p_indexed_params
+ 535 04d0 F04FBDE8 	setup_indexed_params:
+ 536 04d4 1EFF2FE1 	.LFB5:
+ 537              		.loc 1 74 0
+ 538              		@ Function supports interworking.
+ 539              		@ args = 0, pretend = 0, frame = 24
+ 540 04d8 00000000 		@ frame_needed = 0, uses_anonymous_args = 0
+ 541 04dc 00000000 		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 542 04e0 80320000 	.LCFI4:
+ 543              		.loc 1 83 0
+ 544              		ldr	r3, .L20
+ 545              		.loc 1 74 0
+ 546              		sub	sp, sp, #24
+ 547              	.LCFI5:
+ 548              		.loc 1 109 0
+ 549              		add	r1, r3, #1856
+  74:solver.c      ****  /*     A[i] (5,3), i=1..4 */
+ 550              	]
+ 551              		.loc 1 112 0
+ 552              		add	r2, r3, #1968
+ 553              		.loc 1 116 0
+ 554 04e4 F04F2DE9 		add	r1, r3, #2144
+ 555              		.loc 1 112 0
+  75:solver.c      ****  /*   end */
+  76:solver.c      ****   /* This function sets up A[2] to be a pointer to A_2, which is a length-15 */
+  77:solver.c      ****   /* vector of doubles. */
+  78:solver.c      ****   /* If you access parameters that you haven't defined in CVXGEN, the result */
+  79:solver.c      ****   /* is undefined. */
+  80:solver.c      ****   params.x[0] = params.x_0;
+  81:solver.c      ****   params.x_ss[0] = params.x_ss_0;
+  82:solver.c      ****   params.u_ss[0] = params.u_ss_0;
+  83:solver.c      ****   params.x_ss[1] = params.x_ss_1;
+ 556              	2, [sp, #16]
+ 557 04e8 0C329FE5 		.loc 1 116 0
+ 558              		str	r1, [sp, #12]
+ 559 04ec 18D04DE2 		.loc 1 117 0
+ 560              		add	r2, r3, #2208
+  84:solver.c      **** u_ss[1] = params.u_ss_1;
+  85:solver.c      ****   params.x_ss[2] = params.x_ss_2;
+  86:solver.c      ****   params.u_ss[2] = params.u_ss_2;
+  87:solver.c      ****   params.x_ss[3] = params.x_ss_3;
+  88:solver.c      ****   params.u_ss[3] = params.u_ss_3;
+  89:solver.c      ****   params.x_ss[4] = params.x_ss_4;
+  90:solver.c      ****   params.u_ss[4] = params.u_ss_4;
+  91:solver.c      ****   params.x_ss[5] = params.x_ss_5;
+  92:solver.c      ****   params.u_ss[5] = params.u_ss_5;
+  93:solver.c      ****   params.x_ss[6] = params.x_ss_6;
+  94:solver.c      ****   params.u_ss[6] = params.u_ss_6;
+  95:solver.c      ****   params.x_ss[7] = params.x_ss_7;
+  96:solver.c      ****   params.u_ss[7] = params.u_ss_7;
+  97:solver.c      ****   params.x_ss[8] = params.x_ss_8;
+  98:solver.c      ****   params.u_ss[8] = params.u_ss_8;
+  99:solver.c      ****   params.x_ss[9] = params.x_ss_9;
+ 100:solver.c      ****   params.u_ss[9] = params.u_ss_9;
+ 101:solver.c      ****   params.x_ss[10] = params.x_ss_10;
+ 102:solver.c      ****   params.u_ss[10] = params.u_ss_10;
+ 103:solver.c      ****   params.x_ss[11] = params.x_ss_11;
+ 104:solver.c      ****   params.u_ss[11] = params.u_ss_11;
+ 105:solver.c      ****   params.x_ss[12] = params.x_ss_12;
+ 106:solver.c      ****   params.u_ss[12] = params.u_ss_12;
+ 107:solver.c      ****   params.x_ss[13] = params.x_ss_13;
+ 108:solver.c      ****   params.u_ss[13] = params.u_ss_13;
+ 109:solver.c      ****   params.x_ss[14] = params.x_ss_14;
+ 561              	 1 120 0
+ 562 04f0 1D1D83E2 		add	r1, r3, #2320
+ 563 04f4 14108DE5 		.loc 1 117 0
+ 110:solver.c      **** .u_ss_14;
+ 111:solver.c      ****   params.x_ss[15] = params.x_ss_15;
+ 112:solver.c      ****   params.u_ss[15] = params.u_ss_15;
+ 564              	mib	sp, {r1, r2}	@ phole stm
+ 565 04f8 7B2E83E2 		.loc 1 121 0
+ 113:solver.c      **** arams.x_ss[16] = params.x_ss_16;
+ 114:solver.c      ****   params.u_ss[16] = params.u_ss_16;
+ 115:solver.c      ****   params.x_ss[17] = params.x_ss_17;
+ 116:solver.c      ****   params.u_ss[17] = params.u_ss_17;
+ 566              	dd	r2, r3, #2384
+ 567 04fc 861E83E2 		.loc 1 109 0
+ 568              		ldr	r1, [sp, #20]
+ 569 0500 10208DE5 		.loc 1 121 0
+ 570              		str	r2, [sp, #0]
+ 571 0504 0C108DE5 		.loc 1 112 0
+ 117:solver.c      **** rams.x_ss[18] = params.x_ss_18;
+ 572              	2, [sp, #16]
+ 573 0508 8A2E83E2 		.loc 1 109 0
+ 118:solver.c      ****  params.u_ss[18] = params.u_ss_18;
+ 119:solver.c      ****   params.x_ss[19] = params.x_ss_19;
+ 120:solver.c      **** }
+ 574              	dd	r1, r1, #8
+ 575 050c 911E83E2 		str	r1, [sp, #20]
+ 576              		.loc 1 112 0
+ 577 0510 06008DE9 		add	r2, r2, #8
+ 121:solver.c      **** d setup_indexed_optvars(void) {
+ 578              	c 1 116 0
+ 579 0514 952E83E2 		ldr	r1, [sp, #12]
+ 580              		.loc 1 112 0
+ 581 0518 14109DE5 		str	r2, [sp, #16]
+ 582              		.loc 1 117 0
+ 583 051c 00208DE5 		ldr	r2, [sp, #8]
+ 584              		.loc 1 116 0
+ 585 0520 10209DE5 		add	r1, r1, #8
+ 586              		str	r1, [sp, #12]
+ 587 0524 081081E2 		.loc 1 117 0
+ 588 0528 14108DE5 		add	r2, r2, #8
+ 589              		.loc 1 120 0
+ 590 052c 082082E2 		ldr	r1, [sp, #4]
+ 591              		.loc 1 117 0
+ 592 0530 0C109DE5 		str	r2, [sp, #8]
+ 593              		.loc 1 121 0
+ 594 0534 10208DE5 		ldr	r2, [sp, #0]
+ 595              		.loc 1 120 0
+ 596 0538 08209DE5 		add	r1, r1, #8
+ 597              		str	r1, [sp, #4]
+ 598 053c 081081E2 		.loc 1 121 0
+ 599 0540 0C108DE5 		add	r2, r2, #8
+ 600              		.loc 1 113 0
+ 601 0544 082082E2 		mov	r1, #4096
+ 602              		.loc 1 121 0
+ 603 0548 04109DE5 		str	r2, [sp, #0]
+ 604              		.loc 1 113 0
+ 605 054c 08208DE5 		add	r0, r1, #4
+ 606              		.loc 1 115 0
+ 607 0550 00209DE5 		add	r2, r3, #2128
+ 608              		add	r1, r1, #8
+ 609 0554 081081E2 		str	r2, [r3, r1]
+ 610 0558 04108DE5 		.loc 1 85 0
+ 611              		ldr	r1, .L20+4
+ 612 055c 082082E2 		.loc 1 84 0
+ 613              		ldr	r2, .L20+8
+ 614 0560 011AA0E3 		.loc 1 85 0
+ 615              		str	r1, [r3, #4044]
+ 616 0564 00208DE5 		.loc 1 87 0
+ 617              		ldr	r1, .L20+12
+ 618 0568 040081E2 		.loc 1 84 0
+ 619              		str	r2, [r3, #3964]
+ 620 056c 852E83E2 		.loc 1 86 0
+ 621 0570 081081E2 		ldr	r2, .L20+16
+ 622 0574 012083E7 		.loc 1 87 0
+ 623              		str	r1, [r3, #4048]
+ 624 0578 80119FE5 		.loc 1 89 0
+ 625              		ldr	r1, .L20+20
+ 626 057c 80219FE5 		.loc 1 86 0
+ 627              		str	r2, [r3, #3968]
+ 628 0580 CC1F83E5 		.loc 1 88 0
+ 629              		ldr	r2, .L20+24
+ 630 0584 7C119FE5 		.loc 1 89 0
+ 631              		str	r1, [r3, #4052]
+ 632 0588 7C2F83E5 		.loc 1 91 0
+ 633              		ldr	r1, .L20+28
+ 634 058c 78219FE5 		.loc 1 88 0
+ 635              		str	r2, [r3, #3972]
+ 636 0590 D01F83E5 		.loc 1 90 0
+ 637              		ldr	r2, .L20+32
+ 638 0594 74119FE5 		.loc 1 91 0
+ 639              		str	r1, [r3, #4056]
+ 640 0598 802F83E5 		.loc 1 95 0
+ 641              		ldr	r1, .L20+36
+ 642 059c 70219FE5 		.loc 1 90 0
+ 643              		str	r2, [r3, #3976]
+ 644 05a0 D41F83E5 		.loc 1 94 0
+ 645              		ldr	r2, .L20+40
+ 646 05a4 6C119FE5 		.loc 1 95 0
+ 647              		str	r1, [r3, #4064]
+ 648 05a8 842F83E5 		.loc 1 92 0
+ 649              		add	r4, r3, #1088
+ 650 05ac 68219FE5 		.loc 1 99 0
+ 651              		ldr	r1, .L20+44
+ 652 05b0 D81F83E5 		.loc 1 93 0
+ 653              		add	r5, r3, #1152
+ 654 05b4 64119FE5 		.loc 1 96 0
+ 655              		add	r6, r3, #1264
+ 656 05b8 882F83E5 		.loc 1 113 0
+ 657              		add	ip, r3, #2032
+ 658 05bc 60219FE5 		.loc 1 94 0
+ 659              		str	r2, [r3, #3984]
+ 660 05c0 E01F83E5 		.loc 1 92 0
+ 661              		add	r4, r4, #8
+ 662 05c4 114D83E2 		.loc 1 98 0
+ 663              		ldr	r2, .L20+48
+ 664 05c8 58119FE5 		.loc 1 93 0
+ 665              		add	r5, r5, #8
+ 666 05cc 125D83E2 		.loc 1 96 0
+ 667              		add	r6, r6, #8
+ 668 05d0 4F6E83E2 		.loc 1 113 0
+ 669              		add	ip, ip, #8
+ 670 05d4 7FCE83E2 		str	ip, [r3, r0]
+ 671              		.loc 1 92 0
+ 672 05d8 902F83E5 		str	r4, [r3, #3980]
+ 673              		.loc 1 93 0
+ 674 05dc 084084E2 		str	r5, [r3, #4060]
+ 675              		.loc 1 96 0
+ 676 05e0 44219FE5 		str	r6, [r3, #3988]
+ 677              		.loc 1 99 0
+ 678 05e4 085085E2 		str	r1, [r3, #4072]
+ 679              		.loc 1 103 0
+ 680 05e8 086086E2 		ldr	r1, .L20+52
+ 681              		.loc 1 98 0
+ 682 05ec 08C08CE2 		str	r2, [r3, #3992]
+ 683 05f0 00C083E7 		.loc 1 102 0
+ 684              		ldr	r2, .L20+56
+ 685 05f4 8C4F83E5 		.loc 1 103 0
+ 686              		str	r1, [r3, #4080]
+ 687 05f8 DC5F83E5 		.loc 1 107 0
+ 688              		ldr	r1, .L20+60
+ 689 05fc 946F83E5 		.loc 1 102 0
+ 690              		str	r2, [r3, #4000]
+ 691 0600 E81F83E5 		.loc 1 106 0
+ 692              		ldr	r2, .L20+64
+ 693 0604 24119FE5 		.loc 1 107 0
+ 694              		str	r1, [r3, #4088]
+ 695 0608 982F83E5 		.loc 1 110 0
+ 696              		ldr	r1, .L20+68
+ 697 060c 20219FE5 		.loc 1 106 0
+ 698              		str	r2, [r3, #4008]
+ 699 0610 F01F83E5 		.loc 1 109 0
+ 700              		ldr	r2, [sp, #20]
+ 701 0614 1C119FE5 		.loc 1 110 0
+ 702              		str	r1, [r3, #4016]
+ 703 0618 A02F83E5 		.loc 1 111 0
+ 704              		ldr	r1, .L20+72
+ 705 061c 18219FE5 		.loc 1 109 0
+ 706              		str	r2, [r3, #4092]
+ 707 0620 F81F83E5 		.loc 1 111 0
+ 708              		mov	r2, #4096
+ 709 0624 14119FE5 		str	r1, [r3, r2]
+ 710              		.loc 1 112 0
+ 711 0628 A82F83E5 		ldr	r2, [sp, #16]
+ 712              		.loc 1 114 0
+ 713 062c 14209DE5 		ldr	r1, .L20+76
+ 714              		.loc 1 112 0
+ 715 0630 B01F83E5 		str	r2, [r3, #4020]
+ 716              		.loc 1 116 0
+ 717 0634 08119FE5 		ldr	r2, [sp, #12]
+ 718              		.loc 1 114 0
+ 719 0638 FC2F83E5 		str	r1, [r3, #4024]
+ 720              		.loc 1 116 0
+ 721 063c 012AA0E3 		str	r2, [r3, #4028]
+ 722 0640 021083E7 		.loc 1 117 0
+ 723              		mov	r1, #4096
+ 724 0644 10209DE5 		ldr	r2, [sp, #8]
+ 725              		add	r1, r1, #12
+ 726 0648 F8109FE5 		str	r2, [r3, r1]
+ 727              		.loc 1 119 0
+ 728 064c B42F83E5 		ldr	r2, .L20+80
+ 729              		sub	r1, r1, #12
+ 730 0650 0C209DE5 		add	r1, r1, #16
+ 731              		str	r2, [r3, r1]
+ 732 0654 B81F83E5 		.loc 1 121 0
+ 733              		ldr	r2, [sp, #0]
+ 734 0658 BC2F83E5 		sub	r1, r1, #16
+ 735              		add	r1, r1, #20
+ 736 065c 011AA0E3 		str	r2, [r3, r1]
+ 737 0660 08209DE5 		.loc 1 122 0
+ 738 0664 0C1081E2 		ldr	r1, .L20+84
+ 739 0668 012083E7 		.loc 1 97 0
+ 740              		add	r7, r3, #1328
+ 741 066c D8209FE5 		.loc 1 100 0
+ 742 0670 0C1041E2 		add	r8, r3, #1440
+ 743 0674 101081E2 		.loc 1 101 0
+ 744 0678 012083E7 		add	sl, r3, #1504
+ 745              		.loc 1 104 0
+ 746 067c 00209DE5 		add	r9, r3, #1616
+ 747 0680 101041E2 		.loc 1 105 0
+ 748 0684 141081E2 		add	fp, r3, #1680
+ 749 0688 012083E7 		.loc 1 108 0
+ 122:solver.c      ****  /* In CVXGEN, you can say */
+ 750              	 #8
+ 751 068c BC109FE5 		.loc 1 101 0
+ 752              		add	sl, sl, #8
+ 753 0690 537E83E2 		.loc 1 104 0
+ 754              		add	r9, r9, #8
+ 755 0694 5A8E83E2 		.loc 1 105 0
+ 756              		add	fp, fp, #8
+ 757 0698 5EAE83E2 		.loc 1 108 0
+ 758              		add	lr, lr, #8
+ 759 069c 659E83E2 		.loc 1 97 0
+ 760              		str	r7, [r3, #4068]
+ 761 06a0 69BE83E2 		.loc 1 100 0
+ 762              		str	r8, [r3, #3996]
+ 763 06a4 07EC83E2 		.loc 1 101 0
+ 764              		str	sl, [r3, #4076]
+ 765 06a8 C81F83E5 		.loc 1 104 0
+ 766              		str	r9, [r3, #4004]
+ 767 06ac A0209FE5 		.loc 1 105 0
+ 768              		str	fp, [r3, #4084]
+ 769 06b0 04109DE5 		.loc 1 108 0
+ 770              		str	lr, [r3, #4012]
+ 771 06b4 087087E2 		.loc 1 83 0
+ 772              		str	r3, [r3, #3960]
+ 773 06b8 088088E2 		.loc 1 118 0
+ 774              		str	r2, [r3, #4032]
+ 775 06bc 08A08AE2 		.loc 1 120 0
+ 776              		str	r1, [r3, #4036]
+ 777 06c0 089089E2 		.loc 1 123 0
+ 778              		add	sp, sp, #24
+ 779 06c4 08B08BE2 		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 780              		bx	lr
+ 781 06c8 08E08EE2 	.L21:
+ 782              		.align	2
+ 783 06cc E47F83E5 	.L20:
+ 784              		.word	params
+ 785 06d0 9C8F83E5 		.word	params+640
+ 786              		.word	params+64
+ 787 06d4 ECAF83E5 		.word	params+896
+ 788              		.word	params+832
+ 789 06d8 A49F83E5 		.word	params+984
+ 790              		.word	params+920
+ 791 06dc F4BF83E5 		.word	params+1072
+ 792              		.word	params+1008
+ 793 06e0 ACEF83E5 		.word	params+1248
+ 794              		.word	params+1184
+ 795 06e4 783F83E5 		.word	params+1424
+ 796              		.word	params+1360
+ 797 06e8 C02F83E5 		.word	params+1600
+ 798              		.word	params+1536
+ 799 06ec C41F83E5 		.word	params+1776
+ 123:solver.c      ****  /*   variables */
+ 800              	s+1952
+ 801 06f0 18D08DE2 		.word	params+2064
+ 802 06f4 F04FBDE8 		.word	params+2304
+ 803 06f8 1EFF2FE1 		.word	params+2416
+ 804              		.word	params+2240
+ 805              	.LFE5:
+ 807 06fc 00000000 		.align	2
+ 808 0700 80020000 		.global	setup_indexed_optvars
+ 810 0708 80030000 	setup_indexed_optvars:
+ 811 070c 40030000 	.LFB6:
+ 812 0710 D8030000 		.loc 1 124 0
+ 813 0714 98030000 		@ Function supports interworking.
+ 814 0718 30040000 		@ args = 0, pretend = 0, frame = 0
+ 815 071c F0030000 		@ frame_needed = 0, uses_anonymous_args = 0
+ 816 0720 E0040000 		.loc 1 133 0
+ 817 0724 A0040000 		ldr	r3, .L24
+ 818 0728 90050000 		ldr	r2, [r3, #0]
+ 819 072c 50050000 		str	r2, [r3, #224]
+ 820 0730 40060000 		.loc 1 146 0
+ 821 0734 00060000 		ldr	r2, [r3, #76]
+ 822 0738 F0060000 		str	r2, [r3, #328]
+ 823 073c B0060000 		.loc 1 147 0
+ 824 0740 60070000 		ldr	r2, [r3, #80]
+ 825 0744 A0070000 		str	r2, [r3, #252]
+ 826 0748 10080000 		.loc 1 148 0
+ 827 074c 00090000 		ldr	r2, [r3, #88]
+ 828 0750 70090000 		.loc 1 124 0
+ 829 0754 C0080000 		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 830              	.LCFI6:
+ 831              		.loc 1 134 0
+ 832              		ldr	r1, [r3, #4]
+ 833              		.loc 1 135 0
+ 834              		ldr	r0, [r3, #8]
+ 835              		.loc 1 136 0
+ 836              		add	ip, r3, #16
+ 124:solver.c      ****  /*     x[i] (5), i=2..4 */
+ 837              	 1 138 0
+ 838              		add	r4, r3, #28
+ 839              		ldmia	r4, {r4, r5}	@ phole ldm
+ 840              		.loc 1 140 0
+ 125:solver.c      ****  /*   end */
+ 126:solver.c      ****   /* This function sets up x[3] to be a pointer to x_3, which is a length-5 */
+ 127:solver.c      ****   /* vector of doubles. */
+ 128:solver.c      ****   /* If you access variables that you haven't defined in CVXGEN, the result */
+ 129:solver.c      ****   /* is undefined. */
+ 130:solver.c      ****   vars.u[0] = vars.u_0;
+ 131:solver.c      ****   vars.x[1] = vars.x_1;
+ 132:solver.c      ****   vars.u[1] = vars.u_1;
+ 133:solver.c      ****   vars.x[2] = vars.x_2;
+ 841              		r6, r3, #40
+ 842 0758 38319FE5 		ldmia	r6, {r6, r7}	@ phole ldm
+ 843 075c 002093E5 		.loc 1 142 0
+ 844 0760 E02083E5 		add	r8, r3, #52
+ 134:solver.c      **** 2] = vars.u_2;
+ 135:solver.c      ****   vars.x[3] = vars.x_3;
+ 136:solver.c      ****   vars.u[3] = vars.u_3;
+ 137:solver.c      ****   vars.x[4] = vars.x_4;
+ 138:solver.c      ****   vars.u[4] = vars.u_4;
+ 139:solver.c      ****   vars.x[5] = vars.x_5;
+ 140:solver.c      ****   vars.u[5] = vars.u_5;
+ 141:solver.c      ****   vars.x[6] = vars.x_6;
+ 142:solver.c      ****   vars.u[6] = vars.u_6;
+ 143:solver.c      ****   vars.x[7] = vars.x_7;
+ 144:solver.c      ****   vars.u[7] = vars.u_7;
+ 145:solver.c      ****   vars.x[8] = vars.x_8;
+ 146:solver.c      ****   vars.u[8] = vars.u_8;
+ 845              	ia	r8, {r8, sl}	@ phole ldm
+ 846 0764 4C2093E5 		.loc 1 144 0
+ 847 0768 482183E5 		add	r9, r3, #64
+ 147:solver.c      ****  vars.x_9;
+ 848              	mia	r9, {r9, fp}	@ phole ldm
+ 849 076c 502093E5 		.loc 1 148 0
+ 850 0770 FC2083E5 		str	r2, [r3, #332]
+ 148:solver.c      ****  vars.u[9] = vars.u_9;
+ 851              	oc 1 149 0
+ 852 0774 582093E5 		ldr	r2, [r3, #92]
+ 853              		.loc 1 134 0
+ 854 0778 F04F2DE9 		str	r1, [r3, #304]
+ 855              		.loc 1 135 0
+ 856              		str	r0, [r3, #228]
+ 857 077c 041093E5 		.loc 1 136 0
+ 858              		str	ip, [r3, #308]
+ 859 0780 080093E5 		.loc 1 137 0
+ 860              		str	lr, [r3, #232]
+ 861 0784 10C083E2 		.loc 1 138 0
+ 862 0788 00509CE8 		str	r4, [r3, #312]
+ 863              		.loc 1 139 0
+ 864 078c 1C4083E2 		str	r5, [r3, #236]
+ 865 0790 300094E8 		.loc 1 140 0
+ 866              		str	r6, [r3, #316]
+ 867 0794 286083E2 		.loc 1 141 0
+ 868 0798 C00096E8 		str	r7, [r3, #240]
+ 869              		.loc 1 142 0
+ 870 079c 348083E2 		str	r8, [r3, #320]
+ 871 07a0 000598E8 		.loc 1 143 0
+ 872              		str	sl, [r3, #244]
+ 873 07a4 409083E2 		.loc 1 144 0
+ 874 07a8 000A99E8 		str	r9, [r3, #324]
+ 875              		.loc 1 145 0
+ 876 07ac 4C2183E5 		str	fp, [r3, #248]
+ 149:solver.c      ****  vars.x[10] = vars.x_10;
+ 877              	, #256]
+ 878 07b0 5C2093E5 		.loc 1 150 0
+ 879              		ldr	r2, [r3, #100]
+ 880 07b4 301183E5 		str	r2, [r3, #336]
+ 881              		.loc 1 163 0
+ 882 07b8 E40083E5 		ldr	r2, [r3, #176]
+ 883              		str	r2, [r3, #284]
+ 884 07bc 34C183E5 		.loc 1 164 0
+ 885              		ldr	r2, [r3, #184]
+ 886 07c0 E8E083E5 		str	r2, [r3, #364]
+ 887              		.loc 1 165 0
+ 888 07c4 384183E5 		ldr	r2, [r3, #188]
+ 889              		.loc 1 151 0
+ 890 07c8 EC5083E5 		ldr	r1, [r3, #104]
+ 891              		.loc 1 152 0
+ 892 07cc 3C6183E5 		add	r0, r3, #112
+ 893              		ldmia	r0, {r0, ip}	@ phole ldm
+ 894 07d0 F07083E5 		.loc 1 154 0
+ 895              		ldr	lr, [r3, #124]
+ 896 07d4 408183E5 		.loc 1 155 0
+ 897              		ldr	r4, [r3, #128]
+ 898 07d8 F4A083E5 		.loc 1 156 0
+ 899              		add	r5, r3, #136
+ 900 07dc 449183E5 		ldmia	r5, {r5, r6}	@ phole ldm
+ 901              		.loc 1 158 0
+ 902 07e0 F8B083E5 		add	r7, r3, #148
+ 903              		ldmia	r7, {r7, r8}	@ phole ldm
+ 904 07e4 002183E5 		.loc 1 160 0
+ 150:solver.c      ****  vars.u[10] = vars.u_10;
+ 905              	161 0
+ 906 07e8 642093E5 		ldr	r9, [r3, #164]
+ 907 07ec 502183E5 		.loc 1 162 0
+ 151:solver.c      ****  vars.x[11] = vars.x_11;
+ 152:solver.c      ****   vars.u[11] = vars.u_11;
+ 153:solver.c      ****   vars.x[12] = vars.x_12;
+ 154:solver.c      ****   vars.u[12] = vars.u_12;
+ 155:solver.c      ****   vars.x[13] = vars.x_13;
+ 156:solver.c      ****   vars.u[13] = vars.u_13;
+ 157:solver.c      ****   vars.x[14] = vars.x_14;
+ 158:solver.c      ****   vars.u[14] = vars.u_14;
+ 159:solver.c      ****   vars.x[15] = vars.x_15;
+ 160:solver.c      ****   vars.u[15] = vars.u_15;
+ 161:solver.c      ****   vars.x[16] = vars.x_16;
+ 162:solver.c      ****   vars.u[16] = vars.u_16;
+ 163:solver.c      ****   vars.x[17] = vars.x_17;
+ 908              	r	fp, [r3, #172]
+ 909 07f0 B02093E5 		.loc 1 165 0
+ 910 07f4 1C2183E5 		str	r2, [r3, #288]
+ 164:solver.c      **** = vars.u_17;
+ 911              	oc 1 166 0
+ 912 07f8 B82093E5 		ldr	r2, [r3, #196]
+ 913 07fc 6C2183E5 		.loc 1 151 0
+ 165:solver.c      ****  vars.x[18] = vars.x_18;
+ 914              	r	r1, [r3, #260]
+ 915 0800 BC2093E5 		.loc 1 152 0
+ 916              		str	r0, [r3, #340]
+ 917 0804 681093E5 		.loc 1 153 0
+ 918              		str	ip, [r3, #264]
+ 919 0808 700083E2 		.loc 1 154 0
+ 920 080c 011090E8 		str	lr, [r3, #344]
+ 921              		.loc 1 155 0
+ 922 0810 7CE093E5 		str	r4, [r3, #268]
+ 923              		.loc 1 156 0
+ 924 0814 804093E5 		str	r5, [r3, #348]
+ 925              		.loc 1 157 0
+ 926 0818 885083E2 		str	r6, [r3, #272]
+ 927 081c 600095E8 		.loc 1 158 0
+ 928              		str	r7, [r3, #352]
+ 929 0820 947083E2 		.loc 1 159 0
+ 930 0824 800197E8 		str	r8, [r3, #276]
+ 931              		.loc 1 160 0
+ 932 0828 A0A093E5 		str	sl, [r3, #356]
+ 933              		.loc 1 161 0
+ 934 082c A49093E5 		str	r9, [r3, #280]
+ 935              		.loc 1 162 0
+ 936 0830 ACB093E5 		str	fp, [r3, #360]
+ 937              		.loc 1 166 0
+ 938 0834 202183E5 		str	r2, [r3, #368]
+ 166:solver.c      ****  vars.u[18] = vars.u_18;
+ 939              	3, #200]
+ 940 0838 C42093E5 		.loc 1 168 0
+ 941              		add	r0, r3, #208
+ 942 083c 041183E5 		ldmia	r0, {r0, ip}	@ phole ldm
+ 943              		.loc 1 170 0
+ 944 0840 540183E5 		ldr	r2, [r3, #220]
+ 945              		.loc 1 167 0
+ 946 0844 08C183E5 		str	r1, [r3, #292]
+ 947              		.loc 1 170 0
+ 948 0848 58E183E5 		str	r2, [r3, #376]
+ 949              		.loc 1 168 0
+ 950 084c 0C4183E5 		str	r0, [r3, #372]
+ 951              		.loc 1 169 0
+ 952 0850 5C5183E5 		str	ip, [r3, #296]
+ 953              		.loc 1 171 0
+ 954 0854 106183E5 		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 955              		bx	lr
+ 956 0858 607183E5 	.L25:
+ 957              		.align	2
+ 958 085c 148183E5 	.L24:
+ 959              		.word	vars
+ 960 0860 64A183E5 	.LFE6:
+ 962 0864 189183E5 		.align	2
+ 963              		.global	setup_indexing
+ 965              	setup_indexing:
+ 966 086c 702183E5 	.LFB7:
+ 167:solver.c      ****  vars.x[19] = vars.x_19;
+ 967              	pports interworking.
+ 968 0870 C81093E5 		@ args = 0, pretend = 0, frame = 0
+ 168:solver.c      **** 
+ 969              	 frame_needed = 0, uses_anonymous_args = 0
+ 970 0874 D00083E2 		str	lr, [sp, #-4]!
+ 971 0878 011090E8 	.LCFI7:
+ 169:solver.c      **** void setup_indexing(void) {
+ 170:solver.c      ****   setup_pointers();
+ 972              	oc 1 173 0
+ 973 087c DC2093E5 		bl	setup_pointers
+ 974              		.loc 1 174 0
+ 975 0880 241183E5 		bl	setup_indexed_params
+ 976              		.loc 1 176 0
+ 977 0884 782183E5 		ldr	lr, [sp], #4
+ 978              		.loc 1 175 0
+ 979 0888 740183E5 		b	setup_indexed_optvars
+ 980              	.LFE7:
+ 171:solver.c      **** setup_indexed_params();
+ 982              	_gtdf2
+ 983 0890 F04FBDE8 		.align	2
+ 984 0894 1EFF2FE1 		.global	set_start
+ 986              	set_start:
+ 987              	.LFB8:
+ 988 0898 00000000 		.loc 1 177 0
+ 989              		@ Function supports interworking.
+ 990              		@ args = 0, pretend = 0, frame = 4
+ 991              		@ frame_needed = 0, uses_anonymous_args = 0
+ 992              		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 993              	.LCFI8:
+ 994              		ldr	r2, .L48
+ 995              		add	r3, r2, #2096
+ 172:solver.c      ****  setup_indexed_optvars();
+ 996              	4
+ 997              	.LCFI9:
+ 998              		add	r3, r3, #8
+ 999              	.L29:
+ 1000 089c 04E02DE5 		.loc 1 180 0
+ 1001              		mov	r0, #0
+ 173:solver.c      **** 
+ 1002              	1, #0
+ 1003 08a0 FEFFFFEB 		stmia	r2!, {r0-r1}
+ 174:solver.c      **** void set_start(void) {
+ 1004              	loc 1 179 0
+ 1005 08a4 FEFFFFEB 		cmp	r2, r3
+ 175:solver.c      ****  int i;
+ 176:solver.c      ****   for (i = 0; i < 263; i++)
+ 1006              	ne	.L29
+ 1007 08a8 04E09DE4 		sub	ip, r2, #14144
+ 1008              		ldr	r1, [r2, #3480]
+ 1009 08ac FEFFFFEA 		sub	ip, ip, #24
+ 1010              		mov	r2, #0
+ 1011              	.L31:
+ 1012              		.loc 1 182 0
+ 1013              		add	r3, r1, r2
+ 1014              		add	r2, r2, #8
+ 1015              		mov	r4, #0
+ 1016              		mov	r5, #0
+ 1017              		.loc 1 181 0
+ 177:solver.c      ****   work.x[i] = 0;
+ 1018              	48
+ 1019              		.loc 1 182 0
+ 1020              		stmia	r3, {r4-r5}
+ 1021              		.loc 1 181 0
+ 1022 08b0 F04F2DE9 		bne	.L31
+ 1023              		ldr	r9, .L48+4
+ 1024 08b4 DC209FE5 		mov	r3, #17408
+ 1025 08b8 833E82E2 		add	r3, r3, #232
+ 1026 08bc 04D04DE2 		ldr	r6, .L48+8
+ 1027              		ldr	r7, [ip, r3]
+ 1028 08c0 083083E2 		add	sl, r9, #28
+ 1029              		ldmia	sl, {sl-fp}
+ 178:solver.c      ****  for (i = 0; i < 206; i++)
+ 179:solver.c      ****     work.y[i] = 0;
+ 180:solver.c      ****   for (i = 0; i < 114; i++)
+ 1030              	 #912
+ 1031 08c4 0000A0E3 	.L33:
+ 1032 08c8 0010A0E3 		.loc 1 184 0
+ 1033 08cc 0300A2E8 		ldmia	r6, {r4-r5}
+ 1034              		mov	r2, #0
+ 1035 08d0 030052E1 		mov	r0, r4
+ 1036 08d4 FAFFFF1A 		mov	r1, r5
+ 1037 08d8 DDCD42E2 		mov	r3, #0
+ 1038 08dc 981D92E5 		str	ip, [sp, #0]
+ 1039 08e0 18C04CE2 		bl	__gtdf2
+ 1040 08e4 0020A0E3 		add	r6, r6, #8
+ 1041              		cmp	r0, #0
+ 181:solver.c      ****  work.s[i] = (work.h[i] > 0) ? work.h[i] : settings.s_init;
+ 182:solver.c      ****   for (i = 0; i < 114; i++)
+ 1042              	l
+ 1043 08e8 023081E0 		movle	r5, fp
+ 1044 08ec 082082E2 		.loc 1 183 0
+ 1045 08f0 0040A0E3 		cmp	r6, r8
+ 1046 08f4 0050A0E3 		.loc 1 184 0
+ 1047              		ldr	ip, [sp, #0]
+ 1048 08f8 670E52E3 		stmia	r7!, {r4-r5}
+ 1049              		.loc 1 183 0
+ 1050 08fc 300083E8 		bne	.L33
+ 1051              		mov	r3, #17408
+ 1052 0900 F8FFFF1A 		add	r3, r3, #236
+ 1053 0904 90909FE5 		ldr	r1, [ip, r3]
+ 1054 0908 113BA0E3 		mov	r2, #0
+ 1055 090c E83083E2 	.L37:
+ 1056 0910 88609FE5 		.loc 1 186 0
+ 1057 0914 03709CE7 		add	r3, r1, r2
+ 1058 0918 1CA089E2 		add	r4, r9, #36
+ 1059 091c 000C9AE8 		ldmia	r4, {r4-r5}
+ 1060 0920 398E86E2 		add	r2, r2, #8
+ 1061              		.loc 1 185 0
+ 183:solver.c      ****   work.z[i] = settings.z_init;
+ 184:solver.c      **** }
+ 1062              	1 186 0
+ 1063 0924 300096E8 		stmia	r3, {r4-r5}
+ 1064 0928 0020A0E3 		.loc 1 185 0
+ 1065 092c 0400A0E1 		bne	.L37
+ 1066 0930 0510A0E1 		.loc 1 187 0
+ 1067 0934 0030A0E3 		add	sp, sp, #4
+ 1068 0938 00C08DE5 		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 1069 093c FEFFFFEB 		bx	lr
+ 1070 0940 086086E2 	.L49:
+ 1071 0944 000050E3 		.align	2
+ 1072 0948 0A40A0D1 	.L48:
+ 1073 094c 0B50A0D1 		.word	work+12064
+ 1074              		.word	settings
+ 1075 0950 080056E1 		.word	work
+ 1076              	.LFE8:
+ 1078 0958 3000A7E8 		.global	__ltdf2
+ 1079              		.global	__divdf3
+ 1080 095c F0FFFF1A 		.global	__subdf3
+ 1081 0960 113BA0E3 		.align	2
+ 1082 0964 EC3083E2 		.global	fillrhs_cc
+ 1084 096c 0020A0E3 	fillrhs_cc:
+ 1085              	.LFB11:
+ 185:solver.c      **** uble eval_objv(void) {
+ 186:solver.c      ****   int i;
+ 1086              	n supports interworking.
+ 1087 0970 023081E0 		@ args = 0, pretend = 0, frame = 28
+ 1088 0974 244089E2 		@ frame_needed = 0, uses_anonymous_args = 0
+ 1089 0978 300094E8 		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 1090 097c 082082E2 	.LCFI10:
+ 1091              		.loc 1 243 0
+ 1092 0980 390E52E3 		mov	r2, #17408
+ 1093              		ldr	r1, .L90+8
+ 1094 0984 300083E8 		mov	r3, r2
+ 1095              		add	r3, r3, #236
+ 1096 0988 F8FFFF1A 		add	r2, r2, #232
+ 187:solver.c      **** double objv;
+ 1097              	 0
+ 1098 098c 04D08DE2 		sub	sp, sp, #28
+ 1099 0990 F04FBDE8 	.LCFI11:
+ 1100 0994 1EFF2FE1 		.loc 1 243 0
+ 1101              		ldr	r3, [r1, r3]
+ 1102              		ldr	r9, [r1, r2]
+ 1103              		mov	r0, #0
+ 1104 0998 202F0000 		mov	r1, #0
+ 1105 099c 00000000 		str	r0, [sp, #20]
+ 1106 09a0 00000000 		str	r1, [sp, #24]
+ 1107              	.LVL2:
+ 1108              		str	r3, [sp, #8]
+ 1109              		mov	r4, #0
+ 1110              	.L51:
+ 1111              		ldr	r1, [sp, #8]
+ 1112              		add	r3, r9, r4
+ 1113              		add	ip, r1, r4
+ 1114              		ldmia	r3, {r0-r1}
+ 1115              		ldmia	ip, {r2-r3}
+ 1116              		bl	__muldf3
+ 188:solver.c      ****  /* Borrow space in work.rhs. */
+ 189:solver.c      ****   multbyP(work.rhs, work.x);
+ 190:solver.c      ****   objv = 0;
+ 191:solver.c      ****   for (i = 0; i < 263; i++)
+ 192:solver.c      ****     objv += work.x[i]*work.rhs[i];
+ 193:solver.c      ****   objv *= 0.5;
+ 194:solver.c      ****   for (i = 0; i < 263; i++)
+ 195:solver.c      ****     objv += work.q[i]*work.x[i];
+ 196:solver.c      ****   objv += work.quad_345851330560[0]+work.quad_503357964288[0]+work.quad_689417555968[0]+work.quad_5
+ 197:solver.c      ****   return objv;
+ 198:solver.c      **** }
+ 199:solver.c      **** void fillrhs_aff(void) {
+ 200:solver.c      ****   int i;
+ 201:solver.c      ****   double *r1, *r2, *r3, *r4;
+ 202:solver.c      ****   r1 = work.rhs;
+ 203:solver.c      ****   r2 = work.rhs + 263;
+ 204:solver.c      ****   r3 = work.rhs + 377;
+ 205:solver.c      ****   r4 = work.rhs + 491;
+ 206:solver.c      ****   /* r1 = -A^Ty - G^Tz - Px - q. */
+ 207:solver.c      ****   multbymAT(r1, work.y);
+ 208:solver.c      ****   multbymGT(work.buffer, work.z);
+ 209:solver.c      ****   for (i = 0; i < 263; i++)
+ 210:solver.c      ****     r1[i] += work.buffer[i];
+ 211:solver.c      ****   multbyP(work.buffer, work.x);
+ 212:solver.c      ****   for (i = 0; i < 263; i++)
+ 213:solver.c      ****     r1[i] -= work.buffer[i] + work.q[i];
+ 214:solver.c      ****   /* r2 = -z. */
+ 215:solver.c      ****   for (i = 0; i < 114; i++)
+ 216:solver.c      ****     r2[i] = -work.z[i];
+ 217:solver.c      ****   /* r3 = -Gx - s + h. */
+ 218:solver.c      ****   multbymG(r3, work.x);
+ 219:solver.c      ****   for (i = 0; i < 114; i++)
+ 220:solver.c      ****     r3[i] += -work.s[i] + work.h[i];
+ 221:solver.c      ****   /* r4 = -Ax + b. */
+ 222:solver.c      ****   multbymA(r4, work.x);
+ 223:solver.c      ****   for (i = 0; i < 206; i++)
+ 224:solver.c      ****     r4[i] += work.b[i];
+ 225:solver.c      **** }
+ 226:solver.c      **** void fillrhs_cc(void) {
+ 227:solver.c      ****   int i;
+ 228:solver.c      ****   double *r2;
+ 229:solver.c      ****   double *ds_aff, *dz_aff;
+ 1117              	 r1
+ 1118              		add	r0, sp, #20
+ 1119              		ldmia	r0, {r0-r1}
+ 1120              		bl	__adddf3
+ 1121 09a4 F04F2DE9 		add	r4, r4, #8
+ 1122              		.loc 1 242 0
+ 230:solver.c      **** a;
+ 231:solver.c      ****   double smu;
+ 232:solver.c      ****   double minval;
+ 233:solver.c      ****   r2 = work.rhs + 263;
+ 234:solver.c      ****   ds_aff = work.lhs_aff + 263;
+ 235:solver.c      ****   dz_aff = work.lhs_aff + 377;
+ 236:solver.c      ****   mu = 0;
+ 237:solver.c      ****   for (i = 0; i < 114; i++)
+ 238:solver.c      ****     mu += work.s[i]*work.z[i];
+ 239:solver.c      ****   /* Don't finish calculating mu quite yet. */
+ 240:solver.c      ****   /* Find min(min(ds./s), min(dz./z)). */
+ 241:solver.c      ****   minval = 0;
+ 242:solver.c      ****   for (i = 0; i < 114; i++)
+ 243:solver.c      ****     if (ds_aff[i] < minval*work.s[i])
+ 1123              	4, #912
+ 1124 09a8 112BA0E3 		.loc 1 243 0
+ 1125 09ac 70139FE5 		str	r0, [sp, #20]
+ 1126 09b0 0230A0E1 		str	r1, [sp, #24]
+ 1127 09b4 EC3083E2 		.loc 1 242 0
+ 1128 09b8 E82082E2 		bne	.L51
+ 1129              		ldr	r2, .L90+12
+ 1130 09bc 1CD04DE2 		str	r2, [sp, #0]
+ 1131              		mov	sl, #0
+ 1132              	.LVL3:
+ 1133 09c0 033091E7 		mov	fp, #0
+ 1134 09c4 029091E7 	.LVL4:
+ 1135 09c8 0000A0E3 		mov	r8, #0
+ 1136 09cc 0010A0E3 	.L53:
+ 1137 09d0 14008DE5 		.loc 1 248 0
+ 1138 09d4 18108DE5 		add	r3, r9, r8
+ 1139              		ldmia	r3, {r4-r5}
+ 1140 09d8 08308DE5 		ldr	r3, [sp, #0]
+ 1141 09dc 0040A0E3 		ldmia	r3!, {r6-r7}
+ 1142              		mov	r2, r4
+ 1143 09e0 08109DE5 		str	r3, [sp, #0]
+ 1144 09e4 043089E0 		mov	r0, sl
+ 1145 09e8 04C081E0 		mov	r3, r5
+ 1146 09ec 030093E8 		mov	r1, fp
+ 1147 09f0 0C009CE8 		bl	__muldf3
+ 1148 09f4 FEFFFFEB 		mov	r2, r0
+ 1149 09f8 0020A0E1 		mov	r3, r1
+ 1150 09fc 0130A0E1 		mov	r0, r6
+ 1151 0a00 14008DE2 		mov	r1, r7
+ 1152 0a04 030090E8 		bl	__ltdf2
+ 1153 0a08 FEFFFFEB 		cmp	r0, #0
+ 1154 0a0c 084084E2 		.loc 1 249 0
+ 1155              		add	r8, r8, #8
+ 1156 0a10 390E54E3 		mov	r2, r4
+ 1157              		mov	r3, r5
+ 1158 0a14 14008DE5 		mov	r0, r6
+ 1159 0a18 18108DE5 		mov	r1, r7
+ 1160              		.loc 1 248 0
+ 1161 0a1c EFFFFF1A 		bge	.L54
+ 1162 0a20 00239FE5 		.loc 1 249 0
+ 1163 0a24 00208DE5 		bl	__divdf3
+ 1164 0a28 00A0A0E3 		mov	sl, r0
+ 1165              		mov	fp, r1
+ 1166 0a2c 00B0A0E3 	.L54:
+ 1167              		.loc 1 247 0
+ 1168 0a30 0080A0E3 		cmp	r8, #912
+ 1169              		bne	.L53
+ 244:solver.c      ****  ds_aff[i]/work.s[i];
+ 245:solver.c      ****   for (i = 0; i < 114; i++)
+ 246:solver.c      ****     if (dz_aff[i] < minval*work.z[i])
+ 247:solver.c      ****       minval = dz_aff[i]/work.z[i];
+ 248:solver.c      ****   /* Find alpha. */
+ 1170              	 #912
+ 1171 0a34 083089E0 	.L58:
+ 1172 0a38 300093E8 		.loc 1 251 0
+ 1173 0a3c 00309DE5 		ldmib	sp, {r0, r5}	@ phole ldm
+ 1174 0a40 C000B3E8 		add	r3, r5, r8
+ 1175 0a44 0420A0E1 		ldmia	r0!, {r6-r7}
+ 1176 0a48 00308DE5 		ldmia	r3, {r4-r5}
+ 1177 0a4c 0A00A0E1 		str	r0, [sp, #4]
+ 1178 0a50 0530A0E1 		mov	r2, r4
+ 1179 0a54 0B10A0E1 		mov	r3, r5
+ 1180 0a58 FEFFFFEB 		mov	r0, sl
+ 1181 0a5c 0020A0E1 		mov	r1, fp
+ 1182 0a60 0130A0E1 		bl	__muldf3
+ 1183 0a64 0600A0E1 		mov	r2, r0
+ 1184 0a68 0710A0E1 		mov	r3, r1
+ 1185 0a6c FEFFFFEB 		mov	r0, r6
+ 1186 0a70 000050E3 		mov	r1, r7
+ 249:solver.c      **** (-1 < minval)
+ 1187              	r0, #0
+ 1188 0a74 088088E2 		.loc 1 252 0
+ 1189 0a78 0420A0E1 		add	r8, r8, #8
+ 1190 0a7c 0530A0E1 		mov	r2, r4
+ 1191 0a80 0600A0E1 		mov	r3, r5
+ 1192 0a84 0710A0E1 		mov	r0, r6
+ 1193              		mov	r1, r7
+ 1194 0a88 020000AA 		.loc 1 251 0
+ 1195              		bge	.L59
+ 1196 0a8c FEFFFFEB 		.loc 1 252 0
+ 1197 0a90 00A0A0E1 		bl	__divdf3
+ 1198 0a94 01B0A0E1 		mov	sl, r0
+ 1199              		mov	fp, r1
+ 1200              	.L59:
+ 1201 0a98 390E58E3 		.loc 1 250 0
+ 1202 0a9c E4FFFF1A 		cmp	r8, #912
+ 1203 0aa0 84429FE5 		bne	.L58
+ 1204 0aa4 04408DE5 		.loc 1 254 0
+ 1205 0aa8 398E48E2 		mov	r2, #-1090519040
+ 1206              		mov	r0, sl
+ 250:solver.c      ****      alpha = 1;
+ 251:solver.c      ****   else
+ 1207              	 r2, #15728640
+ 1208 0aac 21009DE9 		mov	r3, #0
+ 1209 0ab0 083085E0 		bl	__gtdf2
+ 1210 0ab4 C000B0E8 		cmp	r0, #0
+ 1211 0ab8 300093E8 		ble	.L63
+ 1212 0abc 04008DE5 		mov	r1, #1069547520
+ 1213 0ac0 0420A0E1 		add	r1, r1, #3145728
+ 1214 0ac4 0530A0E1 		mov	r2, #0
+ 1215 0ac8 0A00A0E1 		str	r1, [sp, #12]
+ 1216 0acc 0B10A0E1 		str	r2, [sp, #16]
+ 1217 0ad0 FEFFFFEB 	.LVL5:
+ 1218 0ad4 0020A0E1 	.L66:
+ 1219 0ad8 0130A0E1 		.loc 1 257 0
+ 1220 0adc 0600A0E1 		ldr	r7, .L90+12
+ 1221 0ae0 0710A0E1 		mov	sl, #0
+ 1222 0ae4 FEFFFFEB 	.LVL6:
+ 1223 0ae8 000050E3 		mov	fp, #0
+ 252:solver.c      ****     alpha = -1/minval;
+ 1224              	0
+ 1225 0aec 088088E2 	.L67:
+ 1226 0af0 0420A0E1 		.loc 1 260 0
+ 1227 0af4 0530A0E1 		ldmia	r7, {r2-r3}
+ 1228 0af8 0600A0E1 		add	r4, r9, r8
+ 1229 0afc 0710A0E1 		add	r0, sp, #12
+ 1230              		ldmia	r0, {r0-r1}
+ 1231 0b00 020000AA 		bl	__muldf3
+ 1232              		ldmia	r4, {r2-r3}
+ 1233 0b04 FEFFFFEB 		bl	__adddf3
+ 1234 0b08 00A0A0E1 		mov	r5, r0
+ 1235 0b0c 01B0A0E1 		ldr	r0, [sp, #8]
+ 1236              		add	r2, r7, #912
+ 1237              		ldmia	r2, {r2-r3}
+ 1238 0b10 390E58E3 		add	r4, r0, r8
+ 1239 0b14 E4FFFF1A 		mov	r6, r1
+ 253:solver.c      ****  sigma = 0;
+ 254:solver.c      ****   for (i = 0; i < 114; i++)
+ 1240              	
+ 1241 0b18 BF24A0E3 		ldmia	r0, {r0-r1}
+ 1242 0b1c 0A00A0E1 		bl	__muldf3
+ 1243 0b20 0B10A0E1 		ldmia	r4, {r2-r3}
+ 1244 0b24 0F2682E2 		bl	__adddf3
+ 1245 0b28 0030A0E3 		mov	r2, r0
+ 1246 0b2c FEFFFFEB 		mov	r3, r1
+ 1247 0b30 000050E3 		mov	r0, r5
+ 1248 0b34 6F0000DA 		mov	r1, r6
+ 1249 0b38 FF15A0E3 		bl	__muldf3
+ 1250 0b3c 031681E2 		mov	r2, r0
+ 1251 0b40 0020A0E3 		mov	r3, r1
+ 1252 0b44 0C108DE5 		mov	r0, sl
+ 1253 0b48 10208DE5 		mov	r1, fp
+ 1254              		bl	__adddf3
+ 1255              		add	r8, r8, #8
+ 255:solver.c      ****   sigma += (work.s[i] + alpha*ds_aff[i])*
+ 256:solver.c      ****       (work.z[i] + alpha*dz_aff[i]);
+ 257:solver.c      ****   sigma /= mu;
+ 1256              	cmp	r8, #912
+ 1257 0b4c D4719FE5 		.loc 1 260 0
+ 1258 0b50 00A0A0E3 		mov	sl, r0
+ 1259              		mov	fp, r1
+ 1260 0b54 00B0A0E3 		add	r7, r7, #8
+ 1261              		.loc 1 259 0
+ 1262 0b58 0080A0E3 		bne	.L67
+ 1263              		.loc 1 262 0
+ 258:solver.c      **** igma = sigma*sigma*sigma;
+ 259:solver.c      ****   /* Finish calculating mu now. */
+ 260:solver.c      ****   mu *= 0.008771929824561403;
+ 1264              	 sp, #20
+ 1265 0b5c 0C0097E8 		ldmia	r2, {r2-r3}
+ 1266 0b60 084089E0 		bl	__divdf3
+ 1267 0b64 0C008DE2 		mov	r4, r0
+ 1268 0b68 030090E8 		mov	r5, r1
+ 1269 0b6c FEFFFFEB 		.loc 1 266 0
+ 1270 0b70 0C0094E8 		mov	r2, r4
+ 1271 0b74 FEFFFFEB 	.LVL8:
+ 1272 0b78 0050A0E1 		mov	r3, r5
+ 1273 0b7c 08009DE5 	.LVL9:
+ 1274 0b80 392E87E2 		bl	__muldf3
+ 1275 0b84 0C0092E8 	.LVL10:
+ 1276 0b88 084080E0 		mov	r2, r0
+ 1277 0b8c 0160A0E1 		mov	r3, r1
+ 1278 0b90 0C008DE2 		mov	r0, r4
+ 1279 0b94 030090E8 	.LVL11:
+ 1280 0b98 FEFFFFEB 		mov	r1, r5
+ 1281 0b9c 0C0094E8 	.LVL12:
+ 1282 0ba0 FEFFFFEB 		bl	__muldf3
+ 1283 0ba4 0020A0E1 	.LVL13:
+ 1284 0ba8 0130A0E1 		adr	r2, .L90
+ 1285 0bac 0500A0E1 		ldmia	r2, {r2-r3}
+ 1286 0bb0 0610A0E1 		mov	r4, r0
+ 1287 0bb4 FEFFFFEB 		mov	r5, r1
+ 1288 0bb8 0020A0E1 		add	r0, sp, #20
+ 1289 0bbc 0130A0E1 		ldmia	r0, {r0-r1}
+ 1290 0bc0 0A00A0E1 		bl	__muldf3
+ 1291 0bc4 0B10A0E1 		mov	r2, r0
+ 1292 0bc8 FEFFFFEB 		mov	r3, r1
+ 1293 0bcc 088088E2 		mov	r0, r4
+ 1294              		mov	r1, r5
+ 1295 0bd0 390E58E3 		bl	__muldf3
+ 1296              		ldr	r2, .L90+20
+ 1297 0bd4 00A0A0E1 		add	r3, r2, #2096
+ 1298 0bd8 01B0A0E1 		mov	r7, r0
+ 1299 0bdc 087087E2 	.LVL14:
+ 1300              		mov	r8, r1
+ 1301 0be0 DDFFFF1A 	.LVL15:
+ 261:solver.c      **** mu = sigma*mu;
+ 262:solver.c      ****   /* Fill-in the rhs. */
+ 1302              	ov	r4, #0
+ 1303 0be4 14208DE2 		mov	r5, #0
+ 1304 0be8 0C0092E8 		stmia	r2!, {r4-r5}
+ 1305 0bec FEFFFFEB 		.loc 1 268 0
+ 1306 0bf0 0040A0E1 		cmp	r2, r3
+ 1307 0bf4 0150A0E1 		bne	.L69
+ 263:solver.c      **** for (i = 0; i < 263; i++)
+ 264:solver.c      ****     work.rhs[i] = 0;
+ 265:solver.c      ****   for (i = 377; i < 697; i++)
+ 266:solver.c      ****     work.rhs[i] = 0;
+ 1308              	1, r2, #3472
+ 1309 0bf8 0420A0E1 		add	r3, r2, #912
+ 1310              	.L71:
+ 1311 0bfc 0530A0E1 		.loc 1 271 0
+ 1312              		mov	r4, #0
+ 1313 0c00 FEFFFFEB 		mov	r5, #0
+ 1314              		stmia	r3!, {r4-r5}
+ 1315 0c04 0020A0E1 		.loc 1 270 0
+ 1316 0c08 0130A0E1 		cmp	r3, r1
+ 1317 0c0c 0400A0E1 		bne	.L71
+ 1318              		sub	r5, r3, #11136
+ 1319 0c10 0510A0E1 		add	r4, r3, #7680
+ 1320              		add	r6, r3, #8576
+ 1321 0c14 FEFFFFEB 		add	r4, r4, #12
+ 1322              		add	r6, r6, #28
+ 1323 0c18 FC208FE2 		sub	r5, r5, #16
+ 1324 0c1c 0C0092E8 		sub	sl, r3, #3472
+ 1325 0c20 0040A0E1 	.LVL16:
+ 1326 0c24 0150A0E1 	.L73:
+ 1327 0c28 14008DE2 		.loc 1 273 0
+ 1328 0c2c 030090E8 		add	r2, r4, #912
+ 1329 0c30 FEFFFFEB 		ldmia	r2, {r2-r3}
+ 1330 0c34 0020A0E1 		ldmia	r4, {r0-r1}
+ 1331 0c38 0130A0E1 		bl	__muldf3
+ 1332 0c3c 0400A0E1 		mov	r2, r0
+ 1333 0c40 0510A0E1 		mov	r3, r1
+ 1334 0c44 FEFFFFEB 		mov	r0, r7
+ 1335 0c48 E0209FE5 		mov	r1, r8
+ 1336 0c4c 833E82E2 		bl	__subdf3
+ 1337 0c50 0070A0E1 		mov	r2, r0
+ 1338              		mov	r3, r1
+ 1339 0c54 0180A0E1 		ldmia	r5!, {r0-r1}
+ 1340              		bl	__muldf3
+ 1341 0c58 083083E2 		add	r4, r4, #8
+ 1342              		.loc 1 272 0
+ 267:solver.c      **** r (i = 0; i < 114; i++)
+ 268:solver.c      ****     r2[i] = work.s_inv[i]*(smu - ds_aff[i]*dz_aff[i]);
+ 269:solver.c      **** }
+ 1343              	!, {r0-r1}
+ 1344 0c5c 0040A0E3 		.loc 1 272 0
+ 1345 0c60 0050A0E3 		bne	.L73
+ 1346 0c64 3000A2E8 		.loc 1 274 0
+ 1347              		add	sp, sp, #28
+ 1348 0c68 030052E1 		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 1349 0c6c FAFFFF1A 		bx	lr
+ 1350 0c70 D91E82E2 	.LVL17:
+ 1351 0c74 393E82E2 	.L63:
+ 1352              		.loc 1 257 0
+ 270:solver.c      **** d refine(double *target, double *var) {
+ 271:solver.c      ****   int i, j;
+ 1353              	-1090519040
+ 1354 0c78 0040A0E3 		mov	r2, sl
+ 1355 0c7c 0050A0E3 		mov	r3, fp
+ 1356 0c80 3000A3E8 		add	r0, r0, #15728640
+ 1357              		mov	r1, #0
+ 1358 0c84 010053E1 		bl	__divdf3
+ 1359 0c88 FAFFFF1A 		str	r0, [sp, #12]
+ 1360 0c8c AE5D43E2 		str	r1, [sp, #16]
+ 1361 0c90 1E4C83E2 	.LVL18:
+ 1362 0c94 866D83E2 		b	.L66
+ 1363 0c98 0C4084E2 	.L91:
+ 1364 0c9c 1C6086E2 		.align	2
+ 1365 0ca0 105045E2 	.L90:
+ 1366 0ca4 D9AE43E2 		.word	1065481988
+ 1367              		.word	2109808496
+ 1368              		.word	work
+ 272:solver.c      **** double *residual = work.buffer;
+ 273:solver.c      ****   double norm2;
+ 1369              	6
+ 1370 0ca8 392E84E2 		.word	work+20668
+ 1371 0cac 0C0092E8 		.word	work+6488
+ 1372 0cb0 030094E8 	.LFE11:
+ 1374 0cb8 0020A0E1 		.align	2
+ 1375 0cbc 0130A0E1 		.global	fillrhs_start
+ 1377 0cc4 0810A0E1 	fillrhs_start:
+ 1378 0cc8 FEFFFFEB 	.LFB16:
+ 1379 0ccc 0020A0E1 		.loc 1 403 0
+ 1380 0cd0 0130A0E1 		@ Function supports interworking.
+ 1381 0cd4 0300B5E8 		@ args = 0, pretend = 0, frame = 0
+ 1382 0cd8 FEFFFFEB 		@ frame_needed = 0, uses_anonymous_args = 0
+ 1383 0cdc 084084E2 		@ link register save eliminated.
+ 1384              		stmfd	sp!, {r4, r5}
+ 1385 0ce0 060054E1 	.LCFI12:
+ 1386              		ldr	ip, .L110
+ 1387 0ce4 0300AAE8 		add	r0, ip, #2096
+ 1388              		@ lr needed for prologue
+ 1389 0ce8 EEFFFF1A 		add	r0, r0, #8
+ 274:solver.c      **** double *new_var = work.buffer2;
+ 1390              	, ip
+ 1391 0cec 1CD08DE2 	.L93:
+ 1392 0cf0 F04FBDE8 		.loc 1 412 0
+ 1393 0cf4 1EFF2FE1 		ldr	r3, [r1, #0]
+ 1394              		ldr	r2, [r1, #4]
+ 1395              		add	r3, r3, #-2147483648
+ 1396              		str	r3, [r1, #2104]
+ 1397 0cf8 BF04A0E3 		str	r2, [r1, #2108]
+ 1398 0cfc 0A20A0E1 		add	r1, r1, #8
+ 1399 0d00 0B30A0E1 		.loc 1 411 0
+ 1400 0d04 0F0680E2 		cmp	r1, r0
+ 1401 0d08 0010A0E3 		bne	.L93
+ 1402 0d0c FEFFFFEB 		add	r3, r1, #3008
+ 1403 0d10 0C008DE5 		add	r2, r1, #2096
+ 1404 0d14 10108DE5 		add	r2, r2, #8
+ 1405              		add	r3, r3, #8
+ 1406 0d18 8BFFFFEA 	.L95:
+ 1407              		.loc 1 414 0
+ 1408              		mov	r0, #0
+ 1409              		mov	r1, #0
+ 1410 0d1c 04F7813F 		stmia	r2!, {r0-r1}
+ 1411 0d20 701FC17D 		.loc 1 413 0
+ 1412 0d24 00000000 		cmp	r2, r3
+ 1413 0d28 2C4D0000 		bne	.L95
+ 1414 0d2c BC500000 		sub	r3, r2, #9472
+ 1415 0d30 58190000 		sub	r3, r3, #32
+ 1416              		add	r1, r3, #912
+ 1417              	.L97:
+ 1418              		.loc 1 416 0
+ 1419              		ldmia	r3!, {r4-r5}
+ 1420              		.loc 1 415 0
+ 1421              		cmp	r3, r1
+ 1422              		.loc 1 416 0
+ 275:solver.c      ****  for (j = 0; j < settings.refine_steps; j++) {
+ 276:solver.c      ****     norm2 = 0;
+ 277:solver.c      ****     matrix_multiply(residual, var);
+ 278:solver.c      ****     for (i = 0; i < 697; i++) {
+ 279:solver.c      ****       residual[i] = residual[i] - target[i];
+ 280:solver.c      ****       norm2 += residual[i]*residual[i];
+ 281:solver.c      ****     }
+ 282:solver.c      **** #ifndef ZERO_LIBRARY_MODE
+ 283:solver.c      ****     if (settings.verbose_refinement) {
+ 284:solver.c      ****       if (j == 0)
+ 285:solver.c      ****         printf("Initial residual before refinement has norm squared %.6g.\n", norm2);
+ 286:solver.c      ****       else
+ 287:solver.c      ****         printf("After refinement we get squared norm %.6g.\n", norm2);
+ 288:solver.c      ****     }
+ 289:solver.c      **** #endif
+ 290:solver.c      ****     /* Solve to find new_var = KKT \ (target - A*var). */
+ 291:solver.c      ****     ldl_solve(residual, new_var);
+ 292:solver.c      ****     /* Update var += new_var, or var += KKT \ (target - A*var). */
+ 293:solver.c      ****     for (i = 0; i < 697; i++) {
+ 294:solver.c      ****       var[i] -= new_var[i];
+ 295:solver.c      ****     }
+ 296:solver.c      ****   }
+ 297:solver.c      **** #ifndef ZERO_LIBRARY_MODE
+ 298:solver.c      ****   if (settings.verbose_refinement) {
+ 299:solver.c      ****     /* Check the residual once more, but only if we're reporting it, since */
+ 300:solver.c      ****     /* it's expensive. */
+ 301:solver.c      ****     norm2 = 0;
+ 302:solver.c      ****     matrix_multiply(residual, var);
+ 303:solver.c      ****     for (i = 0; i < 697; i++) {
+ 304:solver.c      ****       residual[i] = residual[i] - target[i];
+ 305:solver.c      ****       norm2 += residual[i]*residual[i];
+ 306:solver.c      ****     }
+ 307:solver.c      ****     if (j == 0)
+ 308:solver.c      ****       printf("Initial residual before refinement has norm squared %.6g.\n", norm2);
+ 309:solver.c      ****     else
+ 310:solver.c      ****       printf("After refinement we get squared norm %.6g.\n", norm2);
+ 311:solver.c      ****   }
+ 312:solver.c      **** #endif
+ 313:solver.c      **** }
+ 314:solver.c      **** double calc_ineq_resid_squared(void) {
+ 315:solver.c      ****   /* Calculates the norm ||-Gx - s + h||. */
+ 316:solver.c      ****   double norm2_squared;
+ 317:solver.c      ****   int i;
+ 318:solver.c      ****   /* Find -Gx. */
+ 319:solver.c      ****   multbymG(work.buffer, work.x);
+ 320:solver.c      ****   /* Add -s + h. */
+ 321:solver.c      ****   for (i = 0; i < 114; i++)
+ 322:solver.c      ****     work.buffer[i] += -work.s[i] + work.h[i];
+ 323:solver.c      ****   /* Now find the squared norm. */
+ 324:solver.c      ****   norm2_squared = 0;
+ 325:solver.c      ****   for (i = 0; i < 114; i++)
+ 326:solver.c      ****     norm2_squared += work.buffer[i]*work.buffer[i];
+ 327:solver.c      ****   return norm2_squared;
+ 328:solver.c      **** }
+ 329:solver.c      **** double calc_eq_resid_squared(void) {
+ 330:solver.c      ****   /* Calculates the norm ||-Ax + b||. */
+ 331:solver.c      ****   double norm2_squared;
+ 332:solver.c      ****   int i;
+ 333:solver.c      ****   /* Find -Ax. */
+ 334:solver.c      ****   multbymA(work.buffer, work.x);
+ 335:solver.c      ****   /* Add +b. */
+ 336:solver.c      ****   for (i = 0; i < 206; i++)
+ 337:solver.c      ****     work.buffer[i] += work.b[i];
+ 338:solver.c      ****   /* Now find the squared norm. */
+ 339:solver.c      ****   norm2_squared = 0;
+ 340:solver.c      ****   for (i = 0; i < 206; i++)
+ 341:solver.c      ****     norm2_squared += work.buffer[i]*work.buffer[i];
+ 342:solver.c      ****   return norm2_squared;
+ 343:solver.c      **** }
+ 344:solver.c      **** void better_start(void) {
+ 345:solver.c      ****   /* Calculates a better starting point, using a similar approach to CVXOPT. */
+ 346:solver.c      ****   /* Not yet speed optimized. */
+ 347:solver.c      ****   int i;
+ 348:solver.c      ****   double *x, *s, *z, *y;
+ 349:solver.c      ****   double alpha;
+ 350:solver.c      ****   work.block_33[0] = -1;
+ 351:solver.c      ****   /* Make sure sinvz is 1 to make hijacked KKT system ok. */
+ 352:solver.c      ****   for (i = 0; i < 114; i++)
+ 353:solver.c      ****     work.s_inv_z[i] = 1;
+ 354:solver.c      ****   fill_KKT();
+ 355:solver.c      ****   ldl_factor();
+ 356:solver.c      ****   fillrhs_start();
+ 357:solver.c      ****   /* Borrow work.lhs_aff for the solution. */
+ 358:solver.c      ****   ldl_solve(work.rhs, work.lhs_aff);
+ 359:solver.c      ****   /* Don't do any refinement for now. Precision doesn't matter too much. */
+ 360:solver.c      ****   x = work.lhs_aff;
+ 361:solver.c      ****   s = work.lhs_aff + 263;
+ 362:solver.c      ****   z = work.lhs_aff + 377;
+ 363:solver.c      ****   y = work.lhs_aff + 491;
+ 364:solver.c      ****   /* Just set x and y as is. */
+ 365:solver.c      ****   for (i = 0; i < 263; i++)
+ 366:solver.c      ****     work.x[i] = x[i];
+ 367:solver.c      ****   for (i = 0; i < 206; i++)
+ 368:solver.c      ****     work.y[i] = y[i];
+ 369:solver.c      ****   /* Now complete the initialization. Start with s. */
+ 370:solver.c      ****   /* Must have alpha > max(z). */
+ 371:solver.c      ****   alpha = -1e99;
+ 372:solver.c      ****   for (i = 0; i < 114; i++)
+ 373:solver.c      ****     if (alpha < z[i])
+ 374:solver.c      ****       alpha = z[i];
+ 375:solver.c      ****   if (alpha < 0) {
+ 376:solver.c      ****     for (i = 0; i < 114; i++)
+ 377:solver.c      ****       work.s[i] = -z[i];
+ 378:solver.c      ****   } else {
+ 379:solver.c      ****     alpha += 1;
+ 380:solver.c      ****     for (i = 0; i < 114; i++)
+ 381:solver.c      ****       work.s[i] = -z[i] + alpha;
+ 382:solver.c      ****   }
+ 383:solver.c      ****   /* Now initialize z. */
+ 384:solver.c      ****   /* Now must have alpha > max(-z). */
+ 385:solver.c      ****   alpha = -1e99;
+ 386:solver.c      ****   for (i = 0; i < 114; i++)
+ 387:solver.c      ****     if (alpha < -z[i])
+ 388:solver.c      ****       alpha = -z[i];
+ 389:solver.c      ****   if (alpha < 0) {
+ 390:solver.c      ****     for (i = 0; i < 114; i++)
+ 391:solver.c      ****       work.z[i] = z[i];
+ 392:solver.c      ****   } else {
+ 393:solver.c      ****     alpha += 1;
+ 394:solver.c      ****     for (i = 0; i < 114; i++)
+ 395:solver.c      ****       work.z[i] = z[i] + alpha;
+ 396:solver.c      ****   }
+ 397:solver.c      **** }
+ 398:solver.c      **** void fillrhs_start(void) {
+ 399:solver.c      ****   /* Fill rhs with (-q, 0, h, b). */
+ 400:solver.c      ****   int i;
+ 401:solver.c      ****   double *r1, *r2, *r3, *r4;
+ 402:solver.c      ****   r1 = work.rhs;
+ 403:solver.c      ****   r2 = work.rhs + 263;
+ 1423              	
+ 1424              		bne	.L97
+ 1425              		add	r2, r3, #1824
+ 1426              	.L99:
+ 1427              		.loc 1 418 0
+ 1428 0d34 30002DE9 		add	r3, r2, #7680
+ 1429              		ldmia	r2!, {r0-r1}
+ 1430 0d38 88C09FE5 		.loc 1 417 0
+ 1431 0d3c 830E8CE2 		cmp	r2, ip
+ 1432              		.loc 1 418 0
+ 1433 0d40 080080E2 		stmia	r3, {r0-r1}
+ 1434              		.loc 1 417 0
+ 1435 0d44 0C10A0E1 		bne	.L99
+ 1436              		.loc 1 419 0
+ 404:solver.c      ****  r2[i] = 0;
+ 405:solver.c      ****   for (i = 0; i < 114; i++)
+ 406:solver.c      ****     r3[i] = work.h[i];
+ 407:solver.c      ****   for (i = 0; i < 206; i++)
+ 408:solver.c      ****     r4[i] = work.b[i];
+ 409:solver.c      **** }
+ 410:solver.c      **** long solve(void) {
+ 411:solver.c      ****   int i;
+ 412:solver.c      ****   int iter;
+ 1437              	r4, r5}
+ 1438 0d48 003091E5 		bx	lr
+ 1439 0d4c 042091E5 	.L111:
+ 1440 0d50 023183E2 		.align	2
+ 1441 0d54 383881E5 	.L110:
+ 1442 0d58 3C2881E5 		.word	work+4384
+ 1443 0d5c 081081E2 	.LFE16:
+ 1445 0d60 000051E1 		.align	2
+ 1446 0d64 F7FFFF1A 		.global	better_start
+ 1448 0d6c 832E81E2 	better_start:
+ 1449 0d70 082082E2 	.LFB15:
+ 1450 0d74 083083E2 		.loc 1 349 0
+ 1451              		@ Function supports interworking.
+ 413:solver.c      **** (i = 0; i < 206; i++)
+ 414:solver.c      ****     r4[i] = work.b[i];
+ 1452              	etend = 0, frame = 0
+ 1453 0d78 0000A0E3 		@ frame_needed = 0, uses_anonymous_args = 0
+ 1454 0d7c 0010A0E3 		.loc 1 355 0
+ 1455 0d80 0300A2E8 		ldr	r3, .L158+8
+ 1456              		.loc 1 349 0
+ 1457 0d84 030052E1 		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
+ 1458 0d88 FAFFFF1A 	.LCFI13:
+ 1459 0d8c 253C42E2 		.loc 1 355 0
+ 1460 0d90 203043E2 		mov	r1, #-1090519040
+ 1461 0d94 391E83E2 		sub	r9, r3, #128000
+ 1462              		sub	r9, r9, #772
+ 415:solver.c      **** 0; i < 114; i++)
+ 416:solver.c      ****     r3[i] = work.h[i];
+ 1463              	, #15728640
+ 1464 0d98 3000B3E8 		mov	r2, #0
+ 1465              		stmia	r3, {r1-r2}
+ 1466 0d9c 010053E1 		mov	r4, r9
+ 1467              		add	r3, r9, #912
+ 1468 0da0 3000A2E8 	.L113:
+ 1469              		.loc 1 358 0
+ 1470 0da4 FBFFFF1A 		mov	r1, #1069547520
+ 1471 0da8 722E83E2 		add	r1, r1, #3145728
+ 1472              		mov	r2, #0
+ 417:solver.c      ****  for (i = 0; i < 114; i++)
+ 418:solver.c      ****     r2[i] = 0;
+ 1473              	r4, #1824]
+ 1474 0dac 1E3C82E2 		str	r2, [r4, #1828]
+ 1475 0db0 0300B2E8 		add	r4, r4, #8
+ 1476              		.loc 1 357 0
+ 1477 0db4 0C0052E1 		cmp	r4, r3
+ 1478              		bne	.L113
+ 1479 0db8 030083E8 		.loc 1 359 0
+ 1480              		bl	fill_KKT
+ 1481 0dbc FAFFFF1A 		.loc 1 360 0
+ 419:solver.c      ****   for (i = 0; i < 263; i++)
+ 1482              	actor
+ 1483 0dc0 3000BDE8 		.loc 1 361 0
+ 1484 0dc4 1EFF2FE1 		bl	fillrhs_start
+ 1485              		.loc 1 363 0
+ 1486              		add	r0, r4, #5568
+ 1487              		add	r1, r4, #16640
+ 1488 0dc8 20110000 		add	r0, r0, #8
+ 1489              		add	r1, r1, #100
+ 1490              		bl	ldl_solve
+ 1491              		add	r3, r4, #11136
+ 1492              		add	r2, r4, #16640
+ 1493              		add	r0, r4, #18688
+ 1494              		add	r2, r2, #100
+ 1495              		add	r0, r0, #156
+ 1496              		add	r3, r3, #16
+ 1497              	.L115:
+ 1498              		.loc 1 371 0
+ 1499              		ldmia	r2!, {r4-r5}
+ 1500              		.loc 1 370 0
+ 1501 0dcc 9C329FE5 		cmp	r2, r0
+ 1502              		.loc 1 371 0
+ 1503 0dd0 F0472DE9 		stmia	r3!, {r4-r5}
+ 1504              		.loc 1 370 0
+ 1505              		bne	.L115
+ 1506 0dd4 BF14A0E3 		mov	r3, #17408
+ 1507 0dd8 7D9B43E2 		add	r3, r3, #240
+ 1508 0ddc C19F49E2 		ldr	r1, [r9, r3]
+ 1509 0de0 0F1681E2 		add	r0, r2, #1824
+ 1510 0de4 0020A0E3 		mov	r2, #0
+ 1511 0de8 060083E8 	.L117:
+ 1512 0dec 0940A0E1 		.loc 1 373 0
+ 1513 0df0 393E89E2 		add	r3, r1, r2
+ 1514              		ldmia	r0!, {r4-r5}
+ 1515              		add	r2, r2, #8
+ 1516 0df4 FF15A0E3 		.loc 1 372 0
+ 1517 0df8 031681E2 		cmp	r2, #1648
+ 1518 0dfc 0020A0E3 		.loc 1 373 0
+ 1519 0e00 201784E5 		stmia	r3, {r4-r5}
+ 1520 0e04 242784E5 		.loc 1 372 0
+ 1521 0e08 084084E2 		bne	.L117
+ 1522              		ldr	r6, .L158+12
+ 1523 0e0c 030054E1 		adr	r7, .L158
+ 1524 0e10 F7FFFF1A 		ldmia	r7, {r7-r8}
+ 1525              	.LVL19:
+ 1526 0e14 FEFFFFEB 		add	sl, r6, #912
+ 1527              	.L119:
+ 1528 0e18 FEFFFFEB 		.loc 1 378 0
+ 1529              		ldmia	r6, {r4-r5}
+ 1530 0e1c FEFFFFEB 	.LVL20:
+ 1531              		mov	r0, r7
+ 1532 0e20 570D84E2 	.LVL21:
+ 1533 0e24 411C84E2 		mov	r1, r8
+ 1534 0e28 080080E2 		mov	r2, r4
+ 1535 0e2c 641081E2 	.LVL22:
+ 1536 0e30 FEFFFFEB 		mov	r3, r5
+ 1537 0e34 AE3D84E2 		bl	__ltdf2
+ 1538 0e38 412C84E2 		add	r6, r6, #8
+ 1539 0e3c 490C84E2 		cmp	r0, #0
+ 1540 0e40 642082E2 		movlt	r7, r4
+ 1541 0e44 9C0080E2 		movlt	r8, r5
+ 1542 0e48 103083E2 		.loc 1 377 0
+ 1543              		cmp	r6, sl
+ 1544              		bne	.L119
+ 1545 0e4c 3000B2E8 		.loc 1 380 0
+ 1546              		mov	r0, r7
+ 1547 0e50 000052E1 		mov	r1, r8
+ 1548              		mov	r2, #0
+ 1549 0e54 3000A3E8 		mov	r3, #0
+ 1550              		bl	__ltdf2
+ 1551 0e58 FBFFFF1A 		cmp	r0, #0
+ 1552 0e5c 113BA0E3 		blt	.L156
+ 1553 0e60 F03083E2 		.loc 1 384 0
+ 1554 0e64 031099E7 		mov	r2, #1069547520
+ 1555 0e68 720E82E2 		mov	r0, r7
+ 1556 0e6c 0020A0E3 		mov	r1, r8
+ 1557              		mov	r3, #0
+ 1558              		add	r2, r2, #3145728
+ 1559 0e70 023081E0 		bl	__adddf3
+ 1560 0e74 3000B0E8 		mov	r3, #17408
+ 1561 0e78 082082E2 		add	r3, r3, #232
+ 1562              		ldr	r5, [r9, r3]
+ 1563 0e7c 670E52E3 	.LVL23:
+ 1564              		mov	r7, r0
+ 1565 0e80 300083E8 	.LVL24:
+ 1566              		mov	r8, r1
+ 1567 0e84 F9FFFF1A 	.LVL25:
+ 1568 0e88 E4619FE5 		sub	r6, r6, #912
+ 1569 0e8c 757F8FE2 		mov	r4, #0
+ 1570 0e90 800197E8 	.LVL26:
+ 1571              	.L129:
+ 1572 0e94 39AE86E2 		.loc 1 386 0
+ 1573              		ldmia	r6!, {r2-r3}
+ 1574              		mov	r0, r7
+ 1575 0e98 300096E8 		mov	r1, r8
+ 1576              		bl	__subdf3
+ 1577 0e9c 0700A0E1 		add	r3, r5, r4
+ 1578              		add	r4, r4, #8
+ 1579 0ea0 0810A0E1 		.loc 1 385 0
+ 1580 0ea4 0420A0E1 		cmp	r4, #912
+ 1581              		.loc 1 386 0
+ 1582 0ea8 0530A0E1 		stmia	r3, {r0-r1}
+ 1583 0eac FEFFFFEB 		.loc 1 385 0
+ 1584 0eb0 086086E2 		bne	.L129
+ 1585 0eb4 000050E3 	.LVL27:
+ 1586 0eb8 0470A0B1 	.L128:
+ 1587 0ebc 0580A0B1 		adr	r7, .L158
+ 1588              		ldmia	r7, {r7-r8}
+ 1589 0ec0 0A0056E1 	.LVL28:
+ 1590 0ec4 F3FFFF1A 		ldr	r6, .L158+12
+ 1591              	.L130:
+ 1592 0ec8 0700A0E1 		.loc 1 392 0
+ 1593 0ecc 0810A0E1 		ldmia	r6, {r3, r5}	@ phole ldm
+ 1594 0ed0 0020A0E3 	.LVL29:
+ 1595 0ed4 0030A0E3 		add	r4, r3, #-2147483648
+ 1596 0ed8 FEFFFFEB 	.LVL30:
+ 1597 0edc 000050E3 		mov	r0, r7
+ 1598 0ee0 440000BA 	.LVL31:
+ 1599              		mov	r1, r8
+ 1600 0ee4 FF25A0E3 		mov	r2, r4
+ 1601 0ee8 0700A0E1 		mov	r3, r5
+ 1602 0eec 0810A0E1 		bl	__ltdf2
+ 1603 0ef0 0030A0E3 		add	r6, r6, #8
+ 1604 0ef4 032682E2 		cmp	r0, #0
+ 1605 0ef8 FEFFFFEB 		movlt	r7, r4
+ 1606 0efc 113BA0E3 		movlt	r8, r5
+ 1607 0f00 E83083E2 		.loc 1 391 0
+ 1608 0f04 035099E7 		cmp	r6, sl
+ 1609              		bne	.L130
+ 1610 0f08 0070A0E1 		.loc 1 394 0
+ 1611              		mov	r0, r7
+ 1612 0f0c 0180A0E1 		mov	r1, r8
+ 1613              		mov	r2, #0
+ 1614 0f10 396E46E2 		mov	r3, #0
+ 1615 0f14 0040A0E3 		bl	__ltdf2
+ 1616              		cmp	r0, #0
+ 1617              		blt	.L157
+ 1618              		.loc 1 398 0
+ 1619 0f18 0C00B6E8 		mov	r2, #1069547520
+ 1620 0f1c 0700A0E1 		mov	r0, r7
+ 1621 0f20 0810A0E1 		mov	r1, r8
+ 1622 0f24 FEFFFFEB 		mov	r3, #0
+ 1623 0f28 043085E0 		add	r2, r2, #3145728
+ 1624 0f2c 084084E2 		bl	__adddf3
+ 1625              		mov	r3, #17408
+ 1626 0f30 390E54E3 		add	r3, r3, #236
+ 1627              		ldr	r5, [r9, r3]
+ 1628 0f34 030083E8 	.LVL32:
+ 1629              		mov	r7, r0
+ 1630 0f38 F6FFFF1A 	.LVL33:
+ 1631              		mov	r8, r1
+ 1632              	.LVL34:
+ 1633 0f3c 497F8FE2 		sub	r6, r6, #912
+ 1634 0f40 800197E8 		mov	r4, #0
+ 1635              	.LVL35:
+ 1636 0f44 28619FE5 	.L140:
+ 1637              		.loc 1 400 0
+ 1638              		ldmia	r6!, {r2-r3}
+ 1639 0f48 280096E8 		mov	r0, r7
+ 1640              		mov	r1, r8
+ 1641 0f4c 024183E2 		bl	__adddf3
+ 1642              		add	r3, r5, r4
+ 1643 0f50 0700A0E1 		add	r4, r4, #8
+ 1644              		.loc 1 399 0
+ 1645 0f54 0810A0E1 		cmp	r4, #912
+ 1646 0f58 0420A0E1 		.loc 1 400 0
+ 1647 0f5c 0530A0E1 		stmia	r3, {r0-r1}
+ 1648 0f60 FEFFFFEB 		.loc 1 399 0
+ 1649 0f64 086086E2 		bne	.L140
+ 1650 0f68 000050E3 	.LVL36:
+ 1651 0f6c 0470A0B1 	.L141:
+ 1652 0f70 0580A0B1 		.loc 1 402 0
+ 1653              		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
+ 1654 0f74 0A0056E1 		bx	lr
+ 1655 0f78 F2FFFF1A 	.LVL37:
+ 1656              	.L156:
+ 1657 0f7c 0700A0E1 		mov	r3, #17408
+ 1658 0f80 0810A0E1 		add	r3, r3, #232
+ 1659 0f84 0020A0E3 		ldr	ip, [r9, r3]
+ 1660 0f88 0030A0E3 		sub	r0, r6, #912
+ 1661 0f8c FEFFFFEB 		.loc 1 380 0
+ 1662 0f90 000050E3 		mov	r1, #0
+ 1663 0f94 270000BA 	.L127:
+ 1664              		.loc 1 382 0
+ 1665 0f98 FF25A0E3 		ldr	r3, [r0, #0]
+ 1666 0f9c 0700A0E1 		add	r3, r3, #-2147483648
+ 1667 0fa0 0810A0E1 		str	r3, [ip, r1]
+ 1668 0fa4 0030A0E3 		add	r2, ip, r1
+ 1669 0fa8 032682E2 		ldr	r3, [r0, #4]
+ 1670 0fac FEFFFFEB 		add	r1, r1, #8
+ 1671 0fb0 113BA0E3 		.loc 1 381 0
+ 1672 0fb4 EC3083E2 		cmp	r1, #912
+ 1673 0fb8 035099E7 		.loc 1 382 0
+ 1674              		str	r3, [r2, #4]
+ 1675 0fbc 0070A0E1 		add	r0, r0, #8
+ 1676              		.loc 1 381 0
+ 1677 0fc0 0180A0E1 		bne	.L127
+ 1678              		b	.L128
+ 1679 0fc4 396E46E2 	.LVL38:
+ 1680 0fc8 0040A0E3 	.L157:
+ 1681              		mov	r3, #17408
+ 1682              		add	r3, r3, #236
+ 1683              		ldr	r1, [r9, r3]
+ 1684 0fcc 0C00B6E8 		sub	r0, r6, #912
+ 1685 0fd0 0700A0E1 		.loc 1 394 0
+ 1686 0fd4 0810A0E1 		mov	r2, #0
+ 1687 0fd8 FEFFFFEB 	.L138:
+ 1688 0fdc 043085E0 		.loc 1 396 0
+ 1689 0fe0 084084E2 		add	r3, r1, r2
+ 1690              		ldmia	r0!, {r4-r5}
+ 1691 0fe4 390E54E3 	.LVL39:
+ 1692              		add	r2, r2, #8
+ 1693 0fe8 030083E8 		.loc 1 395 0
+ 1694              		cmp	r2, #912
+ 1695 0fec F6FFFF1A 		.loc 1 396 0
+ 1696              		stmia	r3, {r4-r5}
+ 1697              		.loc 1 395 0
+ 1698              		bne	.L138
+ 1699 0ff0 F047BDE8 		b	.L141
+ 1700 0ff4 1EFF2FE1 	.L159:
+ 1701              		.align	2
+ 1702              	.L158:
+ 1703 0ff8 113BA0E3 		.word	-729988434
+ 1704 0ffc E83083E2 		.word	-1568170194
+ 1705 1000 03C099E7 		.word	work+128772
+ 1706 1004 390E46E2 		.word	work+20668
+ 1707              	.LFE15:
+ 1709              		.align	2
+ 1710              		.global	calc_eq_resid_squared
+ 1712 1010 023183E2 	calc_eq_resid_squared:
+ 1713 1014 01308CE7 	.LFB14:
+ 1714 1018 01208CE0 		.loc 1 334 0
+ 1715 101c 043090E5 		@ Function supports interworking.
+ 1716 1020 081081E2 		@ args = 0, pretend = 0, frame = 0
+ 1717              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1718 1024 390E51E3 		.loc 1 339 0
+ 1719              		ldr	r0, .L170
+ 1720 1028 043082E5 		sub	r1, r0, #16640
+ 1721 102c 080080E2 		.loc 1 334 0
+ 1722              		stmfd	sp!, {r4, r5, r6, r7, lr}
+ 1723 1030 F5FFFF1A 	.LCFI14:
+ 1724 1034 C0FFFFEA 		.loc 1 339 0
+ 1725              		sub	r1, r1, #100
+ 1726              		bl	multbymA
+ 1727 1038 113BA0E3 		ldr	r4, .L170
+ 1728 103c EC3083E2 		sub	r5, r4, #25856
+ 1729 1040 031099E7 		sub	r5, r5, #212
+ 1730 1044 390E46E2 		add	r7, r4, #1648
+ 1731              	.L161:
+ 1732 1048 0020A0E3 		.loc 1 342 0
+ 1733              		ldmia	r4, {r0-r1}
+ 1734              		ldmia	r5!, {r2-r3}
+ 1735 104c 023081E0 		bl	__adddf3
+ 1736 1050 3000B0E8 		stmia	r4!, {r0-r1}
+ 1737              		.loc 1 341 0
+ 1738 1054 082082E2 		cmp	r4, r7
+ 1739              		bne	.L161
+ 1740 1058 390E52E3 		sub	r6, r4, #1648
+ 1741              		mov	r5, #0
+ 1742 105c 300083E8 	.LVL40:
+ 1743              		mov	r4, #0
+ 1744 1060 F9FFFF1A 	.LVL41:
+ 1745 1064 E1FFFFEA 	.L163:
+ 1746              		.loc 1 346 0
+ 1747              		ldmia	r6!, {r0-r1}
+ 1748              		mov	r2, r0
+ 1749 1068 AE427DD4 		mov	r3, r1
+ 1750 106c 2E9F87A2 		bl	__muldf3
+ 1751 1070 04F70100 		mov	r2, r0
+ 1752 1074 BC500000 		mov	r3, r1
+ 1753              		mov	r0, r4
+ 1754              		mov	r1, r5
+ 1755              		bl	__adddf3
+ 1756              		.loc 1 345 0
+ 1757              		cmp	r6, r7
+ 1758              		.loc 1 346 0
+ 1759              		mov	r4, r0
+ 1760              		mov	r5, r1
+ 1761              		.loc 1 345 0
+ 1762              		bne	.L163
+ 1763              		.loc 1 348 0
+ 1764              		ldmfd	sp!, {r4, r5, r6, r7, lr}
+ 1765 1078 7C009FE5 		bx	lr
+ 1766 107c 411C40E2 	.L171:
+ 1767              		.align	2
+ 1768 1080 F0402DE9 	.L170:
+ 1769              		.word	work+28804
+ 1770              	.LFE14:
+ 1772 1088 FEFFFFEB 		.align	2
+ 1773 108c 68409FE5 		.global	calc_ineq_resid_squared
+ 1775 1094 D45045E2 	calc_ineq_resid_squared:
+ 1776 1098 677E84E2 	.LFB13:
+ 1777              		.loc 1 319 0
+ 1778              		@ Function supports interworking.
+ 1779 109c 030094E8 		@ args = 0, pretend = 0, frame = 0
+ 1780 10a0 0C00B5E8 		@ frame_needed = 0, uses_anonymous_args = 0
+ 1781 10a4 FEFFFFEB 		.loc 1 324 0
+ 1782 10a8 0300A4E8 		ldr	r0, .L182
+ 1783              		sub	r1, r0, #16640
+ 1784 10ac 070054E1 		.loc 1 319 0
+ 1785 10b0 F9FFFF1A 		stmfd	sp!, {r4, r5, r6, r7, lr}
+ 1786 10b4 676E44E2 	.LCFI15:
+ 1787 10b8 0050A0E3 		.loc 1 324 0
+ 1788              		sub	r1, r1, #100
+ 1789 10bc 0040A0E3 		mov	r5, r0
+ 1790              		bl	multbymG
+ 1791              		sub	r2, r5, #28672
+ 1792              		mov	r3, #17408
+ 1793 10c0 0300B6E8 		sub	r2, r2, #132
+ 1794 10c4 0020A0E1 		add	r3, r3, #232
+ 1795 10c8 0130A0E1 		ldr	r6, [r2, r3]
+ 1796 10cc FEFFFFEB 		mov	r7, r2
+ 1797 10d0 0020A0E1 		mov	r4, #0
+ 1798 10d4 0130A0E1 	.L173:
+ 1799 10d8 0400A0E1 		.loc 1 327 0
+ 1800 10dc 0510A0E1 		add	r1, r6, r4
+ 1801 10e0 FEFFFFEB 		ldmia	r1, {r2-r3}
+ 1802              		ldmia	r7!, {r0-r1}
+ 1803 10e4 070056E1 		bl	__subdf3
+ 1804              		mov	r2, r0
+ 1805 10e8 0040A0E1 		mov	r3, r1
+ 1806 10ec 0150A0E1 		ldmia	r5, {r0-r1}
+ 1807              		bl	__adddf3
+ 1808 10f0 F2FFFF1A 		add	r4, r4, #8
+ 1809              		.loc 1 326 0
+ 1810 10f4 F040BDE8 		cmp	r4, #912
+ 1811 10f8 1EFF2FE1 		.loc 1 327 0
+ 1812              		stmia	r5!, {r0-r1}
+ 1813              		.loc 1 326 0
+ 1814              		bne	.L173
+ 1815 10fc 84700000 		ldr	r6, .L182
+ 1816              		mov	r4, #0
+ 1817              	.LVL42:
+ 1818              		mov	r5, #0
+ 1819              	.LVL43:
+ 1820              		add	r7, r6, #912
+ 1821              	.L175:
+ 1822              		.loc 1 331 0
+ 1823              		ldmia	r6!, {r0-r1}
+ 1824              		mov	r2, r0
+ 1825              		mov	r3, r1
+ 1826              		bl	__muldf3
+ 1827              		mov	r2, r0
+ 1828 1100 A8009FE5 		mov	r3, r1
+ 1829 1104 411C40E2 		mov	r0, r4
+ 1830              		mov	r1, r5
+ 1831 1108 F0402DE9 		bl	__adddf3
+ 1832              		.loc 1 330 0
+ 1833              		cmp	r6, r7
+ 1834 110c 641041E2 		.loc 1 331 0
+ 1835 1110 0050A0E1 		mov	r4, r0
+ 1836 1114 FEFFFFEB 		mov	r5, r1
+ 1837 1118 072A45E2 		.loc 1 330 0
+ 1838 111c 113BA0E3 		bne	.L175
+ 1839 1120 842042E2 		.loc 1 333 0
+ 1840 1124 E83083E2 		ldmfd	sp!, {r4, r5, r6, r7, lr}
+ 1841 1128 036092E7 		bx	lr
+ 1842 112c 0270A0E1 	.L183:
+ 1843 1130 0040A0E3 		.align	2
+ 1844              	.L182:
+ 1845              		.word	work+28804
+ 1846 1134 041086E0 	.LFE13:
+ 1848 113c 0300B7E8 		.align	2
+ 1849 1140 FEFFFFEB 		.global	refine
+ 1851 1148 0130A0E1 	refine:
+ 1852 114c 030095E8 	.LFB12:
+ 1853 1150 FEFFFFEB 		.loc 1 275 0
+ 1854 1154 084084E2 		@ Function supports interworking.
+ 1855              		@ args = 0, pretend = 0, frame = 0
+ 1856 1158 390E54E3 		@ frame_needed = 0, uses_anonymous_args = 0
+ 1857              	.LVL44:
+ 1858 115c 0300A5E8 		.loc 1 280 0
+ 1859              		ldr	r2, .L198
+ 1860 1160 F3FFFF1A 		ldr	r3, [r2, #20]
+ 1861 1164 44609FE5 		cmp	r3, #0
+ 1862 1168 0040A0E3 		.loc 1 275 0
+ 1863              		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 1864 116c 0050A0E3 	.LCFI16:
+ 1865              		.loc 1 275 0
+ 1866 1170 397E86E2 		mov	r9, r0
+ 1867              		mov	sl, r1
+ 1868              		.loc 1 280 0
+ 1869 1174 0300B6E8 		ble	.L192
+ 1870 1178 0020A0E1 	.LVL45:
+ 1871 117c 0130A0E1 		mov	r8, #5568
+ 1872 1180 FEFFFFEB 		add	r8, r8, #8
+ 1873 1184 0020A0E1 		mov	fp, #0
+ 1874 1188 0130A0E1 	.LVL46:
+ 1875 118c 0400A0E1 	.L187:
+ 1876 1190 0510A0E1 		.loc 1 282 0
+ 1877 1194 FEFFFFEB 		ldr	r0, .L198+4
+ 1878              		mov	r1, sl
+ 1879 1198 070056E1 		bl	matrix_multiply
+ 1880              		ldr	r4, .L198+4
+ 1881 119c 0040A0E1 		mov	r5, #0
+ 1882 11a0 0150A0E1 	.L188:
+ 1883              		.loc 1 284 0
+ 1884 11a4 F2FFFF1A 		add	r1, r9, r5
+ 1885              		ldmia	r1, {r2-r3}
+ 1886 11a8 F040BDE8 		ldmia	r4, {r0-r1}
+ 1887 11ac 1EFF2FE1 		bl	__subdf3
+ 1888              		add	r5, r5, #8
+ 1889              		.loc 1 283 0
+ 1890              		cmp	r5, r8
+ 1891 11b0 84700000 		.loc 1 284 0
+ 1892              		stmia	r4!, {r0-r1}
+ 1893              		.loc 1 283 0
+ 1894              		bne	.L188
+ 1895              		.loc 1 296 0
+ 1896              		ldr	r0, .L198+4
+ 1897              		add	r1, r0, #5568
+ 1898              		add	r1, r1, #8
+ 1899              		bl	ldl_solve
+ 1900              		ldr	r6, .L198+8
+ 1901              		mov	r7, r5
+ 1902              		mov	r5, #0
+ 1903              	.L190:
+ 1904              		.loc 1 275 0
+ 1905 11b4 AC209FE5 		add	r4, sl, r5
+ 1906 11b8 143092E5 		.loc 1 299 0
+ 1907 11bc 000053E3 		ldmia	r4, {r0-r1}
+ 1908              		ldmia	r6!, {r2-r3}
+ 1909 11c0 F04F2DE9 		bl	__subdf3
+ 1910              		add	r5, r5, #8
+ 1911              		.loc 1 298 0
+ 1912 11c4 0090A0E1 		cmp	r5, r7
+ 1913 11c8 01A0A0E1 		.loc 1 299 0
+ 1914              		stmia	r4, {r0-r1}
+ 1915 11cc 230000DA 		.loc 1 298 0
+ 1916              		bne	.L190
+ 1917 11d0 578DA0E3 		.loc 1 280 0
+ 1918 11d4 088088E2 		ldr	r2, .L198
+ 1919 11d8 00B0A0E3 		ldr	r3, [r2, #20]
+ 1920              		add	fp, fp, #1
+ 1921              		cmp	r3, fp
+ 1922              		bgt	.L187
+ 1923 11dc 88009FE5 	.LVL47:
+ 1924 11e0 0A10A0E1 	.L192:
+ 1925 11e4 FEFFFFEB 		.loc 1 318 0
+ 1926 11e8 7C409FE5 		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 1927 11ec 0050A0E3 		bx	lr
+ 1928              	.L199:
+ 1929              		.align	2
+ 1930 11f0 051089E0 	.L198:
+ 1931 11f4 0C0091E8 		.word	settings
+ 1932 11f8 030094E8 		.word	work+28804
+ 1933 11fc FEFFFFEB 		.word	work+34380
+ 1934 1200 085085E2 	.LFE12:
+ 1936 1204 080055E1 		.align	2
+ 1937              		.global	fillrhs_aff
+ 1939              	fillrhs_aff:
+ 1940 120c F7FFFF1A 	.LFB10:
+ 1941              		.loc 1 202 0
+ 1942 1210 54009FE5 		@ Function supports interworking.
+ 1943 1214 571D80E2 		@ args = 0, pretend = 0, frame = 0
+ 1944 1218 081081E2 		@ frame_needed = 0, uses_anonymous_args = 0
+ 1945 121c FEFFFFEB 		stmfd	sp!, {r4, r5, r6, r7, r8, lr}
+ 1946 1220 48609FE5 	.LCFI17:
+ 1947 1224 0570A0E1 		.loc 1 210 0
+ 1948 1228 0050A0E3 		ldr	r7, .L222
+ 1949              		mov	r3, #17408
+ 1950              		add	r3, r3, #240
+ 1951 122c 05408AE0 		add	r0, r7, #6464
+ 1952              		ldr	r1, [r7, r3]
+ 1953 1230 030094E8 		add	r0, r0, #24
+ 1954 1234 0C00B6E8 		bl	multbymAT
+ 1955 1238 FEFFFFEB 		.loc 1 211 0
+ 1956 123c 085085E2 		mov	r3, #17408
+ 1957              		add	r3, r3, #236
+ 1958 1240 070055E1 		add	r0, r7, #28672
+ 1959              		add	r0, r0, #132
+ 1960 1244 030084E8 		ldr	r1, [r7, r3]
+ 1961              		bl	multbymGT
+ 1962 1248 F7FFFF1A 		add	r6, r7, #8576
+ 1963              		add	r6, r6, #16
+ 1964 124c 14209FE5 		add	r5, r7, #6464
+ 1965 1250 143092E5 		add	r4, r6, #19968
+ 1966 1254 01B08BE2 		add	r5, r5, #24
+ 1967 1258 0B0053E1 		add	r4, r4, #244
+ 1968 125c DEFFFFCA 	.L201:
+ 1969              		.loc 1 213 0
+ 1970              		ldmia	r5, {r0-r1}
+ 1971              		ldmia	r4!, {r2-r3}
+ 1972 1260 F04FBDE8 		bl	__adddf3
+ 1973 1264 1EFF2FE1 		stmia	r5!, {r0-r1}
+ 1974              		.loc 1 212 0
+ 1975              		cmp	r5, r6
+ 1976              		bne	.L201
+ 1977 1268 00000000 		.loc 1 214 0
+ 1978 126c 84700000 		add	r4, r5, #19968
+ 1979 1270 4C860000 		add	r4, r4, #244
+ 1980              		add	r1, r5, #3472
+ 1981              		mov	r0, r4
+ 1982              		bl	multbyP
+ 1983              		sub	r5, r5, #2096
+ 1984              		sub	r5, r5, #8
+ 1985              	.L203:
+ 1986              		.loc 1 216 0
+ 1987              		ldr	r2, [r5, #-2104]
+ 1988              		ldr	r3, [r5, #-2100]
+ 1989              		ldmia	r4!, {r0-r1}
+ 1990              		bl	__adddf3
+ 1991 1274 F0412DE9 		mov	r2, r0
+ 1992              		mov	r3, r1
+ 1993              		ldmia	r5, {r0-r1}
+ 1994 1278 6C719FE5 		bl	__subdf3
+ 1995 127c 113BA0E3 		stmia	r5!, {r0-r1}
+ 1996 1280 F03083E2 		.loc 1 215 0
+ 1997 1284 650D87E2 		cmp	r5, r6
+ 1998 1288 031097E7 		bne	.L203
+ 1999 128c 180080E2 		mov	r3, #17408
+ 2000 1290 FEFFFFEB 		add	r3, r3, #236
+ 2001              		ldr	r1, [r7, r3]
+ 2002 1294 113BA0E3 		add	r0, r5, #4
+ 2003 1298 EC3083E2 		mov	ip, #0
+ 2004 129c 070A87E2 	.L205:
+ 2005 12a0 840080E2 		.loc 1 219 0
+ 2006 12a4 031097E7 		ldr	r3, [r1, ip]
+ 2007 12a8 FEFFFFEB 		add	r3, r3, #-2147483648
+ 2008 12ac 866D87E2 		str	r3, [r0, #-4]
+ 2009 12b0 106086E2 		add	r2, r1, ip
+ 2010 12b4 655D87E2 		ldr	r3, [r2, #4]
+ 2011 12b8 4E4C86E2 		add	ip, ip, #8
+ 2012 12bc 185085E2 		.loc 1 218 0
+ 2013 12c0 F44084E2 		cmp	ip, #912
+ 2014              		.loc 1 219 0
+ 2015              		str	r3, [r0], #8
+ 2016 12c4 030095E8 		.loc 1 218 0
+ 2017 12c8 0C00B4E8 		bne	.L205
+ 2018 12cc FEFFFFEB 		.loc 1 221 0
+ 2019 12d0 0300A5E8 		ldr	r8, .L222+4
+ 2020              		sub	r0, r8, #2560
+ 2021 12d4 060055E1 		mov	r1, r8
+ 2022 12d8 F9FFFF1A 		bl	multbymG
+ 2023              		mov	r3, #17408
+ 2024 12dc 4E4C85E2 		add	r3, r3, #232
+ 2025 12e0 F44084E2 		sub	r5, r8, #12032
+ 2026 12e4 D91E85E2 		ldr	r7, [r7, r3]
+ 2027 12e8 0400A0E1 		sub	r5, r5, #32
+ 2028 12ec FEFFFFEB 		sub	r6, r8, #2560
+ 2029 12f0 835E45E2 		mov	r4, #0
+ 2030 12f4 085045E2 	.L207:
+ 2031              		.loc 1 223 0
+ 2032              		add	r1, r7, r4
+ 2033 12f8 382815E5 		ldmia	r1, {r2-r3}
+ 2034 12fc 343815E5 		ldmia	r5!, {r0-r1}
+ 2035 1300 0300B4E8 		bl	__subdf3
+ 2036 1304 FEFFFFEB 		mov	r2, r0
+ 2037 1308 0020A0E1 		mov	r3, r1
+ 2038 130c 0130A0E1 		ldmia	r6, {r0-r1}
+ 2039 1310 030095E8 		bl	__adddf3
+ 2040 1314 FEFFFFEB 		add	r4, r4, #8
+ 2041 1318 0300A5E8 		.loc 1 222 0
+ 2042              		cmp	r4, #912
+ 2043 131c 060055E1 		.loc 1 223 0
+ 2044 1320 F4FFFF1A 		stmia	r6!, {r0-r1}
+ 2045 1324 113BA0E3 		.loc 1 222 0
+ 2046 1328 EC3083E2 		bne	.L207
+ 2047 132c 031097E7 		.loc 1 225 0
+ 2048 1330 040085E2 		ldr	r0, .L222+8
+ 2049 1334 00C0A0E3 		add	r1, r0, #1648
+ 2050              		bl	multbymA
+ 2051              		ldr	r4, .L222+8
+ 2052 1338 0C3091E7 	.L209:
+ 2053 133c 023183E2 		.loc 1 227 0
+ 2054 1340 043000E5 		sub	r1, r4, #7680
+ 2055 1344 0C2081E0 		ldmia	r1, {r2-r3}
+ 2056 1348 043092E5 		ldmia	r4, {r0-r1}
+ 2057 134c 08C08CE2 		bl	__adddf3
+ 2058              		stmia	r4!, {r0-r1}
+ 2059 1350 390E5CE3 		.loc 1 226 0
+ 2060              		cmp	r4, r8
+ 2061 1354 083080E4 		bne	.L209
+ 2062              		.loc 1 228 0
+ 2063 1358 F6FFFF1A 		ldmfd	sp!, {r4, r5, r6, r7, r8, lr}
+ 2064              		bx	lr
+ 2065 135c 8C809FE5 	.L223:
+ 2066 1360 0A0C48E2 		.align	2
+ 2067 1364 0810A0E1 	.L222:
+ 2068 1368 FEFFFFEB 		.word	work
+ 2069 136c 113BA0E3 		.word	work+12064
+ 2070 1370 E83083E2 		.word	work+10416
+ 2071 1374 2F5C48E2 	.LFE10:
+ 2073 137c 205045E2 		.align	2
+ 2074 1380 0A6C48E2 		.global	eval_objv
+ 2076              	eval_objv:
+ 2077              	.LFB9:
+ 2078 1388 041087E0 		.loc 1 188 0
+ 2079 138c 0C0091E8 		@ Function supports interworking.
+ 2080 1390 0300B5E8 		@ args = 0, pretend = 0, frame = 0
+ 2081 1394 FEFFFFEB 		@ frame_needed = 0, uses_anonymous_args = 0
+ 2082 1398 0020A0E1 		stmfd	sp!, {r4, r5, r6, r7, r8, sl, lr}
+ 2083 139c 0130A0E1 	.LCFI18:
+ 2084 13a0 030096E8 		.loc 1 192 0
+ 2085 13a4 FEFFFFEB 		ldr	sl, .L234
+ 2086 13a8 084084E2 		add	r1, sl, #5568
+ 2087              		add	r1, r1, #8
+ 2088 13ac 390E54E3 		mov	r0, sl
+ 2089              		bl	multbyP
+ 2090 13b0 0300A6E8 		add	r6, sl, #5568
+ 2091              		add	r6, r6, #8
+ 2092 13b4 F3FFFF1A 		mov	r4, #0
+ 2093              	.LVL48:
+ 2094 13b8 34009FE5 		mov	r5, #0
+ 2095 13bc 671E80E2 	.LVL49:
+ 2096 13c0 FEFFFFEB 		add	r8, sl, #7680
+ 2097 13c4 28409FE5 		mov	r7, sl
+ 2098              	.L225:
+ 2099              		.loc 1 195 0
+ 2100 13c8 1E1C44E2 		ldmia	r7!, {r2-r3}
+ 2101 13cc 0C0091E8 		ldmia	r6!, {r0-r1}
+ 2102 13d0 030094E8 		bl	__muldf3
+ 2103 13d4 FEFFFFEB 		mov	r2, r0
+ 2104 13d8 0300A4E8 		mov	r3, r1
+ 2105              		mov	r0, r4
+ 2106 13dc 080054E1 		mov	r1, r5
+ 2107 13e0 F8FFFF1A 		bl	__adddf3
+ 2108              		.loc 1 194 0
+ 2109 13e4 F041BDE8 		cmp	r6, r8
+ 2110 13e8 1EFF2FE1 		.loc 1 195 0
+ 2111              		mov	r4, r0
+ 2112              		mov	r5, r1
+ 2113              		.loc 1 194 0
+ 2114 13ec 00000000 		bne	.L225
+ 2115 13f0 202F0000 		.loc 1 196 0
+ 2116 13f4 B0280000 		mov	r2, #1069547520
+ 2117              		add	r2, r2, #2097152
+ 2118              		mov	r3, #0
+ 2119              		bl	__muldf3
+ 2120              		sub	r4, r6, #9728
+ 2121              	.LVL50:
+ 2122              		mov	r5, r0
+ 2123              	.LVL51:
+ 2124              		mov	r6, r1
+ 2125              	.LVL52:
+ 2126              		sub	r4, r4, #56
+ 2127              	.L227:
+ 2128 13f8 F0452DE9 		.loc 1 198 0
+ 2129              		add	r1, r4, #7680
+ 2130              		ldmia	r1, {r2-r3}
+ 2131 13fc 38A39FE5 		ldmia	r4!, {r0-r1}
+ 2132 1400 571D8AE2 		bl	__muldf3
+ 2133 1404 081081E2 		mov	r2, r0
+ 2134 1408 0A00A0E1 		mov	r3, r1
+ 2135 140c FEFFFFEB 		mov	r0, r5
+ 2136 1410 576D8AE2 		mov	r1, r6
+ 2137 1414 086086E2 		bl	__adddf3
+ 2138 1418 0040A0E3 		.loc 1 197 0
+ 2139              		cmp	r4, sl
+ 2140 141c 0050A0E3 		.loc 1 198 0
+ 2141              		mov	r5, r0
+ 2142 1420 1E8C8AE2 		mov	r6, r1
+ 2143 1424 0A70A0E1 		.loc 1 197 0
+ 2144              		bne	.L227
+ 2145              		add	ip, r4, #121856
+ 2146 1428 0C00B7E8 		add	r1, r4, #121856
+ 2147 142c 0300B6E8 		add	ip, ip, #436
+ 2148 1430 FEFFFFEB 		add	r1, r1, #444
+ 2149 1434 0020A0E1 		ldmia	r1, {r2-r3}
+ 2150 1438 0130A0E1 		ldmia	ip, {r0-r1}
+ 2151 143c 0400A0E1 		bl	__adddf3
+ 2152 1440 0510A0E1 		add	ip, r4, #121856
+ 2153 1444 FEFFFFEB 		add	ip, ip, #452
+ 2154              		ldmia	ip, {r2-r3}
+ 2155 1448 080056E1 		bl	__adddf3
+ 2156              		add	ip, r4, #121856
+ 2157 144c 0040A0E1 		add	ip, ip, #460
+ 2158 1450 0150A0E1 		ldmia	ip, {r2-r3}
+ 2159              		bl	__adddf3
+ 2160 1454 F3FFFF1A 		add	ip, r4, #121856
+ 2161              		add	ip, ip, #468
+ 2162 1458 FF25A0E3 		ldmia	ip, {r2-r3}
+ 2163 145c 022682E2 		bl	__adddf3
+ 2164 1460 0030A0E3 		add	ip, r4, #121856
+ 2165 1464 FEFFFFEB 		add	ip, ip, #476
+ 2166 1468 264C46E2 		ldmia	ip, {r2-r3}
+ 2167              		bl	__adddf3
+ 2168 146c 0050A0E1 		add	ip, r4, #121856
+ 2169              		add	ip, ip, #484
+ 2170 1470 0160A0E1 		ldmia	ip, {r2-r3}
+ 2171              		bl	__adddf3
+ 2172 1474 384044E2 		add	ip, r4, #121856
+ 2173              		add	ip, ip, #492
+ 2174              		ldmia	ip, {r2-r3}
+ 2175 1478 1E1C84E2 		bl	__adddf3
+ 2176 147c 0C0091E8 		add	ip, r4, #121856
+ 2177 1480 0300B4E8 		add	ip, ip, #500
+ 2178 1484 FEFFFFEB 		ldmia	ip, {r2-r3}
+ 2179 1488 0020A0E1 		bl	__adddf3
+ 2180 148c 0130A0E1 		add	ip, r4, #121856
+ 2181 1490 0500A0E1 		add	ip, ip, #508
+ 2182 1494 0610A0E1 		ldmia	ip, {r2-r3}
+ 2183 1498 FEFFFFEB 		bl	__adddf3
+ 2184              		add	ip, r4, #121856
+ 2185 149c 0A0054E1 		add	ip, ip, #516
+ 2186              		ldmia	ip, {r2-r3}
+ 2187 14a0 0050A0E1 		bl	__adddf3
+ 2188 14a4 0160A0E1 		add	ip, r4, #121856
+ 2189              		add	ip, ip, #524
+ 2190 14a8 F2FFFF1A 		ldmia	ip, {r2-r3}
+ 2191 14ac 77CB84E2 		bl	__adddf3
+ 2192 14b0 771B84E2 		add	ip, r4, #121856
+ 2193 14b4 6DCF8CE2 		add	ip, ip, #532
+ 2194 14b8 6F1F81E2 		ldmia	ip, {r2-r3}
+ 2195 14bc 0C0091E8 		bl	__adddf3
+ 2196 14c0 03009CE8 		add	ip, r4, #121856
+ 2197 14c4 FEFFFFEB 		add	ip, ip, #540
+ 2198 14c8 77CB84E2 		ldmia	ip, {r2-r3}
+ 2199 14cc 71CF8CE2 		bl	__adddf3
+ 2200 14d0 0C009CE8 		add	ip, r4, #121856
+ 2201 14d4 FEFFFFEB 		add	ip, ip, #548
+ 2202 14d8 77CB84E2 		ldmia	ip, {r2-r3}
+ 2203 14dc 73CF8CE2 		bl	__adddf3
+ 2204 14e0 0C009CE8 		add	ip, r4, #121856
+ 2205 14e4 FEFFFFEB 		add	ip, ip, #556
+ 2206 14e8 77CB84E2 		ldmia	ip, {r2-r3}
+ 2207 14ec 75CF8CE2 		bl	__adddf3
+ 2208 14f0 0C009CE8 		add	ip, r4, #121856
+ 2209 14f4 FEFFFFEB 		add	ip, ip, #564
+ 2210 14f8 77CB84E2 		ldmia	ip, {r2-r3}
+ 2211 14fc 77CF8CE2 		bl	__adddf3
+ 2212 1500 0C009CE8 		add	ip, r4, #121856
+ 2213 1504 FEFFFFEB 		add	ip, ip, #572
+ 2214 1508 77CB84E2 		ldmia	ip, {r2-r3}
+ 2215 150c 79CF8CE2 		bl	__adddf3
+ 2216 1510 0C009CE8 		add	ip, r4, #121856
+ 2217 1514 FEFFFFEB 		add	ip, ip, #580
+ 2218 1518 77CB84E2 		ldmia	ip, {r2-r3}
+ 2219 151c 7BCF8CE2 		bl	__adddf3
+ 2220 1520 0C009CE8 		add	ip, r4, #121856
+ 2221 1524 FEFFFFEB 		add	ip, ip, #588
+ 2222 1528 77CB84E2 		ldmia	ip, {r2-r3}
+ 2223 152c 7DCF8CE2 		bl	__adddf3
+ 2224 1530 0C009CE8 		add	ip, r4, #121856
+ 2225 1534 FEFFFFEB 		add	ip, ip, #596
+ 2226 1538 77CB84E2 		ldmia	ip, {r2-r3}
+ 2227 153c 7FCF8CE2 		bl	__adddf3
+ 2228 1540 0C009CE8 		add	ip, r4, #121856
+ 2229 1544 FEFFFFEB 		add	ip, ip, #604
+ 2230 1548 77CB84E2 		ldmia	ip, {r2-r3}
+ 2231 154c 81CF8CE2 		bl	__adddf3
+ 2232 1550 0C009CE8 		add	ip, r4, #121856
+ 2233 1554 FEFFFFEB 		add	ip, ip, #612
+ 2234 1558 77CB84E2 		ldmia	ip, {r2-r3}
+ 2235 155c 83CF8CE2 		bl	__adddf3
+ 2236 1560 0C009CE8 		add	ip, r4, #121856
+ 2237 1564 FEFFFFEB 		add	ip, ip, #620
+ 2238 1568 77CB84E2 		ldmia	ip, {r2-r3}
+ 2239 156c 85CF8CE2 		bl	__adddf3
+ 2240 1570 0C009CE8 		add	ip, r4, #121856
+ 2241 1574 FEFFFFEB 		add	ip, ip, #628
+ 2242 1578 77CB84E2 		ldmia	ip, {r2-r3}
+ 2243 157c 87CF8CE2 		bl	__adddf3
+ 2244 1580 0C009CE8 		add	ip, r4, #121856
+ 2245 1584 FEFFFFEB 		add	ip, ip, #636
+ 2246 1588 77CB84E2 		ldmia	ip, {r2-r3}
+ 2247 158c 89CF8CE2 		bl	__adddf3
+ 2248 1590 0C009CE8 		add	ip, r4, #121856
+ 2249 1594 FEFFFFEB 		add	ip, ip, #644
+ 2250 1598 77CB84E2 		ldmia	ip, {r2-r3}
+ 2251 159c 8BCF8CE2 		bl	__adddf3
+ 2252 15a0 0C009CE8 		add	ip, r4, #121856
+ 2253 15a4 FEFFFFEB 		add	ip, ip, #652
+ 2254 15a8 77CB84E2 		ldmia	ip, {r2-r3}
+ 2255 15ac 8DCF8CE2 		bl	__adddf3
+ 2256 15b0 0C009CE8 		add	ip, r4, #121856
+ 2257 15b4 FEFFFFEB 		add	ip, ip, #660
+ 2258 15b8 77CB84E2 		ldmia	ip, {r2-r3}
+ 2259 15bc 8FCF8CE2 		bl	__adddf3
+ 2260 15c0 0C009CE8 		add	ip, r4, #121856
+ 2261 15c4 FEFFFFEB 		add	ip, ip, #668
+ 2262 15c8 77CB84E2 		ldmia	ip, {r2-r3}
+ 2263 15cc 91CF8CE2 		bl	__adddf3
+ 2264 15d0 0C009CE8 		add	ip, r4, #121856
+ 2265 15d4 FEFFFFEB 		add	ip, ip, #676
+ 2266 15d8 77CB84E2 		ldmia	ip, {r2-r3}
+ 2267 15dc 93CF8CE2 		bl	__adddf3
+ 2268 15e0 0C009CE8 		add	ip, r4, #121856
+ 2269 15e4 FEFFFFEB 		add	ip, ip, #684
+ 2270 15e8 77CB84E2 		ldmia	ip, {r2-r3}
+ 2271 15ec 95CF8CE2 		bl	__adddf3
+ 2272 15f0 0C009CE8 		add	ip, r4, #121856
+ 2273 15f4 FEFFFFEB 		add	ip, ip, #692
+ 2274 15f8 77CB84E2 		ldmia	ip, {r2-r3}
+ 2275 15fc 97CF8CE2 		bl	__adddf3
+ 2276 1600 0C009CE8 		add	ip, r4, #121856
+ 2277 1604 FEFFFFEB 		add	ip, ip, #700
+ 2278 1608 77CB84E2 		ldmia	ip, {r2-r3}
+ 2279 160c 99CF8CE2 		bl	__adddf3
+ 2280 1610 0C009CE8 		add	ip, r4, #121856
+ 2281 1614 FEFFFFEB 		add	ip, ip, #708
+ 2282 1618 77CB84E2 		ldmia	ip, {r2-r3}
+ 2283 161c 9BCF8CE2 		bl	__adddf3
+ 2284 1620 0C009CE8 		add	ip, r4, #121856
+ 2285 1624 FEFFFFEB 		add	ip, ip, #716
+ 2286 1628 77CB84E2 		ldmia	ip, {r2-r3}
+ 2287 162c 9DCF8CE2 		bl	__adddf3
+ 2288 1630 0C009CE8 		add	ip, r4, #121856
+ 2289 1634 FEFFFFEB 		add	ip, ip, #724
+ 2290 1638 77CB84E2 		ldmia	ip, {r2-r3}
+ 2291 163c 9FCF8CE2 		bl	__adddf3
+ 2292 1640 0C009CE8 		add	ip, r4, #121856
+ 2293 1644 FEFFFFEB 		add	ip, ip, #732
+ 2294 1648 77CB84E2 		ldmia	ip, {r2-r3}
+ 2295 164c A1CF8CE2 		bl	__adddf3
+ 2296 1650 0C009CE8 		add	ip, r4, #121856
+ 2297 1654 FEFFFFEB 		add	ip, ip, #740
+ 2298 1658 77CB84E2 		ldmia	ip, {r2-r3}
+ 2299 165c A3CF8CE2 		bl	__adddf3
+ 2300 1660 0C009CE8 		add	ip, r4, #121856
+ 2301 1664 FEFFFFEB 		add	ip, ip, #748
+ 2302 1668 77CB84E2 		ldmia	ip, {r2-r3}
+ 2303 166c A5CF8CE2 		bl	__adddf3
+ 2304 1670 0C009CE8 		mov	r2, r5
+ 2305 1674 FEFFFFEB 		mov	r3, r6
+ 2306 1678 77CB84E2 		bl	__adddf3
+ 2307 167c A7CF8CE2 		.loc 1 201 0
+ 2308 1680 0C009CE8 		ldmfd	sp!, {r4, r5, r6, r7, r8, sl, lr}
+ 2309 1684 FEFFFFEB 		bx	lr
+ 2310 1688 77CB84E2 	.L235:
+ 2311 168c A9CF8CE2 		.align	2
+ 2312 1690 0C009CE8 	.L234:
+ 2313 1694 FEFFFFEB 		.word	work+6488
+ 2314 1698 77CB84E2 	.LFE9:
+ 2316 16a0 0C009CE8 		.global	__ledf2
+ 2317 16a4 FEFFFFEB 		.align	2
+ 2318 16a8 77CB84E2 		.global	solve
+ 2320 16b0 0C009CE8 	solve:
+ 2321 16b4 FEFFFFEB 	.LFB17:
+ 2322 16b8 77CB84E2 		.loc 1 420 0
+ 2323 16bc AFCF8CE2 		@ Function supports interworking.
+ 2324 16c0 0C009CE8 		@ args = 0, pretend = 0, frame = 32
+ 2325 16c4 FEFFFFEB 		@ frame_needed = 0, uses_anonymous_args = 0
+ 2326 16c8 77CB84E2 		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 2327 16cc B1CF8CE2 	.LCFI19:
+ 2328 16d0 0C009CE8 		.loc 1 426 0
+ 2329 16d4 FEFFFFEB 		ldr	r1, .L298+8
+ 2330 16d8 77CB84E2 		mov	r3, #129024
+ 2331 16dc B3CF8CE2 		add	r3, r3, #76
+ 2332 16e0 0C009CE8 		mov	r2, #0
+ 2333 16e4 FEFFFFEB 		str	r2, [r1, r3]
+ 2334 16e8 77CB84E2 		.loc 1 420 0
+ 2335 16ec B5CF8CE2 		sub	sp, sp, #32
+ 2336 16f0 0C009CE8 	.LCFI20:
+ 2337 16f4 FEFFFFEB 		.loc 1 427 0
+ 2338 16f8 77CB84E2 		bl	setup_pointers
+ 2339 16fc B7CF8CE2 		.loc 1 428 0
+ 2340 1700 0C009CE8 		bl	pre_ops
+ 2341 1704 FEFFFFEB 		.loc 1 433 0
+ 2342 1708 77CB84E2 		bl	fillq
+ 2343 170c B9CF8CE2 		.loc 1 434 0
+ 2344 1710 0C009CE8 		bl	fillh
+ 2345 1714 FEFFFFEB 		.loc 1 435 0
+ 2346 1718 77CB84E2 		bl	fillb
+ 2347 171c BBCF8CE2 		.loc 1 436 0
+ 2348 1720 0C009CE8 		ldr	r2, .L298+12
+ 2349 1724 FEFFFFEB 		ldr	r3, [r2, #24]
+ 2350 1728 0520A0E1 		cmp	r3, #0
+ 2351 172c 0630A0E1 		beq	.L237
+ 2352 1730 FEFFFFEB 		.loc 1 437 0
+ 2353              		bl	better_start
+ 2354 1734 F045BDE8 	.L239:
+ 2355 1738 1EFF2FE1 		.loc 1 440 0
+ 2356              		ldr	r4, .L298+12
+ 2357              		ldr	r3, [r4, #16]
+ 2358              		cmp	r3, #0
+ 2359 173c 58190000 		movle	r3, #0
+ 2360              		ble	.L242
+ 2361              		ldr	r3, .L298+16
+ 2362              		ldr	r2, .L298+16
+ 2363              		add	r4, r3, #13248
+ 2364              		add	r2, r2, #126976
+ 2365              		add	ip, r3, #126976
+ 2366              		add	r1, r3, #126976
+ 2367              		add	r4, r4, #8
+ 420:solver.c      **** 
+ 2368              	2, #868
+ 2369              		mov	r4, #0
+ 2370              		str	r3, [sp, #0]
+ 2371              		str	ip, [sp, #16]
+ 2372 1740 F04F2DE9 		str	r1, [sp, #8]
+ 2373              		str	r2, [sp, #12]
+ 421:solver.c      **** t(void) {
+ 422:solver.c      ****   /* Fill rhs with (-q, 0, h, b). */
+ 423:solver.c      ****   int i;
+ 424:solver.c      ****   double *r1, *r2, *r3, *r4;
+ 425:solver.c      ****   r1 = work.rhs;
+ 426:solver.c      ****   r2 = work.rhs + 263;
+ 2374              	4, [sp, #20]
+ 2375 1744 28159FE5 	.LVL53:
+ 2376 1748 7E3BA0E3 		add	fp, fp, #44
+ 2377 174c 4C3083E2 	.LVL54:
+ 2378 1750 0020A0E3 	.L276:
+ 2379 1754 032081E7 		ldr	r5, .L298+8
+ 2380              	.L243:
+ 2381 1758 20D04DE2 		.loc 1 442 0
+ 2382              		ldr	r2, .L298+8
+ 427:solver.c      **** with (-q, 0, h, b). */
+ 2383              	#17408
+ 2384 175c FEFFFFEB 		add	r3, r3, #232
+ 428:solver.c      **** +)
+ 2385              	dr	r1, [r2, r3]
+ 2386 1760 FEFFFFEB 		.loc 1 420 0
+ 429:solver.c      ****    for (i = 0; i < 114; i++)
+ 430:solver.c      ****       work.z[i] = z[i];
+ 431:solver.c      ****   } else {
+ 432:solver.c      ****     alpha += 1;
+ 433:solver.c      ****     for (i = 0; i < 114; i++)
+ 2387              	sb	r4, r2, r5
+ 2388 1764 FEFFFFEB 		.loc 1 442 0
+ 434:solver.c      ****    for (i = 0; i < 114; i++)
+ 2389              	dd	r1, r1, r4
+ 2390 1768 FEFFFFEB 		mov	r0, #1069547520
+ 435:solver.c      **** i = 0; i < 114; i++)
+ 2391              	dmia	r1, {r2-r3}
+ 2392 176c FEFFFFEB 		add	r0, r0, #3145728
+ 436:solver.c      **** ha;
+ 2393              	ov	r1, #0
+ 2394 1770 00259FE5 		bl	__divdf3
+ 2395 1774 183092E5 		.loc 1 443 0
+ 2396 1778 000053E3 		ldr	r2, .L298+8
+ 2397 177c 2E01000A 		mov	r3, #17408
+ 437:solver.c      **** 4; i++)
+ 2398              	r3, r3, #236
+ 2399 1780 FEFFFFEB 		.loc 1 442 0
+ 2400              		str	r0, [r5, #912]
+ 438:solver.c      **** = -1e99;
+ 439:solver.c      ****   for (i = 0; i < 114; i++)
+ 440:solver.c      ****     if (alpha < z[i])
+ 2401              	r	r1, [r5, #916]
+ 2402 1784 EC449FE5 		.loc 1 443 0
+ 2403 1788 103094E5 		ldr	ip, [r2, r3]
+ 2404 178c 000053E3 		add	ip, ip, r4
+ 2405 1790 0030A0D3 		ldmia	ip, {r2-r3}
+ 2406 1794 240100DA 		bl	__muldf3
+ 2407 1798 DC349FE5 		.loc 1 441 0
+ 2408 179c D8249FE5 		ldr	r3, .L298+16
+ 2409 17a0 CF4D83E2 		.loc 1 443 0
+ 2410 17a4 1F2A82E2 		str	r0, [r5, #1824]
+ 2411 17a8 1FCA83E2 		str	r1, [r5, #1828]
+ 2412 17ac 1F1A83E2 		add	r5, r5, #8
+ 2413 17b0 084084E2 		.loc 1 441 0
+ 2414 17b4 57BC83E2 		cmp	r5, r3
+ 2415 17b8 04408DE5 		bne	.L243
+ 2416 17bc DD3F82E2 		.loc 1 445 0
+ 2417 17c0 D5CF8CE2 		ldr	r3, [sp, #0]
+ 2418 17c4 DB1F81E2 		mov	r2, #0
+ 2419 17c8 D92F82E2 		mov	r1, #0
+ 2420 17cc 0040A0E3 		stmia	r3, {r1-r2}
+ 2421 17d0 00308DE5 		.loc 1 446 0
+ 2422 17d4 10C08DE5 		bl	fill_KKT
+ 2423 17d8 08108DE5 		.loc 1 447 0
+ 2424 17dc 0C208DE5 		bl	ldl_factor
+ 2425 17e0 14408DE5 		.loc 1 449 0
+ 2426              		bl	fillrhs_aff
+ 2427 17e4 2CB08BE2 		.loc 1 450 0
+ 2428              		add	r0, r5, #5568
+ 2429              		add	r1, r5, #16640
+ 2430 17e8 84549FE5 		add	r0, r0, #8
+ 2431              		add	r1, r1, #100
+ 441:solver.c      **** tialization. Start with s. */
+ 442:solver.c      ****   /* Must have alpha > max(z). */
+ 2432              	d	r0, r5, #5568
+ 2433 17ec 80249FE5 		add	r1, r5, #16640
+ 2434 17f0 113BA0E3 		add	r0, r0, #8
+ 2435 17f4 E83083E2 		add	r1, r1, #100
+ 2436 17f8 031092E7 		bl	refine
+ 2437              		.loc 1 453 0
+ 2438 17fc 054062E0 		bl	fillrhs_cc
+ 2439              		.loc 1 454 0
+ 2440 1800 041081E0 		add	r0, r5, #5568
+ 2441 1804 FF05A0E3 		add	r1, r5, #22272
+ 2442 1808 0C0091E8 		add	r0, r0, #8
+ 2443 180c 030680E2 		add	r1, r1, #44
+ 2444 1810 0010A0E3 		bl	ldl_solve
+ 2445 1814 FEFFFFEB 		.loc 1 455 0
+ 443:solver.c      ****  (i = 0; i < 206; i++)
+ 2446              	5568
+ 2447 1818 54249FE5 		add	r1, r5, #22272
+ 2448 181c 113BA0E3 		add	r0, r0, #8
+ 2449 1820 EC3083E2 		add	r1, r1, #44
+ 2450              		bl	refine
+ 2451 1824 900385E5 		add	r6, r5, #22272
+ 2452 1828 941385E5 		add	r4, r5, #16640
+ 2453              		add	r4, r4, #100
+ 2454 182c 03C092E7 		add	r6, r6, #44
+ 2455 1830 04C08CE0 	.L245:
+ 2456 1834 0C009CE8 		.loc 1 458 0
+ 2457 1838 FEFFFFEB 		ldmia	r4, {r0-r1}
+ 2458              		ldmia	r6!, {r2-r3}
+ 2459 183c 38349FE5 		bl	__adddf3
+ 2460              		stmia	r4!, {r0-r1}
+ 2461 1840 200785E5 		.loc 1 457 0
+ 2462 1844 241785E5 		cmp	r4, fp
+ 2463 1848 085085E2 		bne	.L245
+ 2464              		.loc 1 467 0
+ 2465 184c 030055E1 		sub	r2, r4, #23040
+ 2466 1850 E5FFFF1A 		mov	r3, #17408
+ 444:solver.c      **** 
+ 445:solver.c      ****   y = work.lhs_aff + 491;
+ 2467              	d	r3, r3, #232
+ 2468 1854 00309DE5 		ldr	r9, [r2, r3]
+ 2469 1858 0020A0E3 		ldr	r4, .L298+8
+ 2470 185c 0010A0E3 		mov	r1, #0
+ 2471 1860 060083E8 		mov	r2, #0
+ 446:solver.c      **** now. Precision doesn't matter too much. */
+ 2472              	r1, [sp, #24]
+ 2473 1864 FEFFFFEB 		str	r2, [sp, #28]
+ 447:solver.c      **** rk.lhs_aff for the solution. */
+ 2474              	dd	sl, r4, #19712
+ 2475 1868 FEFFFFEB 		add	sl, sl, #44
+ 448:solver.c      ****  for (i = 0; i < 114; i++)
+ 449:solver.c      ****     work.s_inv_z[i] = 1;
+ 2476              	ov	r8, #0
+ 2477 186c FEFFFFEB 	.L247:
+ 450:solver.c      **** fill_KKT();
+ 2478              	dd	r3, r9, r8
+ 2479 1870 570D85E2 		ldmia	r3, {r4-r5}
+ 2480 1874 411C85E2 		add	r0, sp, #24
+ 2481 1878 080080E2 		ldmia	r0, {r0-r1}
+ 2482 187c 641081E2 		mov	r2, r4
+ 2483 1880 FEFFFFEB 		mov	r3, r5
+ 451:solver.c      ****  ldl_factor();
+ 2484              	muldf3
+ 2485 1884 570D85E2 		ldmia	sl!, {r6-r7}
+ 2486 1888 411C85E2 		mov	r2, r0
+ 2487 188c 080080E2 		mov	r3, r1
+ 2488 1890 641081E2 		mov	r0, r6
+ 2489 1894 FEFFFFEB 		mov	r1, r7
+ 452:solver.c      ****  fillrhs_start();
+ 453:solver.c      ****   /* Borrow work.lhs_aff for the solution. */
+ 2490              	ltdf2
+ 2491 1898 FEFFFFEB 		cmp	r0, #0
+ 454:solver.c      **** ldl_solve(work.rhs, work.lhs_aff);
+ 2492              	loc 1 468 0
+ 2493 189c 570D85E2 		add	r8, r8, #8
+ 2494 18a0 571C85E2 		mov	r2, r4
+ 2495 18a4 080080E2 		mov	r3, r5
+ 2496 18a8 2C1081E2 		mov	r0, r6
+ 2497 18ac FEFFFFEB 		mov	r1, r7
+ 455:solver.c      **** inv_z[i] = 1;
+ 2498              	1 467 0
+ 2499 18b0 570D85E2 		bge	.L248
+ 2500 18b4 571C85E2 		.loc 1 468 0
+ 2501 18b8 080080E2 		bl	__divdf3
+ 2502 18bc 2C1081E2 		str	r0, [sp, #24]
+ 2503 18c0 FEFFFFEB 		str	r1, [sp, #28]
+ 2504 18c4 576C85E2 	.L248:
+ 2505 18c8 414C85E2 		.loc 1 466 0
+ 2506 18cc 644084E2 		cmp	r8, #912
+ 2507 18d0 2C6086E2 		bne	.L247
+ 2508              		.loc 1 470 0
+ 456:solver.c      ****  fill_KKT();
+ 457:solver.c      ****   ldl_factor();
+ 458:solver.c      ****   fillrhs_start();
+ 2509              	7408
+ 2510 18d4 030094E8 		ldr	r2, .L298+8
+ 2511 18d8 0C00B6E8 		add	r3, r3, #236
+ 2512 18dc FEFFFFEB 		ldr	sl, [r2, r3]
+ 2513 18e0 0300A4E8 		ldr	r9, .L298+20
+ 2514              		sub	r8, r8, #912
+ 2515 18e4 0B0054E1 	.L252:
+ 2516 18e8 F9FFFF1A 		add	r3, sl, r8
+ 459:solver.c      **** * Borrow work.lhs_aff for the solution. */
+ 460:solver.c      ****   ldl_solve(work.rhs, work.lhs_aff);
+ 461:solver.c      ****   /* Don't do any refinement for now. Precision doesn't matter too much. */
+ 462:solver.c      ****   x = work.lhs_aff;
+ 463:solver.c      ****   s = work.lhs_aff + 263;
+ 464:solver.c      ****   z = work.lhs_aff + 377;
+ 465:solver.c      ****   y = work.lhs_aff + 491;
+ 466:solver.c      ****   /* Just set x and y as is. */
+ 467:solver.c      ****   for (i = 0; i < 263; i++)
+ 2517              	3, {r4-r5}
+ 2518 18ec 5A2C44E2 		add	r2, sp, #24
+ 2519 18f0 113BA0E3 		ldmia	r2, {r2-r3}
+ 2520 18f4 BC2042E2 		mov	r0, r4
+ 2521 18f8 E83083E2 		mov	r1, r5
+ 2522 18fc 039092E7 		bl	__muldf3
+ 2523 1900 6C439FE5 		ldmia	r9!, {r6-r7}
+ 2524 1904 0010A0E3 		mov	r2, r0
+ 2525 1908 0020A0E3 		mov	r3, r1
+ 2526 190c 18108DE5 		mov	r0, r6
+ 2527 1910 1C208DE5 		mov	r1, r7
+ 2528 1914 4DAC84E2 		bl	__ltdf2
+ 2529 1918 2CA08AE2 		cmp	r0, #0
+ 2530 191c 0080A0E3 		.loc 1 471 0
+ 2531              		add	r8, r8, #8
+ 2532 1920 083089E0 		mov	r2, r4
+ 2533 1924 300093E8 		mov	r3, r5
+ 2534 1928 18008DE2 		mov	r0, r6
+ 2535 192c 030090E8 		mov	r1, r7
+ 2536 1930 0420A0E1 		.loc 1 470 0
+ 2537 1934 0530A0E1 		bge	.L253
+ 2538 1938 FEFFFFEB 		.loc 1 471 0
+ 2539 193c C000BAE8 		bl	__divdf3
+ 2540 1940 0020A0E1 		str	r0, [sp, #24]
+ 2541 1944 0130A0E1 		str	r1, [sp, #28]
+ 2542 1948 0600A0E1 	.L253:
+ 2543 194c 0710A0E1 		.loc 1 469 0
+ 2544 1950 FEFFFFEB 		cmp	r8, #912
+ 2545 1954 000050E3 		bne	.L252
+ 468:solver.c      **** x[i] = x[i];
+ 2546              	4
+ 2547 1958 088088E2 		ldmia	r0, {r0-r1}
+ 2548 195c 0420A0E1 		adr	r2, .L298
+ 2549 1960 0530A0E1 		ldmia	r2, {r2-r3}
+ 2550 1964 0600A0E1 		bl	__gtdf2
+ 2551 1968 0710A0E1 		cmp	r0, #0
+ 2552              		movgt	r7, #1069547520
+ 2553 196c 020000AA 	.LVL55:
+ 2554              		addgt	r7, r7, #3145728
+ 2555 1970 FEFFFFEB 		movgt	r8, #0
+ 2556 1974 18008DE5 	.LVL56:
+ 2557 1978 1C108DE5 		bgt	.L260
+ 2558              		.loc 1 476 0
+ 2559              		add	r2, sp, #24
+ 2560 197c 390E58E3 		ldmia	r2, {r2-r3}
+ 2561 1980 E6FFFF1A 		adr	r0, .L298
+ 469:solver.c      **** 63;
+ 470:solver.c      ****   z = work.lhs_aff + 377;
+ 2562              	1}
+ 2563 1984 113BA0E3 		bl	__divdf3
+ 2564 1988 E4229FE5 		mov	r7, r0
+ 2565 198c EC3083E2 		mov	r8, r1
+ 2566 1990 03A092E7 	.L260:
+ 2567 1994 E4929FE5 		ldr	r5, .L298+24
+ 2568 1998 398E48E2 		add	r4, r5, #5568
+ 2569              		add	r4, r4, #20
+ 2570 199c 08308AE0 	.L261:
+ 2571 19a0 300093E8 		.loc 1 479 0
+ 2572 19a4 18208DE2 		ldmia	r4!, {r2-r3}
+ 2573 19a8 0C0092E8 		mov	r0, r7
+ 2574 19ac 0400A0E1 		mov	r1, r8
+ 2575 19b0 0510A0E1 		bl	__muldf3
+ 2576 19b4 FEFFFFEB 		mov	r3, r1
+ 2577 19b8 C000B9E8 		mov	r2, r0
+ 2578 19bc 0020A0E1 		ldmia	r5, {r0-r1}
+ 2579 19c0 0130A0E1 		bl	__adddf3
+ 2580 19c4 0600A0E1 		stmia	r5!, {r0-r1}
+ 2581 19c8 0710A0E1 		.loc 1 478 0
+ 2582 19cc FEFFFFEB 		ldr	r3, [sp, #4]
+ 2583 19d0 000050E3 		cmp	r5, r3
+ 471:solver.c      **** on't do any refinement for now. Precision doesn't matter too much. */
+ 2584              	7408
+ 2585 19d4 088088E2 		ldr	r4, .L298+8
+ 2586 19d8 0420A0E1 		add	r3, r3, #232
+ 2587 19dc 0530A0E1 		add	r5, r5, #5568
+ 2588 19e0 0600A0E1 		ldr	sl, [r4, r3]
+ 2589 19e4 0710A0E1 		add	r5, r5, #20
+ 2590              		mov	r6, #0
+ 2591 19e8 020000AA 	.L263:
+ 2592              		.loc 1 481 0
+ 2593 19ec FEFFFFEB 		ldmia	r5!, {r2-r3}
+ 2594 19f0 18008DE5 		mov	r0, r7
+ 2595 19f4 1C108DE5 		mov	r1, r8
+ 2596              		bl	__muldf3
+ 2597              		add	r4, r6, sl
+ 2598 19f8 390E58E3 		mov	r2, r0
+ 2599 19fc E6FFFF1A 		mov	r3, r1
+ 472:solver.c      **** rk.lhs_aff for the solution. */
+ 473:solver.c      ****   ldl_solve(work.rhs, work.lhs_aff);
+ 2600              	1}
+ 2601 1a00 18008DE2 		bl	__adddf3
+ 2602 1a04 030090E8 		add	r6, r6, #8
+ 2603 1a08 972F8FE2 		.loc 1 480 0
+ 2604 1a0c 0C0092E8 		cmp	r6, #912
+ 2605 1a10 FEFFFFEB 		.loc 1 481 0
+ 2606 1a14 000050E3 		stmia	r4, {r0-r1}
+ 2607 1a18 FF75A0C3 		.loc 1 480 0
+ 2608              		bne	.L263
+ 2609 1a1c 037687C2 		mov	r3, #17408
+ 2610 1a20 0080A0C3 		ldr	ip, .L298+8
+ 2611              		add	r3, r3, #236
+ 2612 1a24 060000CA 		ldr	r5, [ip, r3]
+ 474:solver.c      **** inv_z[i] = 1;
+ 475:solver.c      ****   fill_KKT();
+ 476:solver.c      ****   ldl_factor();
+ 2613              	8+20
+ 2614 1a28 18208DE2 		sub	r6, r6, #912
+ 2615 1a2c 0C0092E8 	.L265:
+ 2616 1a30 8D0F8FE2 		.loc 1 483 0
+ 2617 1a34 030090E8 		ldmia	sl!, {r2-r3}
+ 2618 1a38 FEFFFFEB 		mov	r0, r7
+ 2619 1a3c 0070A0E1 		mov	r1, r8
+ 2620 1a40 0180A0E1 		bl	__muldf3
+ 2621              		add	r4, r6, r5
+ 2622 1a44 38529FE5 		mov	r2, r0
+ 2623 1a48 574D85E2 		mov	r3, r1
+ 2624 1a4c 144084E2 		ldmia	r4, {r0-r1}
+ 2625              		bl	__adddf3
+ 477:solver.c      **** illrhs_start();
+ 478:solver.c      ****   /* Borrow work.lhs_aff for the solution. */
+ 479:solver.c      ****   ldl_solve(work.rhs, work.lhs_aff);
+ 2626              	#8
+ 2627 1a50 0C00B4E8 		.loc 1 482 0
+ 2628 1a54 0700A0E1 		cmp	r6, #912
+ 2629 1a58 0810A0E1 		.loc 1 483 0
+ 2630 1a5c FEFFFFEB 		stmia	r4, {r0-r1}
+ 2631 1a60 0130A0E1 		.loc 1 482 0
+ 2632 1a64 0020A0E1 		bne	.L265
+ 2633 1a68 030095E8 		ldr	r9, .L298+8
+ 2634 1a6c FEFFFFEB 		mov	r3, #17408
+ 2635 1a70 0300A5E8 		add	r3, r3, #240
+ 2636              		add	r5, r9, #21504
+ 2637 1a74 04309DE5 		ldr	sl, [r9, r3]
+ 2638 1a78 030055E1 		add	r5, r5, #76
+ 2639 1a7c F3FFFF1A 		sub	r6, r6, #912
+ 2640 1a80 113BA0E3 	.L267:
+ 2641 1a84 E8419FE5 		.loc 1 485 0
+ 2642 1a88 E83083E2 		ldmia	r5!, {r2-r3}
+ 2643 1a8c 575D85E2 		mov	r0, r7
+ 2644 1a90 03A094E7 		mov	r1, r8
+ 2645 1a94 145085E2 		bl	__muldf3
+ 2646 1a98 0060A0E3 		add	r4, r6, sl
+ 2647              		mov	r2, r0
+ 480:solver.c      **** * Don't do any refinement for now. Precision doesn't matter too much. */
+ 481:solver.c      ****   x = work.lhs_aff;
+ 2648              	 {r0-r1}
+ 2649 1a9c 0C00B5E8 		bl	__adddf3
+ 2650 1aa0 0700A0E1 		add	r6, r6, #8
+ 2651 1aa4 0810A0E1 		.loc 1 484 0
+ 2652 1aa8 FEFFFFEB 		cmp	r6, #1648
+ 2653 1aac 0A4086E0 		.loc 1 485 0
+ 2654 1ab0 0020A0E1 		stmia	r4, {r0-r1}
+ 2655 1ab4 0130A0E1 		.loc 1 484 0
+ 2656 1ab8 030094E8 		bne	.L267
+ 2657 1abc FEFFFFEB 		.loc 1 486 0
+ 2658 1ac0 086086E2 		bl	eval_gap
+ 2659              		ldr	r2, [sp, #16]
+ 2660 1ac4 390E56E3 		stmia	r2, {r0-r1}
+ 2661              		.loc 1 487 0
+ 2662 1ac8 030084E8 		bl	calc_eq_resid_squared
+ 2663              		ldr	r3, [sp, #8]
+ 2664 1acc F2FFFF1A 		stmia	r3, {r0-r1}
+ 2665 1ad0 113BA0E3 		.loc 1 488 0
+ 2666 1ad4 98C19FE5 		bl	calc_ineq_resid_squared
+ 2667 1ad8 EC3083E2 		.loc 1 499 0
+ 2668 1adc 03509CE7 		ldr	r4, .L298+12
+ 2669 1ae0 98A19FE5 		ldr	ip, [sp, #16]
+ 2670 1ae4 396E46E2 		add	r2, r4, #8
+ 2671              		ldmia	r2, {r2-r3}
+ 482:solver.c      **** lution. */
+ 483:solver.c      ****   ldl_solve(work.rhs, work.lhs_aff);
+ 2672              	sp, #12]
+ 2673 1ae8 0C00BAE8 		mov	r6, r0
+ 2674 1aec 0700A0E1 		mov	r7, r1
+ 2675 1af0 0810A0E1 	.LVL57:
+ 2676 1af4 FEFFFFEB 		stmia	r4, {r6-r7}
+ 2677 1af8 054086E0 		.loc 1 499 0
+ 2678 1afc 0020A0E1 		ldmia	ip, {r0-r1}
+ 2679 1b00 0130A0E1 		bl	__ltdf2
+ 2680 1b04 030094E8 		cmp	r0, #0
+ 2681 1b08 FEFFFFEB 		.loc 1 487 0
+ 2682 1b0c 086086E2 		ldr	r8, .L298+28
+ 2683              	.LVL58:
+ 2684 1b10 390E56E3 		.loc 1 499 0
+ 2685              		bge	.L269
+ 2686 1b14 030084E8 		ldr	r3, .L298+12
+ 2687              		ldmia	r3, {r0-r1}
+ 2688 1b18 F2FFFF1A 		mov	r2, r0
+ 2689 1b1c 50919FE5 		mov	r3, r1
+ 2690 1b20 113BA0E3 		bl	__muldf3
+ 2691 1b24 F03083E2 		mov	r2, r0
+ 2692 1b28 155B89E2 		mov	r3, r1
+ 2693 1b2c 03A099E7 		mov	r4, r0
+ 2694 1b30 4C5085E2 		mov	r5, r1
+ 2695 1b34 396E46E2 		ldmia	r8, {r0-r1}
+ 2696              		bl	__ledf2
+ 484:solver.c      **** inv_z[i] = 1;
+ 485:solver.c      ****   fill_KKT();
+ 2697              	ov	r0, r6
+ 2698 1b38 0C00B5E8 		mov	r1, r7
+ 2699 1b3c 0700A0E1 		mov	r2, r4
+ 2700 1b40 0810A0E1 		mov	r3, r5
+ 2701 1b44 FEFFFFEB 		bl	__ledf2
+ 2702 1b48 0A4086E0 		cmp	r0, #0
+ 2703 1b4c 0020A0E1 		ble	.L279
+ 2704 1b50 0130A0E1 	.L269:
+ 2705 1b54 030094E8 		.loc 1 440 0
+ 2706 1b58 FEFFFFEB 		ldr	ip, .L298+12
+ 2707 1b5c 086086E2 		ldr	r1, [sp, #20]
+ 2708              		ldr	r3, [ip, #16]
+ 2709 1b60 670E56E3 		add	r1, r1, #1
+ 2710              		cmp	r3, r1
+ 2711 1b64 030084E8 		str	r1, [sp, #20]
+ 2712              		bgt	.L276
+ 2713 1b68 F2FFFF1A 		mov	r3, r1
+ 486:solver.c      **** ldl_factor();
+ 2714              	9 0
+ 2715 1b6c FEFFFFEB 		mov	r0, r3
+ 2716 1b70 10209DE5 		add	sp, sp, #32
+ 2717 1b74 030082E8 		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 487:solver.c      ****  fillrhs_start();
+ 2718              	lr
+ 2719 1b78 FEFFFFEB 	.LVL59:
+ 2720 1b7c 08309DE5 	.L237:
+ 2721 1b80 030083E8 		.loc 1 439 0
+ 488:solver.c      ****  /* Borrow work.lhs_aff for the solution. */
+ 2722              	set_start
+ 2723 1b84 FEFFFFEB 		b	.L239
+ 489:solver.c      ****  ldl_solve(work.rhs, work.lhs_aff);
+ 490:solver.c      ****   /* Don't do any refinement for now. Precision doesn't matter too much. */
+ 491:solver.c      ****   x = work.lhs_aff;
+ 492:solver.c      ****   s = work.lhs_aff + 263;
+ 493:solver.c      ****   z = work.lhs_aff + 377;
+ 494:solver.c      ****   y = work.lhs_aff + 491;
+ 495:solver.c      ****   /* Just set x and y as is. */
+ 496:solver.c      ****   for (i = 0; i < 263; i++)
+ 497:solver.c      ****     work.x[i] = x[i];
+ 498:solver.c      ****   for (i = 0; i < 206; i++)
+ 499:solver.c      ****     work.y[i] = y[i];
+ 2724              	VL60:
+ 2725 1b88 E8409FE5 	.L279:
+ 2726 1b8c 10C09DE5 		.loc 1 503 0
+ 2727 1b90 082084E2 		mov	r3, #129024
+ 2728 1b94 0C0092E8 		add	r3, r3, #76
+ 2729              		mov	r2, #1
+ 2730 1b98 0C409DE5 		str	r2, [r9, r3]
+ 2731 1b9c 0060A0E1 		.loc 1 504 0
+ 2732 1ba0 0170A0E1 		bl	eval_objv
+ 2733              		.loc 1 505 0
+ 2734 1ba4 C00084E8 		ldr	ip, [sp, #20]
+ 2735              		add	r3, ip, #1
+ 2736 1ba8 03009CE8 		.loc 1 504 0
+ 2737 1bac FEFFFFEB 		str	r0, [r8, #-16]
+ 2738 1bb0 000050E3 		str	r1, [r8, #-12]
+ 2739              		b	.L242
+ 2740 1bb4 CC809FE5 	.L299:
+ 2741              		.align	2
+ 2742              	.L298:
+ 2743 1bb8 130000AA 		.word	-1074811372
+ 2744 1bbc B4309FE5 		.word	2061584302
+ 2745 1bc0 030093E8 		.word	work
+ 2746 1bc4 0020A0E1 		.word	settings
+ 2747 1bc8 0130A0E1 		.word	work+912
+ 2748 1bcc FEFFFFEB 		.word	work+20668
+ 2749 1bd0 0020A0E1 		.word	work+12064
+ 2750 1bd4 0130A0E1 		.word	work+128764
+ 2751 1bd8 0040A0E1 	.LFE17:
+ 2753 1be0 030098E8 		.section	.debug_frame,"",%progbits
+ 2754 1be4 FEFFFFEB 	.Lframe0:
+ 2755 1be8 000050E3 		.4byte	.LECIE0-.LSCIE0
+ 2756 1bec 060000CA 	.LSCIE0:
+ 2757 1bf0 0600A0E1 		.4byte	0xffffffff
+ 2758 1bf4 0710A0E1 		.byte	0x1
+ 2759 1bf8 0420A0E1 		.ascii	"\000"
+ 2760 1bfc 0530A0E1 		.uleb128 0x1
+ 2761 1c00 FEFFFFEB 		.sleb128 -4
+ 2762 1c04 000050E3 		.byte	0xe
+ 2763 1c08 0D0000DA 		.byte	0xc
+ 2764              		.uleb128 0xd
+ 2765              		.uleb128 0x0
+ 2766 1c0c 64C09FE5 		.align	2
+ 2767 1c10 14109DE5 	.LECIE0:
+ 2768 1c14 10309CE5 	.LSFDE0:
+ 2769 1c18 011081E2 		.4byte	.LEFDE0-.LASFDE0
+ 2770 1c1c 010053E1 	.LASFDE0:
+ 2771 1c20 14108DE5 		.4byte	.Lframe0
+ 2772 1c24 EFFEFFCA 		.4byte	.LFB2
+ 2773 1c28 0130A0E1 		.4byte	.LFE2-.LFB2
+ 2774              		.byte	0x4
+ 500:solver.c      **** 91;
+ 501:solver.c      ****   /* Just set x and y as is. */
+ 502:solver.c      ****   for (i = 0; i < 263; i++)
+ 503:solver.c      ****     work.x[i] = x[i];
+ 504:solver.c      ****   for (i = 0; i < 206; i++)
+ 505:solver.c      ****     work.y[i] = y[i];
+ 506:solver.c      ****   /* Now complete the initialization. Start with s. */
+ 507:solver.c      ****   /* Must have alpha > max(z). */
+ 508:solver.c      ****   alpha = -1e99;
+ 509:solver.c      ****   for (i = 0; i < 114; i++)
+ 2775              	te	0x8e
+ 2776 1c2c 0300A0E1 		.uleb128 0x1
+ 2777 1c30 20D08DE2 		.byte	0x88
+ 2778 1c34 F04FBDE8 		.uleb128 0x2
+ 2779 1c38 1EFF2FE1 		.byte	0x87
+ 2780              		.uleb128 0x3
+ 2781              		.byte	0x86
+ 2782              		.uleb128 0x4
+ 2783 1c3c FEFFFFEB 		.byte	0x85
+ 2784 1c40 CFFEFFEA 		.uleb128 0x5
+ 2785              		.byte	0x84
+ 2786              		.uleb128 0x6
+ 2787              		.align	2
+ 2788 1c44 7E3BA0E3 	.LEFDE0:
+ 2789 1c48 4C3083E2 	.LSFDE2:
+ 2790 1c4c 0120A0E3 		.4byte	.LEFDE2-.LASFDE2
+ 2791 1c50 032089E7 	.LASFDE2:
+ 2792              		.4byte	.Lframe0
+ 2793 1c54 FEFFFFEB 		.4byte	.LFB3
+ 2794              		.4byte	.LFE3-.LFB3
+ 2795 1c58 14C09DE5 		.byte	0x4
+ 2796 1c5c 01308CE2 		.4byte	.LCFI1-.LFB3
+ 2797              		.byte	0xe
+ 2798 1c60 100008E5 		.uleb128 0x4
+ 2799 1c64 0C1008E5 		.byte	0x84
+ 2800 1c68 EFFFFFEA 		.uleb128 0x1
+ 2801              		.align	2
+ 2802              	.LEFDE2:
+ 2803              	.LSFDE4:
+ 2804 1c6c 14AEEFBF 		.4byte	.LEFDE4-.LASFDE4
+ 2805 1c70 AE47E17A 	.LASFDE4:
+ 2806 1c74 00000000 		.4byte	.Lframe0
+ 2807 1c78 00000000 		.4byte	.LFB4
+ 2808 1c7c 90030000 		.4byte	.LFE4-.LFB4
+ 2809 1c80 BC500000 		.byte	0x4
+ 2810 1c84 202F0000 		.4byte	.LCFI2-.LFB4
+ 2811 1c88 FCF60100 		.byte	0xe
+ 2812              		.uleb128 0x24
+ 2813              		.byte	0x4
+ 3251              		.2byte	0x1
+DEFINED SYMBOLS
+                            *ABS*:00000000 solver.c
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:15     .text:00000000 eval_gap
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:23     .text:00000000 $a
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:64     .text:00000070 $d
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:70     .text:00000074 set_defaults
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:78     .text:00000074 $a
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:133    .text:000000f0 $d
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:145    .text:0000010c setup_pointers
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:151    .text:0000010c $a
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:540    .text:000004d8 $d
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:548    .text:000004e4 setup_indexed_params
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:554    .text:000004e4 $a
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:807    .text:000006fc $d
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:835    .text:00000758 setup_indexed_optvars
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:842    .text:00000758 $a
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:988    .text:00000898 $d
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:994    .text:0000089c setup_indexing
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1000   .text:0000089c $a
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1016   .text:000008b0 set_start
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1104   .text:00000998 $d
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1115   .text:000009a4 fillrhs_cc
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1121   .text:000009a4 $a
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1410   .text:00000d1c $d
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1421   .text:00000d34 fillrhs_start
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1428   .text:00000d34 $a
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1488   .text:00000dc8 $d
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1494   .text:00000dcc better_start
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1501   .text:00000dcc $a
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1749   .text:00001068 $d
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1758   .text:00001078 calc_eq_resid_squared
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1765   .text:00001078 $a
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1815   .text:000010fc $d
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1821   .text:00001100 calc_ineq_resid_squared
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1828   .text:00001100 $a
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1891   .text:000011b0 $d
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1897   .text:000011b4 refine
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1905   .text:000011b4 $a
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1977   .text:00001268 $d
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1985   .text:00001274 fillrhs_aff
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:1991   .text:00001274 $a
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:2114   .text:000013ec $d
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:2122   .text:000013f8 eval_objv
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:2128   .text:000013f8 $a
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:2359   .text:0000173c $d
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:2366   .text:00001740 solve
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:2372   .text:00001740 $a
+C:\Users\XY\AppData\Local\Temp/ccK6baaa.s:2804   .text:00001c6c $d
+
+UNDEFINED SYMBOLS
+__muldf3
+__adddf3
+work
+settings
+vars
+params
+__gtdf2
+__ltdf2
+__divdf3
+__subdf3
+fill_KKT
+ldl_factor
+ldl_solve
+multbymA
+multbymG
+matrix_multiply
+multbymAT
+multbymGT
+multbyP
+__ledf2
+pre_ops
+fillq
+fillh
+fillb

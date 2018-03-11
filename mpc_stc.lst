@@ -1,0 +1,771 @@
+   1              		.file	"mpc_stc.c"
+   9              	.Ltext0:
+  10              		.align	2
+  11              		.global	stc_compute_state_constr_bound_online
+  13              	stc_compute_state_constr_bound_online:
+  14              	.LFB6:
+  15              		.file 1 "mpc_stc.c"
+   1:mpc_stc.c     **** /** Solve state constrained (stc) Model Predictive Control (MPC) problem.
+   2:mpc_stc.c     ****  *
+   3:mpc_stc.c     ****  */
+   4:mpc_stc.c     **** 
+   5:mpc_stc.c     **** #include <string.h> /* sizeof */
+   6:mpc_stc.c     **** #include "mpc_inc.h"
+   7:mpc_stc.c     **** #include "mpc_stc.h"
+   8:mpc_stc.c     **** #include "mpc_const.h"
+   9:mpc_stc.c     **** 
+  10:mpc_stc.c     **** /* Declaration of static functions */
+  11:mpc_stc.c     **** 
+  12:mpc_stc.c     **** static void stc_fgm_minimize_qp(const struct mpc_alm *alm, real_t u[],
+  13:mpc_stc.c     **** 		const real_t u_i[], const real_t l_i[]);
+  14:mpc_stc.c     **** static void stc_fgm_compute_grad_over_L(const struct mpc_alm *alm,
+  15:mpc_stc.c     **** 		real_t gradoL[], const real_t w[], const real_t l_i[]);
+  16:mpc_stc.c     **** static void stc_fgm_compute_state_constr_violation_penalty(
+  17:mpc_stc.c     **** 		const struct mpc_alm *alm, real_t out[], const real_t w[],
+  18:mpc_stc.c     **** 		const real_t l_i[], const real_t zx_b[]);
+  19:mpc_stc.c     **** static void stc_fgm_compute_l_update(const struct mpc_alm *alm,
+  20:mpc_stc.c     **** 		real_t l_i1[], const real_t w[], const real_t l_i[]);
+  21:mpc_stc.c     **** static void stc_fgm_compute_grad_alm(const struct mpc_alm *alm,
+  22:mpc_stc.c     **** 		real_t out[], const real_t w[],	const real_t l_i[]);
+  23:mpc_stc.c     **** 
+  24:mpc_stc.c     **** 
+  25:mpc_stc.c     **** /* Definition of external function */
+  26:mpc_stc.c     **** 
+  27:mpc_stc.c     **** /* Form quadratic program for current state */
+  28:mpc_stc.c     **** void stc_ctl_form_qp(struct mpc_ctl *ctl, const real_t x[])
+  29:mpc_stc.c     **** {
+  30:mpc_stc.c     **** 	inc_ctl_form_qp(ctl, x);
+  31:mpc_stc.c     **** 	stc_compute_state_constr_bound_online(ctl->alm, ctl->alm->zx_lb, x, 
+  32:mpc_stc.c     **** 			ctl->alm->e_lb);
+  33:mpc_stc.c     **** 	stc_compute_state_constr_bound_online(ctl->alm, ctl->alm->zx_ub, x, 
+  34:mpc_stc.c     **** 			ctl->alm->e_ub);
+  35:mpc_stc.c     **** 	
+  36:mpc_stc.c     **** 	return;
+  37:mpc_stc.c     **** }
+  38:mpc_stc.c     **** 
+  39:mpc_stc.c     **** /* Warmstart state constrained MPC */
+  40:mpc_stc.c     **** void stc_ctl_warmstart(struct mpc_ctl *ctl) {
+  41:mpc_stc.c     **** 	inc_ctl_warmstart(ctl);
+  42:mpc_stc.c     **** 	mpc_warmstart_vector(ctl->alm->fgm, ctl->alm->l_0, ctl->l_opt, MPC_MXCONSTRS, MPC_HOR+1);
+  43:mpc_stc.c     **** 	
+  44:mpc_stc.c     **** 	return;
+  45:mpc_stc.c     **** }
+  46:mpc_stc.c     **** 
+  47:mpc_stc.c     **** /* Solve state constrained MPC problem for the current state */
+  48:mpc_stc.c     **** void stc_ctl_solve_problem(struct mpc_ctl *ctl, const real_t x[])
+  49:mpc_stc.c     **** {
+  50:mpc_stc.c     **** 	stc_ctl_form_qp(ctl, x);
+  51:mpc_stc.c     **** 	stc_alm_minimize_qp(ctl->alm, ctl->u_opt, ctl->l_opt);
+  52:mpc_stc.c     **** 	
+  53:mpc_stc.c     **** 	return;
+  54:mpc_stc.c     **** }
+  55:mpc_stc.c     **** 
+  56:mpc_stc.c     **** /* Minimize MPC quadratic program using augmented Lagrangian method
+  57:mpc_stc.c     ****  * together with fast gradient method */
+  58:mpc_stc.c     **** void stc_alm_minimize_qp(struct mpc_alm *alm,
+  59:mpc_stc.c     **** 		real_t u_opt[], real_t l_opt[])
+  60:mpc_stc.c     **** {
+  61:mpc_stc.c     **** 
+  62:mpc_stc.c     **** 	static real_t u_i[MPC_HOR_INPUTS]; /* iteration update of input */
+  63:mpc_stc.c     **** 	static real_t l_i[MPC_HOR_MXCONSTRS]; /* it. update of Lagrange mult.*/
+  64:mpc_stc.c     **** 
+  65:mpc_stc.c     **** 	uint32_t i;
+  66:mpc_stc.c     **** 	const size_t sizeof_u = MPC_HOR_INPUTS * sizeof(*u_opt);
+  67:mpc_stc.c     **** 	const size_t sizeof_l = MPC_HOR_MXCONSTRS * sizeof(*l_opt);
+  68:mpc_stc.c     **** 
+  69:mpc_stc.c     **** 	memcpy(u_i, alm->fgm->u_0, sizeof_u);
+  70:mpc_stc.c     **** 	memcpy(l_i, alm->l_0, sizeof_l);
+  71:mpc_stc.c     **** 
+  72:mpc_stc.c     **** 	for (i = 0; i < *(alm->i_ex); i++) {
+  73:mpc_stc.c     **** 		stc_fgm_minimize_qp(alm, u_opt, u_i, l_i);
+  74:mpc_stc.c     **** 		stc_fgm_compute_l_update(alm, l_opt, u_opt, l_i);
+  75:mpc_stc.c     **** 		/* do not take the next two outside the loop. The two previous
+  76:mpc_stc.c     **** 		 * functions expect different pointers for outputs u/l_upd
+  77:mpc_stc.c     **** 		 * and inputs u_i/l_i respectively. */
+  78:mpc_stc.c     **** 		memcpy(u_i, u_opt, sizeof_u);
+  79:mpc_stc.c     **** 		memcpy(l_i, l_opt, sizeof_l);
+  80:mpc_stc.c     **** 	}
+  81:mpc_stc.c     **** 
+  82:mpc_stc.c     **** 	return;
+  83:mpc_stc.c     **** }
+  84:mpc_stc.c     **** 
+  85:mpc_stc.c     **** 
+  86:mpc_stc.c     **** void stc_compute_state_constr_bound_online(const struct mpc_alm *alm,
+  87:mpc_stc.c     **** 		real_t out[], const real_t x[], const real_t bound[])
+  88:mpc_stc.c     **** {
+  16              	 Function supports interworking.
+  17              		@ args = 0, pretend = 0, frame = 0
+  18              		@ frame_needed = 0, uses_anonymous_args = 0
+  19              	.LVL0:
+  20              		stmfd	sp!, {r4, r5, r6, lr}
+  21 0000 70402DE9 	.LCFI0:
+  22              		.loc 1 91 0
+  89:mpc_stc.c     **** C_HOR_MXCONSTRS, MPC_STATES);
+  90:mpc_stc.c     **** 	mtx_substract(out, bound, scb_x, MPC_HOR_MXCONSTRS, 1);
+  91:mpc_stc.c     **** 
+  23              	, [r0, #28]
+  24 0004 1CC090E5 		ldr	r4, .L3
+  25 0008 48409FE5 		.loc 1 88 0
+  26              		sub	sp, sp, #4
+  27 000c 04D04DE2 	.LCFI1:
+  28              		.loc 1 88 0
+  29              		mov	r5, r1
+  30 0010 0150A0E1 		mov	r6, r3
+  31 0014 0360A0E1 		.loc 1 91 0
+  32              		mov	r1, ip
+  33 0018 0C10A0E1 	.LVL1:
+  34              		mov	r0, r4
+  35 001c 0400A0E1 	.LVL2:
+  36              		mov	ip, #8
+  37 0020 08C0A0E3 		mov	r3, #1
+  38 0024 0130A0E3 	.LVL3:
+  39              		str	ip, [sp, #0]
+  40 0028 00C08DE5 		bl	mtx_multiply_mtx_vec
+  41 002c FEFFFFEB 	.LVL4:
+  42              		.loc 1 92 0
+  92:mpc_stc.c     ****  MPC_HOR_MXCONSTRS, MPC_STATES);
+  43              	 r5
+  44 0030 01C0A0E3 		mov	r1, r6
+  45 0034 0500A0E1 		mov	r2, r4
+  46 0038 0610A0E1 		mov	r3, ip
+  47 003c 0420A0E1 		str	ip, [sp, #0]
+  48 0040 0C30A0E1 		bl	mtx_substract
+  49 0044 00C08DE5 		.loc 1 95 0
+  50 0048 FEFFFFEB 		add	sp, sp, #4
+  93:mpc_stc.c     **** HOR_MXCONSTRS];
+  94:mpc_stc.c     **** 
+  95:mpc_stc.c     **** 	mtx_multiply_mtx_vec(scb_x, alm->Kx_Ai, x, MPC_HOR_MXCONSTRS, MPC_STATES);
+  51              	p!, {r4, r5, r6, lr}
+  52 004c 04D08DE2 		bx	lr
+  53 0050 7040BDE8 	.L4:
+  54 0054 1EFF2FE1 		.align	2
+  55              	.L3:
+  56              		.word	scb_x.1795
+  57              	.LFE6:
+  59              		.align	2
+  61              	stc_fgm_compute_state_constr_violation_penalty:
+  62              	.LFB9:
+  63              		.loc 1 141 0
+  64              		@ Function supports interworking.
+  96:mpc_stc.c     **** HOR_MXCONSTRS];
+  97:mpc_stc.c     **** 
+  98:mpc_stc.c     **** 	mtx_multiply_mtx_vec(scb_x, alm->Kx_Ai, x, MPC_HOR_MXCONSTRS, MPC_STATES);
+  99:mpc_stc.c     **** 	mtx_substract(out, bound, scb_x, MPC_HOR_MXCONSTRS, 1);
+ 100:mpc_stc.c     **** 
+ 101:mpc_stc.c     **** 	return;
+ 102:mpc_stc.c     **** }
+ 103:mpc_stc.c     **** 
+ 104:mpc_stc.c     **** 
+ 105:mpc_stc.c     **** /* Definition of static functions */
+ 106:mpc_stc.c     **** 
+ 107:mpc_stc.c     **** /* Minimize ALM internal iteration using a fast gradient method */
+ 108:mpc_stc.c     **** static void stc_fgm_minimize_qp(const struct mpc_alm *alm, real_t u[],
+ 109:mpc_stc.c     **** 		const real_t u_i[], const real_t l_i[])
+ 110:mpc_stc.c     **** {
+ 111:mpc_stc.c     **** 	static real_t u_old[MPC_HOR_INPUTS];
+ 112:mpc_stc.c     **** 	static real_t w[MPC_HOR_INPUTS];
+ 113:mpc_stc.c     **** 	static real_t gradoL[MPC_HOR_INPUTS];
+ 114:mpc_stc.c     **** 	uint32_t i;
+ 115:mpc_stc.c     **** 	const size_t sizeof_u = MPC_HOR_INPUTS * sizeof(*u);
+ 116:mpc_stc.c     **** 
+ 117:mpc_stc.c     **** 	memcpy(u, u_i, sizeof_u);
+ 118:mpc_stc.c     **** 	memcpy(w, u, sizeof_u);
+ 119:mpc_stc.c     **** 	memcpy(u_old, u, sizeof_u);
+ 120:mpc_stc.c     **** 
+ 121:mpc_stc.c     **** 	for (i = 0; i < *(alm->fgm->j_in); i++) {
+ 122:mpc_stc.c     **** 		stc_fgm_compute_grad_over_L(alm, gradoL, w, l_i);
+ 123:mpc_stc.c     **** 		inc_fgm_minimize_qp_iteration(alm->fgm, u, u_old, w, gradoL);
+ 124:mpc_stc.c     **** 	}
+ 125:mpc_stc.c     **** 
+ 126:mpc_stc.c     **** 	return;
+ 127:mpc_stc.c     **** }
+ 128:mpc_stc.c     **** 
+ 129:mpc_stc.c     **** /* Compute gradient divided by Lipschitz constant */
+ 130:mpc_stc.c     **** static void stc_fgm_compute_grad_over_L(const struct mpc_alm *alm,
+ 131:mpc_stc.c     **** 		real_t gradoL[], const real_t w[], const real_t l_i[])
+ 132:mpc_stc.c     **** {
+ 133:mpc_stc.c     **** 	static real_t gradoL_inc[MPC_HOR_INPUTS]; /* input constrained grad. over L*/
+ 134:mpc_stc.c     **** 	static real_t grad_stc[MPC_HOR_INPUTS]; /* state constrained grad. */
+ 135:mpc_stc.c     **** 	static real_t gradoL_stc[MPC_HOR_INPUTS]; /* state constrained grad. over L*/
+ 136:mpc_stc.c     **** 
+ 137:mpc_stc.c     **** 	inc_fgm_compute_grad_over_L(alm->fgm, gradoL_inc, w);
+ 138:mpc_stc.c     **** 	stc_fgm_compute_grad_alm(alm, grad_stc, w, l_i);
+ 139:mpc_stc.c     **** 	mtx_scale(gradoL_stc, grad_stc, *(alm->Linv), MPC_HOR_INPUTS, 1);
+ 140:mpc_stc.c     **** 	mtx_add(gradoL, gradoL_inc, gradoL_stc, MPC_HOR_INPUTS, 1);
+ 141:mpc_stc.c     **** 
+  65              	retend = 0, frame = 0
+  66              		@ frame_needed = 0, uses_anonymous_args = 0
+  67              	.LVL5:
+  68              		stmfd	sp!, {r4, r5, r6, r7, r8, sl, lr}
+  69              	.LCFI2:
+  70 005c F0452DE9 		mov	r6, r0
+  71              		.loc 1 147 0
+  72 0060 0060A0E1 		ldr	r5, .L7
+ 142:mpc_stc.c     **** doL, gradoL_inc, gradoL_stc, MPC_HOR_INPUTS, 1);
+ 143:mpc_stc.c     **** 
+ 144:mpc_stc.c     **** 	return;
+ 145:mpc_stc.c     **** }
+ 146:mpc_stc.c     **** 
+ 147:mpc_stc.c     **** static void stc_fgm_compute_state_constr_violation_penalty(
+  73              	 [r0, #24]
+  74 0064 88509FE5 	.LVL6:
+  75 0068 180090E5 		.loc 1 148 0
+  76              		mov	r4, #1
+ 148:mpc_stc.c     **** c_fgm_compute_state_constr_violation_penalty(
+  77              		r7, .L7+4
+  78 006c 0140A0E3 		.loc 1 141 0
+  79 0070 80709FE5 		sub	sp, sp, #8
+  80              	.LCFI3:
+  81 0074 08D04DE2 		.loc 1 147 0
+  82              		mov	ip, #57
+  83              		.loc 1 141 0
+  84 0078 39C0A0E3 		mov	r8, r1
+  85              		mov	sl, r3
+  86 007c 0180A0E1 		.loc 1 147 0
+  87 0080 03A0A0E1 		mov	r1, r0
+  88              	.LVL7:
+  89 0084 0010A0E1 		mov	r3, r4
+  90              	.LVL8:
+  91 0088 0430A0E1 		mov	r0, r5
+  92              		str	ip, [sp, #0]
+  93 008c 0500A0E1 		bl	mtx_multiply_mtx_vec
+  94 0090 00C08DE5 	.LVL9:
+  95 0094 FEFFFFEB 		.loc 1 148 0
+  96              		mov	r1, r5
+  97              		ldr	r2, [sp, #36]
+  98 0098 0510A0E1 		mov	r0, r7
+  99 009c 24209DE5 		mov	r3, r4
+ 100 00a0 0700A0E1 		.loc 1 149 0
+ 101 00a4 0430A0E1 		ldr	r5, .L7+8
+ 149:mpc_stc.c     **** c_fgm_compute_state_constr_violation_penalty(
+ 102              	p, #0]
+ 103 00a8 4C509FE5 		bl	mtx_substract
+ 104              		.loc 1 149 0
+ 105 00ac 00408DE5 		ldr	r1, [r6, #20]
+ 106 00b0 FEFFFFEB 		mov	r0, r5
+ 107              		ldmia	r1, {r2-r3}
+ 108 00b4 141096E5 		mov	r1, r7
+ 109 00b8 0500A0E1 		str	r4, [sp, #0]
+ 110 00bc 0C0091E8 		str	r4, [sp, #4]
+ 111 00c0 0710A0E1 		bl	mtx_scale
+ 112 00c4 00408DE5 		.loc 1 150 0
+ 113 00c8 04408DE5 		mov	r0, r8
+ 114 00cc FEFFFFEB 		mov	r1, sl
+ 150:mpc_stc.c     **** c_fgm_compute_state_constr_violation_penalty(
+ 115              	mov	r3, r4
+ 116 00d0 0800A0E1 		str	r4, [sp, #0]
+ 117 00d4 0A10A0E1 		bl	mtx_add
+ 118 00d8 0520A0E1 		.loc 1 153 0
+ 119 00dc 0430A0E1 		add	sp, sp, #8
+ 120 00e0 00408DE5 		ldmfd	sp!, {r4, r5, r6, r7, r8, sl, lr}
+ 121 00e4 FEFFFFEB 		bx	lr
+ 151:mpc_stc.c     **** c_fgm_compute_state_constr_violation_penalty(
+ 152:mpc_stc.c     **** 		const struct mpc_alm *alm, real_t out[], const real_t w[],
+ 153:mpc_stc.c     **** 		const real_t l_i[], const real_t zx_b[])
+ 122              	align	2
+ 123 00e8 08D08DE2 	.L7:
+ 124 00ec F045BDE8 		.word	E_w.1833
+ 125 00f0 1EFF2FE1 		.word	diff.1834
+ 126              		.word	pen_diff.1835
+ 127              	.LFE9:
+ 129 00f4 780E0000 		.align	2
+ 131 00fc 680E0000 	stc_fgm_compute_l_update:
+ 132              	.LFB10:
+ 133              		.loc 1 158 0
+ 134              		@ Function supports interworking.
+ 135              		@ args = 0, pretend = 0, frame = 0
+ 136              		@ frame_needed = 0, uses_anonymous_args = 0
+ 137              	.LVL10:
+ 154:mpc_stc.c     **** 
+ 155:mpc_stc.c     **** 		const real_t l_i[], const real_t zx_b[])
+ 156:mpc_stc.c     **** {
+ 157:mpc_stc.c     **** 	/* penalty = l_i + mu * (E * w - z_b) */
+ 158:mpc_stc.c     **** 	static real_t E_w[MPC_HOR_MXCONSTRS];
+ 138              	 r5, r6, r7, r8, sl, lr}
+ 139              	.LCFI4:
+ 140              		.loc 1 162 0
+ 141              		ldr	r8, .L11
+ 142              		ldr	ip, [r0, #12]
+ 143 0100 F0452DE9 		.loc 1 158 0
+ 144              		sub	sp, sp, #4
+ 159:mpc_stc.c     **** /
+ 160:mpc_stc.c     **** 	static real_t E_w[MPC_HOR_MXCONSTRS];
+ 161:mpc_stc.c     **** 	static real_t diff[MPC_HOR_MXCONSTRS];
+ 162:mpc_stc.c     **** 	static real_t pen_diff[MPC_HOR_MXCONSTRS];
+ 145              	
+ 146 0104 80809FE5 		.loc 1 158 0
+ 147 0108 0CC090E5 		mov	r4, r0
+ 148              		.loc 1 163 0
+ 149 010c 04D04DE2 		ldr	r7, .L11+4
+ 150              		.loc 1 158 0
+ 151              		mov	sl, r1
+ 152 0110 0040A0E1 		.loc 1 162 0
+ 163:mpc_stc.c     **** ic real_t pen_diff[MPC_HOR_MXCONSTRS];
+ 153              	, r8
+ 154 0114 74709FE5 	.LVL11:
+ 155              		str	ip, [sp, #0]
+ 156 0118 01A0A0E1 		.loc 1 158 0
+ 157              		mov	r5, r2
+ 158 011c 0810A0E1 		mov	r6, r3
+ 159              		.loc 1 162 0
+ 160 0120 00C08DE5 		bl	stc_fgm_compute_state_constr_violation_penalty
+ 161              	.LVL12:
+ 162 0124 0250A0E1 		.loc 1 163 0
+ 163 0128 0360A0E1 		ldr	ip, [r4, #8]
+ 164              		mov	r2, r5
+ 165 012c CAFFFFEB 		mov	r3, r6
+ 166              		mov	r0, r4
+ 167              		mov	r1, r7
+ 168 0130 08C094E5 		str	ip, [sp, #0]
+ 169 0134 0520A0E1 		bl	stc_fgm_compute_state_constr_violation_penalty
+ 170 0138 0630A0E1 		.loc 1 165 0
+ 171 013c 0400A0E1 		mov	r0, r8
+ 172 0140 0710A0E1 		mov	r1, #1
+ 173 0144 00C08DE5 		bl	mtx_max_vec_zero
+ 174 0148 C3FFFFEB 		.loc 1 166 0
+ 164:mpc_stc.c     **** ic real_t pen_diff[MPC_HOR_MXCONSTRS];
+ 165:mpc_stc.c     **** 
+ 175              	1
+ 176 014c 0800A0E1 		bl	mtx_min_vec_zero
+ 177 0150 0110A0E3 		.loc 1 168 0
+ 178 0154 FEFFFFEB 		mov	ip, #1
+ 166:mpc_stc.c     ****  real_t pen_diff[MPC_HOR_MXCONSTRS];
+ 179              		r0, sl
+ 180 0158 0700A0E1 		mov	r1, r8
+ 181 015c 0110A0E3 		mov	r2, r7
+ 182 0160 FEFFFFEB 		mov	r3, ip
+ 167:mpc_stc.c     **** ic real_t pen_diff[MPC_HOR_MXCONSTRS];
+ 168:mpc_stc.c     **** 
+ 183              		ip, [sp, #0]
+ 184 0164 01C0A0E3 		bl	mtx_add
+ 185 0168 0A00A0E1 		.loc 1 171 0
+ 186 016c 0810A0E1 		add	sp, sp, #4
+ 187 0170 0720A0E1 		ldmfd	sp!, {r4, r5, r6, r7, r8, sl, lr}
+ 188 0174 0C30A0E1 		bx	lr
+ 189 0178 00C08DE5 	.L12:
+ 190 017c FEFFFFEB 		.align	2
+ 169:mpc_stc.c     ****  real_t pen_diff[MPC_HOR_MXCONSTRS];
+ 170:mpc_stc.c     **** 
+ 171:mpc_stc.c     **** 	mtx_multiply_mtx_vec(E_w, alm->E, w, MPC_HOR_MXCONSTRS, MPC_HOR_INPUTS);
+ 191              	word	p_pos.1845
+ 192 0180 04D08DE2 		.word	p_neg.1846
+ 193 0184 F045BDE8 	.LFE10:
+ 195              		.align	2
+ 196              		.global	stc_alm_minimize_qp
+ 198 018c 600E0000 	stc_alm_minimize_qp:
+ 199 0190 580E0000 	.LFB5:
+ 200              		.loc 1 60 0
+ 201              		@ Function supports interworking.
+ 202              		@ args = 0, pretend = 0, frame = 0
+ 203              		@ frame_needed = 0, uses_anonymous_args = 0
+ 204              	.LVL13:
+ 205              		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 206              	.LCFI6:
+ 207              		.loc 1 69 0
+ 208              		ldr	r3, [r0, #0]
+ 209              		.loc 1 60 0
+ 210              		mov	r4, r0
+ 211              		sub	sp, sp, #8
+ 212 0194 F04F2DE9 	.LCFI7:
+ 213              		.loc 1 60 0
+ 214              		mov	r7, r1
+ 215 0198 003090E5 		mov	r9, r2
+ 216              		.loc 1 69 0
+ 217 019c 0040A0E1 		ldr	r1, [r3, #0]
+ 218 01a0 08D04DE2 	.LVL14:
+ 219              		mov	r2, #456
+ 220              	.LVL15:
+ 221 01a4 0170A0E1 		ldr	r0, .L24
+ 222 01a8 0290A0E1 	.LVL16:
+ 223              		bl	memcpy
+ 224 01ac 001093E5 		.loc 1 70 0
+ 225              		ldr	r3, [r4, #4]
+ 226 01b0 722FA0E3 		ldmia	r3, {r0, r1}
+ 227              		ldr	r3, .L24+4
+ 228 01b4 78019FE5 		stmia	r3, {r0, r1}
+ 229              		.loc 1 72 0
+ 230 01b8 FEFFFFEB 		ldr	r3, [r4, #16]
+ 231              		ldr	r2, [r3, #0]
+ 232 01bc 043094E5 		cmp	r2, #0
+ 233 01c0 030093E8 		beq	.L20
+ 234 01c4 6C319FE5 		mov	fp, #0
+ 235 01c8 030083E8 	.LVL17:
+ 236              	.LVL18:
+ 237 01cc 103094E5 	.L16:
+ 238 01d0 002093E5 	.LBB8:
+ 239 01d4 000052E3 	.LBB9:
+ 240 01d8 5200000A 		.loc 1 110 0
+ 241 01dc 00B0A0E3 		ldr	r1, .L24
+ 242              		mov	r2, #456
+ 243              		mov	r0, r7
+ 244              		bl	memcpy
+ 245              		.loc 1 111 0
+ 246              		mov	r1, r7
+ 247              		mov	r2, #456
+ 248 01e0 4C119FE5 		ldr	r0, .L24+8
+ 249 01e4 722FA0E3 		bl	memcpy
+ 250 01e8 0700A0E1 		.loc 1 112 0
+ 251 01ec FEFFFFEB 		mov	r2, #456
+ 252              		ldr	r0, .L24+12
+ 253 01f0 0710A0E1 		mov	r1, r7
+ 254 01f4 722FA0E3 		bl	memcpy
+ 255 01f8 3C019FE5 		.loc 1 114 0
+ 256 01fc FEFFFFEB 		ldr	r0, [r4, #0]
+ 257              		ldr	r3, [r0, #12]
+ 258 0200 722FA0E3 		ldr	r2, [r3, #0]
+ 259 0204 34019FE5 		cmp	r2, #0
+ 260 0208 0710A0E1 		beq	.L17
+ 261 020c FEFFFFEB 		ldr	sl, .L24+16
+ 262              		mov	r6, #0
+ 263 0210 000094E5 		mov	r5, #1
+ 264 0214 0C3090E5 		mov	r8, #57
+ 265 0218 002093E5 	.L19:
+ 266 021c 000052E3 	.LBB10:
+ 267 0220 2F00000A 	.LBB11:
+ 268 0224 18A19FE5 		.loc 1 130 0
+ 269 0228 0060A0E3 		ldr	r1, .L24+20
+ 270 022c 0150A0E3 		ldr	r2, .L24+8
+ 271 0230 3980A0E3 		bl	inc_fgm_compute_grad_over_L
+ 272              	.LBB12:
+ 273              	.LBB13:
+ 274              		.loc 1 179 0
+ 275              		mov	r0, r4
+ 276 0234 0C119FE5 	.LVL19:
+ 277 0238 FC209FE5 		ldr	r1, .L24+24
+ 278 023c FEFFFFEB 		ldr	r2, .L24+8
+ 279              		ldr	r3, .L24+4
+ 280              		bl	stc_fgm_compute_l_update
+ 172:mpc_stc.c     ****  MPC_HOR_MXCONSTRS, MPC_HOR_INPUTS);
+ 173:mpc_stc.c     **** 	mtx_substract(diff, E_w, zx_b, MPC_HOR_MXCONSTRS, 1);
+ 174:mpc_stc.c     **** 	mtx_scale(pen_diff, diff, *(alm->mu), MPC_HOR_MXCONSTRS, 1);
+ 175:mpc_stc.c     **** 	mtx_add(out, l_i, pen_diff, MPC_HOR_MXCONSTRS, 1);
+ 176:mpc_stc.c     **** 
+ 177:mpc_stc.c     **** 	return;
+ 178:mpc_stc.c     **** }
+ 179:mpc_stc.c     **** 
+ 281              	_transpose
+ 282 0240 0400A0E1 		.loc 1 181 0
+ 283              		ldr	r0, .L24+32
+ 284 0244 00119FE5 		ldr	r1, .L24+28
+ 285 0248 EC209FE5 		ldr	r2, .L24+24
+ 286 024c E4309FE5 		mov	r3, #57
+ 287 0250 AAFFFFEB 		str	r5, [sp, #0]
+ 288              		bl	mtx_multiply_mtx_vec
+ 180:mpc_stc.c     **** R_MXCONSTRS, 1);
+ 289              	.LBE12:
+ 290 0254 F4009FE5 		.loc 1 132 0
+ 291 0258 181094E5 		ldr	r1, [r4, #40]
+ 292 025c 0120A0E3 		ldr	r0, .L24+36
+ 293 0260 3930A0E3 		ldmia	r1, {r2-r3}
+ 294 0264 FEFFFFEB 		ldr	r1, .L24+32
+ 181:mpc_stc.c     ****  pen_diff, MPC_HOR_MXCONSTRS, 1);
+ 295              	8, [sp, #0]
+ 296 0268 E4009FE5 		str	r5, [sp, #4]
+ 297 026c DC109FE5 		bl	mtx_scale
+ 298 0270 D4209FE5 		.loc 1 133 0
+ 299 0274 3930A0E3 		ldr	r0, .L24+16
+ 300 0278 00508DE5 		ldr	r1, .L24+20
+ 301 027c FEFFFFEB 		ldr	r2, .L24+36
+ 302              		mov	r3, r8
+ 303              		str	r5, [sp, #0]
+ 304              		bl	mtx_add
+ 305 0280 281094E5 	.LBE11:
+ 306 0284 CC009FE5 	.LBE10:
+ 307 0288 0C0091E8 		.loc 1 116 0
+ 308 028c C0109FE5 		ldr	r0, [r4, #0]
+ 309 0290 00808DE5 		ldr	r2, .L24+12
+ 310 0294 04508DE5 		ldr	r3, .L24+8
+ 311 0298 FEFFFFEB 		mov	r1, r7
+ 312              		str	sl, [sp, #0]
+ 313 029c A0009FE5 		bl	inc_fgm_minimize_qp_iteration
+ 314 02a0 A0109FE5 		.loc 1 114 0
+ 315 02a4 AC209FE5 		ldr	r0, [r4, #0]
+ 316 02a8 0830A0E1 		ldr	r3, [r0, #12]
+ 317 02ac 00508DE5 		ldr	r2, [r3, #0]
+ 318 02b0 FEFFFFEB 		add	r6, r6, #1
+ 319              		cmp	r2, r6
+ 320              		bhi	.L19
+ 321              	.L17:
+ 322 02b4 000094E5 	.LBE9:
+ 323 02b8 80209FE5 	.LBE8:
+ 324 02bc 78309FE5 		.loc 1 74 0
+ 325 02c0 0710A0E1 		ldr	r3, .L24+4
+ 326 02c4 00A08DE5 		mov	r0, r4
+ 327 02c8 FEFFFFEB 		mov	r1, r9
+ 328              		mov	r2, r7
+ 329 02cc 000094E5 		bl	stc_fgm_compute_l_update
+ 330 02d0 0C3090E5 		.loc 1 78 0
+ 331 02d4 002093E5 		mov	r1, r7
+ 332 02d8 016086E2 		mov	r2, #456
+ 333 02dc 060052E1 		ldr	r0, .L24
+ 334 02e0 D3FFFF8A 		bl	memcpy
+ 335              		.loc 1 79 0
+ 336              		ldr	r3, .L24+4
+ 337              		ldmia	r9, {r0, r1}
+ 338              		stmia	r3, {r0, r1}
+ 339 02e4 4C309FE5 		.loc 1 72 0
+ 340 02e8 0400A0E1 		ldr	r3, [r4, #16]
+ 341 02ec 0910A0E1 		ldr	r2, [r3, #0]
+ 342 02f0 0720A0E1 		add	fp, fp, #1
+ 343 02f4 81FFFFEB 		cmp	r2, fp
+ 344              		bhi	.L16
+ 345 02f8 0710A0E1 	.L20:
+ 346 02fc 722FA0E3 		.loc 1 83 0
+ 347 0300 2C009FE5 		add	sp, sp, #8
+ 348 0304 FEFFFFEB 		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 349              		bx	lr
+ 350 0308 28309FE5 	.L25:
+ 351 030c 030099E8 		.align	2
+ 352 0310 030083E8 	.L24:
+ 353              		.word	u_i.1776
+ 354 0314 103094E5 		.word	l_i.1777
+ 355 0318 002093E5 		.word	w.1804
+ 356 031c 01B08BE2 		.word	u_old.1803
+ 357 0320 0B0052E1 		.word	gradoL.1805
+ 358 0324 ADFFFF8A 		.word	gradoL_inc.1820
+ 359              		.word	l_grad.1855
+ 360              		.word	E_T.1856
+ 361 0328 08D08DE2 		.word	grad_stc.1821
+ 362 032c F04FBDE8 		.word	gradoL_stc.1822
+ 363 0330 1EFF2FE1 	.LFE5:
+ 365              		.align	2
+ 366              		.global	stc_ctl_warmstart
+ 368 0338 08000000 	stc_ctl_warmstart:
+ 369 033c A0030000 	.LFB3:
+ 370 0340 68050000 		.loc 1 40 0
+ 371 0344 D8010000 		@ Function supports interworking.
+ 372 0348 C00A0000 		@ args = 0, pretend = 0, frame = 0
+ 373 034c 500E0000 		@ frame_needed = 0, uses_anonymous_args = 0
+ 374 0350 880C0000 	.LVL21:
+ 375 0354 F8080000 		stmfd	sp!, {r4, lr}
+ 376 0358 30070000 	.LCFI8:
+ 377              		mov	r4, r0
+ 378              		sub	sp, sp, #4
+ 379              	.LCFI9:
+ 380              		.loc 1 41 0
+ 381              		bl	inc_ctl_warmstart
+ 382              	.LVL22:
+ 383              		.loc 1 42 0
+ 384              		ldr	r3, [r4, #20]
+ 385              		ldr	r2, [r4, #28]
+ 386              		ldmia	r3, {r0, r1}	@ phole ldm
+ 387              		mov	ip, #20
+ 388              		mov	r3, #0
+ 389 035c 10402DE9 		str	ip, [sp, #0]
+ 390              		bl	mpc_warmstart_vector
+ 391 0360 0040A0E1 		.loc 1 45 0
+ 392 0364 04D04DE2 		add	sp, sp, #4
+ 393              		ldmfd	sp!, {r4, lr}
+ 394              		bx	lr
+ 395 0368 FEFFFFEB 	.LFE3:
+ 397              		.align	2
+ 398 036c 143094E5 		.global	stc_ctl_form_qp
+ 400 0374 030093E8 	stc_ctl_form_qp:
+ 401 0378 14C0A0E3 	.LFB2:
+ 402 037c 0030A0E3 		.loc 1 29 0
+ 403 0380 00C08DE5 		@ Function supports interworking.
+ 404 0384 FEFFFFEB 		@ args = 0, pretend = 0, frame = 0
+ 405              		@ frame_needed = 0, uses_anonymous_args = 0
+ 406 0388 04D08DE2 	.LVL23:
+ 407 038c 1040BDE8 		stmfd	sp!, {r4, r5, lr}
+ 408 0390 1EFF2FE1 	.LCFI10:
+ 409              		.loc 1 29 0
+ 410              		mov	r4, r0
+ 411              		mov	r5, r1
+ 412              		.loc 1 30 0
+ 413              		bl	inc_ctl_form_qp
+ 414              	.LVL24:
+ 415              		.loc 1 31 0
+ 416              		ldr	r0, [r4, #20]
+ 417              		mov	r2, r5
+ 418              		ldr	r1, [r0, #8]
+ 419              		ldr	r3, [r0, #32]
+ 420              		bl	stc_compute_state_constr_bound_online
+ 421 0394 30402DE9 		.loc 1 33 0
+ 422              		ldr	r0, [r4, #20]
+ 423              		ldr	r1, [r0, #12]
+ 424 0398 0040A0E1 		ldr	r3, [r0, #36]
+ 425 039c 0150A0E1 		mov	r2, r5
+ 426              		.loc 1 37 0
+ 427 03a0 FEFFFFEB 		ldmfd	sp!, {r4, r5, lr}
+ 428              		.loc 1 33 0
+ 429              		b	stc_compute_state_constr_bound_online
+ 430 03a4 140094E5 	.LFE2:
+ 432 03ac 081090E5 		.align	2
+ 433 03b0 203090E5 		.global	stc_ctl_solve_problem
+ 435              	stc_ctl_solve_problem:
+ 436 03b8 140094E5 	.LFB4:
+ 437 03bc 0C1090E5 		.loc 1 49 0
+ 438 03c0 243090E5 		@ Function supports interworking.
+ 439 03c4 0520A0E1 		@ args = 0, pretend = 0, frame = 0
+ 440              		@ frame_needed = 0, uses_anonymous_args = 0
+ 441 03c8 3040BDE8 	.LVL25:
+ 442              		stmfd	sp!, {r4, lr}
+ 443 03cc FEFFFFEA 	.LCFI11:
+ 444              		.loc 1 49 0
+ 445              		mov	r4, r0
+ 446              		.loc 1 50 0
+ 447              		bl	stc_ctl_form_qp
+ 448              	.LVL26:
+ 449              		.loc 1 51 0
+ 450              		add	r0, r4, #20
+ 451              		ldmia	r0, {r0, r1, r2}	@ phole ldm
+ 452              		.loc 1 54 0
+ 453              		ldmfd	sp!, {r4, lr}
+ 454              		.loc 1 51 0
+ 455              		b	stc_alm_minimize_qp
+ 456 03d0 10402DE9 	.LFE4:
+ 458              		.bss
+ 459 03d4 0040A0E1 		.align	2
+ 460              	scb_x.1795:
+ 461 03d8 FEFFFFEB 		.space	8
+ 462              		.align	2
+ 463              	l_i.1777:
+ 464 03dc 140084E2 		.space	8
+ 465 03e0 070090E8 		.align	2
+ 466              	u_i.1776:
+ 467 03e4 1040BDE8 		.space	456
+ 468              		.align	2
+ 469 03e8 FEFFFFEA 	gradoL.1805:
+ 470              		.space	456
+ 471              		.align	2
+ 472              	w.1804:
+ 473              		.space	456
+ 474              		.align	2
+ 475 0000 00000000 	u_old.1803:
+ 475      00000000 
+ 476              		.space	456
+ 477              		.align	2
+ 478 0008 00000000 	gradoL_stc.1822:
+ 478      00000000 
+ 479              		.space	456
+ 480              		.align	2
+ 481 0010 00000000 	grad_stc.1821:
+ 481      00000000 
+ 481      00000000 
+ 481      00000000 
+ 481      00000000 
+ 482              		.space	456
+ 483              		.align	2
+ 484 01d8 00000000 	gradoL_inc.1820:
+ 484      00000000 
+ 484      00000000 
+ 484      00000000 
+ 484      00000000 
+ 485              		.space	456
+ 486              		.align	2
+ 487 03a0 00000000 	E_T.1856:
+ 487      00000000 
+ 487      00000000 
+ 487      00000000 
+ 487      00000000 
+ 488              		.space	456
+ 489              		.align	2
+ 490 0568 00000000 	l_grad.1855:
+ 490      00000000 
+ 490      00000000 
+ 490      00000000 
+ 490      00000000 
+ 491              		.space	8
+ 492              		.align	2
+ 493 0730 00000000 	p_neg.1846:
+ 493      00000000 
+ 493      00000000 
+ 493      00000000 
+ 493      00000000 
+ 494              		.space	8
+ 495              		.align	2
+ 496 08f8 00000000 	p_pos.1845:
+ 496      00000000 
+ 496      00000000 
+ 496      00000000 
+ 496      00000000 
+ 497              		.space	8
+ 498              		.align	2
+ 499 0ac0 00000000 	pen_diff.1835:
+ 499      00000000 
+ 499      00000000 
+ 499      00000000 
+ 499      00000000 
+ 500              		.space	8
+ 501              		.align	2
+ 502 0c88 00000000 	diff.1834:
+ 502      00000000 
+ 502      00000000 
+ 502      00000000 
+ 502      00000000 
+ 503              		.space	8
+ 504              		.align	2
+ 505 0e50 00000000 	E_w.1833:
+ 505      00000000 
+ 506              		.space	8
+ 507              		.section	.debug_frame,"",%progbits
+ 508 0e58 00000000 	.Lframe0:
+ 508      00000000 
+ 509              		.4byte	.LECIE0-.LSCIE0
+ 510              	.LSCIE0:
+ 511 0e60 00000000 		.4byte	0xffffffff
+ 511      00000000 
+ 512              		.byte	0x1
+ 513              		.ascii	"\000"
+ 514 0e68 00000000 		.uleb128 0x1
+ 514      00000000 
+ 515              		.sleb128 -4
+ 516              		.byte	0xe
+ 517 0e70 00000000 		.byte	0xc
+ 517      00000000 
+ 518              		.uleb128 0xd
+ 519              		.uleb128 0x0
+ 520 0e78 00000000 		.align	2
+ 520      00000000 
+ 713              		.4byte	.LFE6-.Ltext0
+DEFINED SYMBOLS
+                            *ABS*:00000000 mpc_stc.c
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:13     .text:00000000 stc_compute_state_constr_bound_online
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:21     .text:00000000 $a
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:58     .text:00000058 $d
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:474    .bss:00000000 scb_x.1795
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:63     .text:0000005c stc_fgm_compute_state_constr_violation_penalty
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:70     .text:0000005c $a
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:129    .text:000000f4 $d
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:519    .bss:00000e78 E_w.1833
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:516    .bss:00000e70 diff.1834
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:513    .bss:00000e68 pen_diff.1835
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:136    .text:00000100 stc_fgm_compute_l_update
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:143    .text:00000100 $a
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:198    .text:0000018c $d
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:510    .bss:00000e60 p_pos.1845
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:507    .bss:00000e58 p_neg.1846
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:205    .text:00000194 stc_alm_minimize_qp
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:212    .text:00000194 $a
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:367    .text:00000334 $d
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:480    .bss:00000010 u_i.1776
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:477    .bss:00000008 l_i.1777
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:486    .bss:000003a0 w.1804
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:489    .bss:00000568 u_old.1803
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:483    .bss:000001d8 gradoL.1805
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:498    .bss:00000ac0 gradoL_inc.1820
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:504    .bss:00000e50 l_grad.1855
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:501    .bss:00000c88 E_T.1856
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:495    .bss:000008f8 grad_stc.1821
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:492    .bss:00000730 gradoL_stc.1822
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:382    .text:0000035c stc_ctl_warmstart
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:389    .text:0000035c $a
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:414    .text:00000394 stc_ctl_form_qp
+C:\Users\XY\AppData\Local\Temp/ccQTbaaa.s:449    .text:000003d0 stc_ctl_solve_problem
+                             .bss:00000000 $d
+
+UNDEFINED SYMBOLS
+mtx_multiply_mtx_vec
+mtx_substract
+mtx_scale
+mtx_add
+mtx_max_vec_zero
+mtx_min_vec_zero
+memcpy
+inc_fgm_compute_grad_over_L
+mtx_transpose
+inc_fgm_minimize_qp_iteration
+inc_ctl_warmstart
+mpc_warmstart_vector
+inc_ctl_form_qp

@@ -1,0 +1,94 @@
+   1              		.file	"firefly_height_PD_control.c"
+   9              	.Ltext0:
+  10              		.global	__floatsidf
+  11              		.global	__subdf3
+  12              		.global	__muldf3
+  13              		.global	__adddf3
+  14              		.global	__fixdfsi
+  15              		.align	2
+  16              		.global	calculateThrust
+  18              	calculateThrust:
+  19              	.LFB2:
+  20              		.file 1 "firefly_height_PD_control.c"
+   1:firefly_height_PD_control.c **** /*
+   2:firefly_height_PD_control.c ****  * firefly_height_PD_control.c
+   3:firefly_height_PD_control.c ****  */
+   4:firefly_height_PD_control.c **** 
+   5:firefly_height_PD_control.c **** #include "firefly_height_PD_control.h"
+   6:firefly_height_PD_control.c **** #include "sdk.h"
+   7:firefly_height_PD_control.c **** 
+   8:firefly_height_PD_control.c **** short calculateThrust(int desired_height, int current_height, int current_velocity){
+  21              	ion supports interworking.
+  22              		@ args = 0, pretend = 0, frame = 0
+  23              		@ frame_needed = 0, uses_anonymous_args = 0
+  24              	.LVL0:
+  25              		rsb	r1, r0, r1
+  26 0000 011060E0 	.LVL1:
+  27              		add	r1, r1, r1, asl #1
+  28 0004 811081E0 		stmfd	sp!, {r4, r5, r6, lr}
+  29 0008 70402DE9 	.LCFI0:
+  30              		.loc 1 8 0
+  31              		mov	r0, r1, asl #1
+  32 000c 8100A0E1 	.LVL2:
+  33              		mov	r6, r2
+  34 0010 0260A0E1 		bl	__floatsidf
+  35 0014 FEFFFFEB 	.LVL3:
+  36              		mov	r2, r0
+  37 0018 0020A0E1 		mov	r3, r1
+  38 001c 0130A0E1 		adr	r0, .L3
+  39 0020 64008FE2 		ldmia	r0, {r0-r1}
+  40 0024 030090E8 		bl	__subdf3
+  41 0028 FEFFFFEB 		mov	r4, r0
+  42 002c 0040A0E1 		mov	r0, r6
+  43 0030 0600A0E1 		mov	r5, r1
+  44 0034 0150A0E1 		bl	__floatsidf
+  45 0038 FEFFFFEB 		adr	r2, .L3+8
+  46 003c 50208FE2 		ldmia	r2, {r2-r3}
+  47 0040 0C0092E8 		bl	__muldf3
+  48 0044 FEFFFFEB 		mov	r2, r0
+  49 0048 0020A0E1 		mov	r3, r1
+  50 004c 0130A0E1 		mov	r0, r4
+  51 0050 0400A0E1 		mov	r1, r5
+  52 0054 0510A0E1 		bl	__adddf3
+  53 0058 FEFFFFEB 		bl	__fixdfsi
+  54 005c FEFFFFEB 		mov	r0, r0, asl #16
+  55 0060 0008A0E1 		ldr	r3, .L3+16
+  56 0064 30309FE5 		mov	r0, r0, asr #16
+  57 0068 4008A0E1 		rsb	r0, r0, r0, asl #12
+  58 006c 000660E0 		smull	r1, r2, r3, r0
+  59 0070 9310C2E0 		mov	r0, r0, asr #31
+  60 0074 C00FA0E1 		rsb	r0, r0, r2, asr #3
+  61 0078 C20160E0 		mov	r0, r0, asl #16
+  62 007c 0008A0E1 		.loc 1 14 0
+   9:firefly_height_PD_control.c **** 	// need to change the unit to m
+  10:firefly_height_PD_control.c **** 	int error_position = current_height - desired_height;
+  11:firefly_height_PD_control.c **** 	int error_velocity = current_velocity;
+  12:firefly_height_PD_control.c **** 	short thrust = mass*gravity - K_position*error_position - K_velocity*error_velocity;
+  13:firefly_height_PD_control.c **** 	return thrust*4095/36;		// max thrust: 36N.  0..4095 = 0..100%
+  14:firefly_height_PD_control.c **** }
+  63              	r6, lr}
+  64 0080 4008A0E1 		bx	lr
+  65 0084 7040BDE8 	.L4:
+  66 0088 1EFF2FE1 		.align	2
+  67              	.L3:
+  68              		.word	1076805601
+  69              		.word	-1865989980
+  70 008c E1BF2E40 		.word	-1072509748
+  71 0090 A440C790 		.word	-858993459
+  72 0094 CCCC12C0 		.word	954437177
+  73 0098 CDCCCCCC 	.LFE2:
+  75              		.section	.debug_frame,"",%progbits
+  76              	.Lframe0:
+ 113              	.Ldebug_loc0:
+DEFINED SYMBOLS
+                            *ABS*:00000000 firefly_height_PD_control.c
+C:\Users\XY\AppData\Local\Temp/ccwvcaaa.s:18     .text:00000000 calculateThrust
+C:\Users\XY\AppData\Local\Temp/ccwvcaaa.s:26     .text:00000000 $a
+C:\Users\XY\AppData\Local\Temp/ccwvcaaa.s:70     .text:0000008c $d
+
+UNDEFINED SYMBOLS
+__floatsidf
+__subdf3
+__muldf3
+__adddf3
+__fixdfsi

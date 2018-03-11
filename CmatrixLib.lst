@@ -1,0 +1,3123 @@
+   1              		.file	"CmatrixLib.c"
+   9              	.Ltext0:
+  10              		.align	2
+  11              		.global	matrix_float_set
+  13              	matrix_float_set:
+  14              	.LFB8:
+  15              		.file 1 "CmatrixLib.c"
+   1:CmatrixLib.c  **** /**
+   2:CmatrixLib.c  ****  * @file CMatrixLib.c
+   3:CmatrixLib.c  ****  * @author klaxalk
+   4:CmatrixLib.c  ****  * @brief sources of CMatrixLib
+   5:CmatrixLib.c  ****  * 
+   6:CmatrixLib.c  ****  * @copyright GNU Public License
+   7:CmatrixLib.c  ****  *
+   8:CmatrixLib.c  ****  * This program is free software: you can redistribute it and/or modify
+   9:CmatrixLib.c  ****  * it under the terms of the GNU General Public License as published by
+  10:CmatrixLib.c  ****  * the Free Software Foundation, either version 3 of the License, or
+  11:CmatrixLib.c  ****  * (at your option) any later version.
+  12:CmatrixLib.c  ****  * 
+  13:CmatrixLib.c  ****  * This program is distributed in the hope that it will be useful,
+  14:CmatrixLib.c  ****  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  15:CmatrixLib.c  ****  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  16:CmatrixLib.c  ****  * GNU General Public License for more details.
+  17:CmatrixLib.c  ****  * 
+  18:CmatrixLib.c  ****  * You should have received a copy of the GNU General Public License
+  19:CmatrixLib.c  ****  * along with this program. If not, see <http://www.gnu.org/licenses/>
+  20:CmatrixLib.c  ****  */
+  21:CmatrixLib.c  **** 
+  22:CmatrixLib.c  **** #include "CmatrixLib.h"
+  23:CmatrixLib.c  **** 
+  24:CmatrixLib.c  **** // add two vectors
+  25:CmatrixLib.c  **** void vector_float_add(vector_float * a, const vector_float * b) {
+  26:CmatrixLib.c  **** 	
+  27:CmatrixLib.c  **** 	// check dimension
+  28:CmatrixLib.c  **** 	if (a->length == b->length) {
+  29:CmatrixLib.c  **** 	
+  30:CmatrixLib.c  **** 		int16_t i;
+  31:CmatrixLib.c  **** 	
+  32:CmatrixLib.c  **** 		for (i = 1; i <= a->length; i++) {
+  33:CmatrixLib.c  **** 			
+  34:CmatrixLib.c  **** 			vector_float_set(a, i, vector_float_get(a, i) + vector_float_get(b, i));
+  35:CmatrixLib.c  **** 		}
+  36:CmatrixLib.c  **** 	}
+  37:CmatrixLib.c  **** }
+  38:CmatrixLib.c  **** 
+  39:CmatrixLib.c  **** // subtract two vectors
+  40:CmatrixLib.c  **** void vector_float_subtract(vector_float * a, const vector_float * b) {
+  41:CmatrixLib.c  **** 
+  42:CmatrixLib.c  **** 	// check dimension
+  43:CmatrixLib.c  **** 	if (a->length == b->length) {
+  44:CmatrixLib.c  **** 
+  45:CmatrixLib.c  **** 		int16_t i;
+  46:CmatrixLib.c  **** 
+  47:CmatrixLib.c  **** 		for (i = 1; i <= a->length; i++) {
+  48:CmatrixLib.c  **** 
+  49:CmatrixLib.c  **** 			vector_float_set(a, i, vector_float_get(a, i) - vector_float_get(b, i));
+  50:CmatrixLib.c  **** 		}
+  51:CmatrixLib.c  **** 	}
+  52:CmatrixLib.c  **** }
+  53:CmatrixLib.c  **** 
+  54:CmatrixLib.c  **** // add two vector a, b and write the answer to a
+  55:CmatrixLib.c  **** float vector_float_inner_product(const vector_float * a, const vector_float * b) {
+  56:CmatrixLib.c  **** 	
+  57:CmatrixLib.c  **** 	float output = 0;
+  58:CmatrixLib.c  **** 	
+  59:CmatrixLib.c  **** 	// check dimension
+  60:CmatrixLib.c  **** 	if (a->length == b->length) {
+  61:CmatrixLib.c  **** 		
+  62:CmatrixLib.c  **** 		int16_t i;
+  63:CmatrixLib.c  **** 		
+  64:CmatrixLib.c  **** 		for (i = 1; i <= a->length; i++) {
+  65:CmatrixLib.c  **** 			
+  66:CmatrixLib.c  **** 			output += vector_float_get(a, i)*vector_float_get(b, i);
+  67:CmatrixLib.c  **** 		}
+  68:CmatrixLib.c  **** 	}
+  69:CmatrixLib.c  **** 	
+  70:CmatrixLib.c  **** 	return output;
+  71:CmatrixLib.c  **** }
+  72:CmatrixLib.c  **** 
+  73:CmatrixLib.c  **** void vector_float_outer_product(const vector_float * a, const vector_float * b, matrix_float * C) {
+  74:CmatrixLib.c  **** 	
+  75:CmatrixLib.c  **** 	// check dimension
+  76:CmatrixLib.c  **** 	if ((a->length == C->height) && (b->length == C->width)) {
+  77:CmatrixLib.c  **** 		
+  78:CmatrixLib.c  **** 		int16_t i, j;
+  79:CmatrixLib.c  **** 		
+  80:CmatrixLib.c  **** 		for (i = 1; i <= a->length; i++) {
+  81:CmatrixLib.c  **** 			
+  82:CmatrixLib.c  **** 			for (j = 1; j <= b->length; j++) {
+  83:CmatrixLib.c  **** 				
+  84:CmatrixLib.c  **** 				matrix_float_set(C, i, j, vector_float_get(a, i)*vector_float_get(b, j));
+  85:CmatrixLib.c  **** 			}
+  86:CmatrixLib.c  **** 		}
+  87:CmatrixLib.c  **** 	}
+  88:CmatrixLib.c  **** }
+  89:CmatrixLib.c  **** 
+  90:CmatrixLib.c  **** // multiplies a vector by a constant
+  91:CmatrixLib.c  **** void vector_float_times(vector_float * a, const float C) {
+  92:CmatrixLib.c  **** 	
+  93:CmatrixLib.c  **** 	int16_t i;
+  94:CmatrixLib.c  **** 	
+  95:CmatrixLib.c  **** 	for (i = 1; i <= a->length; i++) {
+  96:CmatrixLib.c  **** 			
+  97:CmatrixLib.c  **** 		vector_float_set(a, i, vector_float_get(a, i)*C);
+  98:CmatrixLib.c  **** 	}
+  99:CmatrixLib.c  **** }
+ 100:CmatrixLib.c  **** 
+ 101:CmatrixLib.c  **** // copy vector b to a vector a
+ 102:CmatrixLib.c  **** void vector_float_copy(vector_float * a, const vector_float * b) {
+ 103:CmatrixLib.c  **** 	
+ 104:CmatrixLib.c  **** 	// check dimension
+ 105:CmatrixLib.c  **** 	if (a->length == b->length) {
+ 106:CmatrixLib.c  **** 		
+ 107:CmatrixLib.c  **** 		memcpy(a->data, b->data, a->length*sizeof(float));
+ 108:CmatrixLib.c  **** 		a->orientation = b->orientation;
+ 109:CmatrixLib.c  **** 	}
+ 110:CmatrixLib.c  **** }
+ 111:CmatrixLib.c  **** 
+ 112:CmatrixLib.c  **** // set particular cell of the matrix
+ 113:CmatrixLib.c  **** void matrix_float_set(matrix_float * m, const int16_t h, const int16_t w, const float value) {
+  16              	@ Function supports interworking.
+  17              		@ args = 0, pretend = 0, frame = 0
+  18              		@ frame_needed = 0, uses_anonymous_args = 0
+  19              	.LVL0:
+  20              		.loc 1 115 0
+ 114:CmatrixLib.c  **** or_float * v, const float value) {
+ 115:CmatrixLib.c  **** 
+  21              	r1, r1, asl #16
+  22 0000 0118A0E1 	.LVL1:
+  23              		.loc 1 113 0
+  24              		str	lr, [sp, #-4]!
+  25 0004 04E02DE5 	.LCFI0:
+  26              		.loc 1 115 0
+  27              		mov	r1, r1, asr #16
+  28 0008 4118A0E1 		mov	r2, r2, asl #16
+  29 000c 0228A0E1 	.LVL2:
+  30              		ldrsh	lr, [r0, #0]
+  31 0010 F0E0D0E1 		mov	r2, r2, asr #16
+  32 0014 4228A0E1 		sub	r1, r1, #1
+  33 0018 011041E2 		mla	ip, lr, r1, r2
+  34 001c 9E212CE0 		ldr	r2, [r0, #4]
+  35 0020 042090E5 		add	r2, r2, ip, asl #2
+  36 0024 0C2182E0 		str	r3, [r2, #-4]	@ float
+  37 0028 043002E5 		.loc 1 116 0
+ 116:CmatrixLib.c  **** nt16_t i;
+  38              	
+  39 002c 04E09DE4 		bx	lr
+  40 0030 1EFF2FE1 	.LFE8:
+  42              		.align	2
+  43              		.global	matrix_float_get
+  45              	matrix_float_get:
+  46              	.LFB11:
+  47              		.loc 1 141 0
+ 117:CmatrixLib.c  **** 	for (i = 1; i <= v->length; i++) {
+ 118:CmatrixLib.c  **** 
+ 119:CmatrixLib.c  **** 		vector_float_set(v, i, value);
+ 120:CmatrixLib.c  **** 	}
+ 121:CmatrixLib.c  **** }
+ 122:CmatrixLib.c  **** 
+ 123:CmatrixLib.c  **** // set the whole vector to zeros
+ 124:CmatrixLib.c  **** void vector_float_set_zero(vector_float * v) {
+ 125:CmatrixLib.c  **** 	
+ 126:CmatrixLib.c  **** 	int16_t i;
+ 127:CmatrixLib.c  **** 	
+ 128:CmatrixLib.c  **** 	for (i = 1; i <= v->length; i++) {
+ 129:CmatrixLib.c  **** 		
+ 130:CmatrixLib.c  **** 		vector_float_set(v, i, 0);
+ 131:CmatrixLib.c  **** 	}
+ 132:CmatrixLib.c  **** }
+ 133:CmatrixLib.c  **** 
+ 134:CmatrixLib.c  **** // get the particular cell of the matrix
+ 135:CmatrixLib.c  **** float matrix_float_get(const matrix_float * m, const int16_t h, const int16_t w) {
+ 136:CmatrixLib.c  **** 	
+ 137:CmatrixLib.c  **** 	return m->data[(h-1)*m->width + w - 1];
+ 138:CmatrixLib.c  **** }
+ 139:CmatrixLib.c  **** 
+ 140:CmatrixLib.c  **** // matrix transposition
+ 141:CmatrixLib.c  **** void matrix_float_transpose(const matrix_float * a, matrix_float * C) {
+  48              	on supports interworking.
+  49              		@ args = 0, pretend = 0, frame = 0
+  50              		@ frame_needed = 0, uses_anonymous_args = 0
+  51              	.LVL3:
+  52              		mov	r1, r1, asl #16
+  53 0034 0118A0E1 	.LVL4:
+  54              		str	lr, [sp, #-4]!
+  55 0038 04E02DE5 	.LCFI1:
+  56              		.loc 1 141 0
+  57              		mov	r1, r1, asr #16
+  58 003c 4118A0E1 		ldrsh	lr, [r0, #0]
+  59 0040 F0E0D0E1 		mov	r2, r2, asl #16
+  60 0044 0228A0E1 	.LVL5:
+  61              		sub	r1, r1, #1
+  62 0048 011041E2 		mov	r2, r2, asr #16
+  63 004c 4228A0E1 		mla	ip, lr, r1, r2
+  64 0050 9E212CE0 		ldr	r3, [r0, #4]
+  65 0054 043090E5 		add	r3, r3, ip, asl #2
+  66 0058 0C3183E0 		.loc 1 144 0
+ 142:CmatrixLib.c  **** mensions must agree
+ 143:CmatrixLib.c  **** 	if ((a->width == C->height) && (a->height == C->width)) {
+ 144:CmatrixLib.c  **** 		
+  67              	@ float
+  68 005c 040013E5 	.LVL6:
+  69              		ldr	lr, [sp], #4
+  70 0060 04E09DE4 		bx	lr
+  71 0064 1EFF2FE1 	.LFE11:
+  73              		.align	2
+  74              		.global	matrix_float_transpose
+  76              	matrix_float_transpose:
+  77              	.LFB12:
+  78              		.loc 1 147 0
+ 145:CmatrixLib.c  **** or (i = 1; i <= a->height; i++) {
+ 146:CmatrixLib.c  **** 			
+ 147:CmatrixLib.c  **** 			for (j = i; j <= a->width; j++) {
+  79              	supports interworking.
+  80              		@ args = 0, pretend = 0, frame = 0
+  81              		@ frame_needed = 0, uses_anonymous_args = 0
+  82              	.LVL7:
+  83              		stmfd	sp!, {r4, r5, r6, r7, r8, sl, lr}
+  84 0068 F0452DE9 	.LCFI2:
+  85              		.loc 1 147 0
+  86              		mov	r8, r1
+  87 006c 0180A0E1 		.loc 1 152 0
+ 148:CmatrixLib.c  **** 		matrix_float_set(C, j, i, matrix_float_get(a, i, j));
+ 149:CmatrixLib.c  **** 			}
+ 150:CmatrixLib.c  **** 		}
+ 151:CmatrixLib.c  **** 	}
+ 152:CmatrixLib.c  **** }
+  88              	, [r8, #2]
+  89 0070 F230D8E1 		ldrsh	r1, [r0, #0]
+  90 0074 F010D0E1 	.LVL8:
+  91              		cmp	r1, r3
+  92 0078 030051E1 		.loc 1 147 0
+  93              		mov	r6, r0
+  94 007c 0060A0E1 		.loc 1 152 0
+  95              		beq	.L21
+  96 0080 0100000A 	.LVL9:
+  97              	.L14:
+  98              		.loc 1 162 0
+ 153:CmatrixLib.c  **** atrix transposition
+ 154:CmatrixLib.c  **** void matrix_float_transpose_square(matrix_float * m) {
+ 155:CmatrixLib.c  **** 	
+ 156:CmatrixLib.c  **** 	int16_t i, j;
+ 157:CmatrixLib.c  **** 	float temp;
+ 158:CmatrixLib.c  **** 	
+ 159:CmatrixLib.c  **** 	for (i = 1; i <= m->height; i++) {
+ 160:CmatrixLib.c  **** 		
+ 161:CmatrixLib.c  **** 		for (j = i; j <= m->width; j++) {
+ 162:CmatrixLib.c  **** 			
+  99              	 {r4, r5, r6, r7, r8, sl, lr}
+ 100 0084 F045BDE8 		bx	lr
+ 101 0088 1EFF2FE1 	.LVL10:
+ 102              	.L21:
+ 103              		.loc 1 152 0
+ 104              		ldrsh	r2, [r8, #0]
+ 105 008c F020D8E1 		ldrsh	r3, [r0, #2]
+ 106 0090 F230D0E1 		cmp	r2, r3
+ 107 0094 030052E1 		bne	.L14
+ 108 0098 F9FFFF1A 	.LVL11:
+ 109              		.loc 1 154 0
+ 110              		cmp	r2, #0
+ 111 009c 000052E3 		movgt	r5, #1
+ 112 00a0 0150A0C3 	.LVL12:
+ 113              		movgt	sl, r5
+ 114 00a4 05A0A0C1 	.LVL13:
+ 115              		movgt	r7, r5
+ 116 00a8 0570A0C1 		ble	.L14
+ 117 00ac F4FFFFDA 		.loc 1 156 0
+ 118              		mov	r4, r5, asl #16
+ 119 00b0 0548A0E1 		cmp	r1, r4, asr #16
+ 120 00b4 440851E1 		blt	.L22
+ 121 00b8 100000BA 	.LVL14:
+ 122              	.L15:
+ 123              		.loc 1 158 0
+ 124              		mov	r4, r4, asr #16
+ 125 00bc 4448A0E1 		mov	r1, r7
+ 126 00c0 0710A0E1 		mov	r2, r4
+ 127 00c4 0420A0E1 		mov	r0, r6
+ 128 00c8 0600A0E1 		bl	matrix_float_get
+ 129 00cc FEFFFFEB 		mov	r1, r4
+ 130 00d0 0410A0E1 		mov	r3, r0
+ 131 00d4 0030A0E1 		mov	r2, r7
+ 132 00d8 0720A0E1 		mov	r0, r8
+ 133 00dc 0800A0E1 		bl	matrix_float_set
+ 134 00e0 FEFFFFEB 		.loc 1 156 0
+ 135              		add	r3, r5, #1
+ 136 00e4 013085E2 		mov	r3, r3, asl #16
+ 137 00e8 0338A0E1 		ldrsh	r1, [r6, #0]
+ 138 00ec F010D6E1 		mov	r5, r3, lsr #16
+ 139 00f0 2358A0E1 	.LVL15:
+ 140              	.L18:
+ 141              		mov	r4, r5, asl #16
+ 142 00f4 0548A0E1 		cmp	r1, r4, asr #16
+ 143 00f8 440851E1 		bge	.L15
+ 144 00fc EEFFFFAA 	.L22:
+ 145              		.loc 1 154 0
+ 146              		add	r3, sl, #1
+ 147 0100 01308AE2 		mov	r3, r3, asl #16
+ 148 0104 0338A0E1 		mov	sl, r3, lsr #16
+ 149 0108 23A8A0E1 		ldrsh	r2, [r6, #2]
+ 150 010c F220D6E1 		mov	r3, sl, asl #16
+ 151 0110 0A38A0E1 		cmp	r2, r3, asr #16
+ 152 0114 430852E1 		add	r7, r7, #1
+ 153 0118 017087E2 		mov	r5, r3, lsr #16
+ 154 011c 2358A0E1 		bge	.L18
+ 155 0120 F3FFFFAA 		b	.L14
+ 156 0124 D6FFFFEA 	.LFE12:
+ 158              		.align	2
+ 159              		.global	matrix_float_transpose_square
+ 161              	matrix_float_transpose_square:
+ 162              	.LFB13:
+ 163              		.loc 1 165 0
+ 163:CmatrixLib.c  **** matrix_float_get(m, i, j);
+ 164:CmatrixLib.c  **** 			matrix_float_set(m, i, j, matrix_float_get(m, j, i));
+ 165:CmatrixLib.c  **** 			matrix_float_set(m, j, i, temp);
+ 164              	e = 0
+ 165              		@ frame_needed = 0, uses_anonymous_args = 0
+ 166              	.LVL16:
+ 167              		stmfd	sp!, {r4, r5, r6, r7, r8, sl, lr}
+ 168              	.LCFI3:
+ 169 0128 F0452DE9 		.loc 1 165 0
+ 170              		mov	r6, r0
+ 171              		.loc 1 170 0
+ 172 012c 0060A0E1 		ldrsh	r0, [r0, #2]
+ 166:CmatrixLib.c  **** 
+ 167:CmatrixLib.c  **** 	}
+ 168:CmatrixLib.c  **** }
+ 169:CmatrixLib.c  **** 
+ 170:CmatrixLib.c  **** 
+ 173              	cmp	r0, #0
+ 174 0130 F200D0E1 		ble	.L30
+ 175              		mov	r7, #1
+ 176 0134 000050E3 	.LVL18:
+ 177 0138 2A0000DA 		ldrsh	r1, [r6, #0]
+ 178 013c 0170A0E3 		mov	sl, r7
+ 179              	.LVL19:
+ 180 0140 F010D6E1 		mov	r8, r7
+ 181 0144 07A0A0E1 	.LVL20:
+ 182              	.L26:
+ 183 0148 0780A0E1 		.loc 1 172 0
+ 184              		mov	r4, r7, asl #16
+ 185              		cmp	r1, r4, asr #16
+ 171:CmatrixLib.c  **** et all cells to value
+ 172:CmatrixLib.c  **** void matrix_float_set_all(matrix_float * m, const float value) {
+ 186              	1:
+ 187 014c 0748A0E1 		.loc 1 174 0
+ 188 0150 440851E1 		mov	r4, r4, asr #16
+ 189 0154 1B0000BA 		mov	r2, r4
+ 190              		mov	r1, r8
+ 173:CmatrixLib.c  **** 	int16_t i, j;
+ 174:CmatrixLib.c  **** 	
+ 191              	r0, r6
+ 192 0158 4448A0E1 		bl	matrix_float_get
+ 193 015c 0420A0E1 		.loc 1 175 0
+ 194 0160 0810A0E1 		mov	r1, r4
+ 195 0164 0600A0E1 		.loc 1 174 0
+ 196 0168 FEFFFFEB 		mov	r5, r0
+ 175:CmatrixLib.c  **** or (i = 1; i <= m->height; i++) {
+ 197              	1 175 0
+ 198 016c 0410A0E1 		mov	r2, r8
+ 199              		mov	r0, r6
+ 200 0170 0050A0E1 		bl	matrix_float_get
+ 201              		mov	r2, r4
+ 202 0174 0820A0E1 		mov	r3, r0
+ 203 0178 0600A0E1 		mov	r1, r8
+ 204 017c FEFFFFEB 		mov	r0, r6
+ 205 0180 0420A0E1 		bl	matrix_float_set
+ 206 0184 0030A0E1 		.loc 1 176 0
+ 207 0188 0810A0E1 		mov	r1, r4
+ 208 018c 0600A0E1 		mov	r3, r5
+ 209 0190 FEFFFFEB 		mov	r0, r6
+ 176:CmatrixLib.c  **** 	
+ 210              	bl	matrix_float_set
+ 211 0194 0410A0E1 		.loc 1 172 0
+ 212 0198 0530A0E1 		add	r3, r7, #1
+ 213 019c 0600A0E1 		mov	r3, r3, asl #16
+ 214 01a0 0820A0E1 		mov	r7, r3, lsr #16
+ 215 01a4 FEFFFFEB 		ldrsh	r1, [r6, #0]
+ 216              		mov	r4, r7, asl #16
+ 217 01a8 013087E2 		cmp	r1, r4, asr #16
+ 218 01ac 0338A0E1 		bge	.L31
+ 219 01b0 2378A0E1 		ldrsh	r0, [r6, #2]
+ 220 01b4 F010D6E1 	.L28:
+ 221 01b8 0748A0E1 		.loc 1 170 0
+ 222 01bc 440851E1 		add	r3, sl, #1
+ 223 01c0 E4FFFFAA 		mov	r3, r3, asl #16
+ 224 01c4 F200D6E1 		mov	sl, r3, lsr #16
+ 225              		mov	r2, sl, asl #16
+ 226              		cmp	r0, r2, asr #16
+ 227 01c8 01308AE2 		add	r8, r8, #1
+ 228 01cc 0338A0E1 		mov	r7, r2, lsr #16
+ 229 01d0 23A8A0E1 		bge	.L26
+ 230 01d4 0A28A0E1 	.L30:
+ 231 01d8 420850E1 		.loc 1 179 0
+ 232 01dc 018088E2 		ldmfd	sp!, {r4, r5, r6, r7, r8, sl, lr}
+ 233 01e0 2278A0E1 		bx	lr
+ 234 01e4 D8FFFFAA 	.LFE13:
+ 177:CmatrixLib.c  **** 	for (j = 1; j <= m->width; j++) {
+ 178:CmatrixLib.c  **** 			
+ 179:CmatrixLib.c  **** 			matrix_float_set(m, i, j, value);
+ 236              	float_set_all
+ 238 01ec 1EFF2FE1 	matrix_float_set_all:
+ 239              	.LFB14:
+ 240              		.loc 1 183 0
+ 241              		@ Function supports interworking.
+ 242              		@ args = 0, pretend = 0, frame = 0
+ 243              		@ frame_needed = 0, uses_anonymous_args = 0
+ 244              	.LVL21:
+ 245              		stmfd	sp!, {r4, r5, r6, r7, r8, sl, lr}
+ 180:CmatrixLib.c  **** 
+ 181:CmatrixLib.c  **** 	}
+ 182:CmatrixLib.c  **** }
+ 183:CmatrixLib.c  **** 
+ 246              	loc 1 183 0
+ 247              		mov	r6, r0
+ 248              		.loc 1 187 0
+ 249              		ldrsh	r0, [r0, #2]
+ 250              	.LVL22:
+ 251 01f0 F0452DE9 		cmp	r0, #0
+ 252              		.loc 1 183 0
+ 253              		mov	r8, r1
+ 254 01f4 0060A0E1 		.loc 1 187 0
+ 184:CmatrixLib.c  **** set matrix to zeros
+ 185:CmatrixLib.c  **** void matrix_float_set_zero(matrix_float * m) {
+ 186:CmatrixLib.c  **** 	
+ 187:CmatrixLib.c  **** 	matrix_float_set_all(m, (float) 0);
+ 255              	
+ 256 01f8 F200D0E1 	.LVL23:
+ 257              		mov	sl, #1
+ 258 01fc 000050E3 	.LVL24:
+ 259              		ldrsh	r2, [r6, #0]
+ 260 0200 0180A0E1 		mov	r7, sl
+ 261              	.LVL25:
+ 262 0204 190000DA 	.L37:
+ 263              		.loc 1 189 0
+ 264 0208 01A0A0E3 		cmp	r2, #0
+ 265              		movgt	r4, #1
+ 266 020c F020D6E1 		movgt	r5, r4
+ 267 0210 0A70A0E1 		ble	.L39
+ 268              	.L38:
+ 269              		.loc 1 191 0
+ 188:CmatrixLib.c  **** / set matrix to identity matrix
+ 189:CmatrixLib.c  **** void matrix_float_set_identity(matrix_float * m) {
+ 270              	ov	r3, r8
+ 271 0214 000052E3 		mov	r0, r6
+ 272 0218 0140A0C3 		mov	r1, r7
+ 273 021c 0450A0C1 		bl	matrix_float_set
+ 274 0220 0C0000DA 		.loc 1 189 0
+ 275              		add	r3, r5, #1
+ 190:CmatrixLib.c  **** 	// matrix must be a square matrix
+ 191:CmatrixLib.c  **** 	if (m->width == m->height) {
+ 276              		r2, [r6, #0]
+ 277 0224 0420A0E1 		mov	r3, r3, asl #16
+ 278 0228 0830A0E1 		cmp	r2, r3, asr #16
+ 279 022c 0600A0E1 		add	r4, r4, #1
+ 280 0230 0710A0E1 		mov	r5, r3, lsr #16
+ 281 0234 FEFFFFEB 		bge	.L38
+ 282              		ldrsh	r0, [r6, #2]
+ 283 0238 013085E2 	.LVL26:
+ 284 023c F020D6E1 	.L39:
+ 285 0240 0338A0E1 		.loc 1 187 0
+ 286 0244 430852E1 		add	r3, sl, #1
+ 287 0248 014084E2 		mov	r3, r3, asl #16
+ 288 024c 2358A0E1 		cmp	r0, r3, asr #16
+ 289 0250 F3FFFFAA 		add	r7, r7, #1
+ 290 0254 F200D6E1 		mov	sl, r3, lsr #16
+ 291              		bge	.L37
+ 292              	.L41:
+ 293              		.loc 1 194 0
+ 294 0258 01308AE2 		ldmfd	sp!, {r4, r5, r6, r7, r8, sl, lr}
+ 295 025c 0338A0E1 		bx	lr
+ 296 0260 430850E1 	.LFE14:
+ 298 0268 23A8A0E1 		.align	2
+ 299 026c E8FFFFAA 		.global	matrix_float_set_zero
+ 192:CmatrixLib.c  **** 		matrix_float_set_zero(m);
+ 193:CmatrixLib.c  **** 		
+ 194:CmatrixLib.c  **** 		int16_t i;
+ 301              	FB15:
+ 302 0270 F045BDE8 		.loc 1 197 0
+ 303 0274 1EFF2FE1 		@ Function supports interworking.
+ 304              		@ args = 0, pretend = 0, frame = 0
+ 305              		@ frame_needed = 0, uses_anonymous_args = 0
+ 306              		@ link register save eliminated.
+ 307              	.LVL27:
+ 308              		.loc 1 199 0
+ 309              		mov	r1, #0
+ 310              		.loc 1 197 0
+ 195:CmatrixLib.c  **** 		for (i = 1; i <= m->height; i++) {
+ 196:CmatrixLib.c  **** 			
+ 197:CmatrixLib.c  **** 			matrix_float_set(m, i, i, (float) 1);	
+ 311              	ed for prologue
+ 312              		.loc 1 200 0
+ 313              		.loc 1 199 0
+ 314              		b	matrix_float_set_all
+ 315              	.LVL28:
+ 316              	.LFE15:
+ 198:CmatrixLib.c  **** 
+ 199:CmatrixLib.c  **** 	}
+ 317              		matrix_float_set_zero, .-matrix_float_set_zero
+ 318 0278 0010A0E3 		.align	2
+ 319              		.global	matrix_float_set_identity
+ 200:CmatrixLib.c  **** 
+ 321              	ix_float_set_identity:
+ 322              	.LFB16:
+ 323 027c FEFFFFEA 		.loc 1 203 0
+ 324              		@ Function supports interworking.
+ 325              		@ args = 0, pretend = 0, frame = 0
+ 326              		@ frame_needed = 0, uses_anonymous_args = 0
+ 327              	.LVL29:
+ 328              		.loc 1 206 0
+ 329              		ldrsh	r2, [r0, #0]
+ 330              		ldrsh	r3, [r0, #2]
+ 331              		cmp	r2, r3
+ 201:CmatrixLib.c  **** 
+ 202:CmatrixLib.c  **** // add two matrices
+ 203:CmatrixLib.c  **** void matrix_float_copy(matrix_float * a, const matrix_float * b) {
+ 332              	 0
+ 333              		stmfd	sp!, {r4, r5, r6, lr}
+ 334              	.LCFI5:
+ 335              		.loc 1 203 0
+ 336              		mov	r4, r0
+ 204:CmatrixLib.c  **** 	// matrices dimensions must agree
+ 205:CmatrixLib.c  **** 	if ((a->width == b->width) && (a->height == b->height)) {
+ 206:CmatrixLib.c  **** 		
+ 337              	 1 206 0
+ 338 0280 F020D0E1 		beq	.L53
+ 339 0284 F230D0E1 	.LVL30:
+ 340 0288 030052E1 	.L51:
+ 341              		.loc 1 217 0
+ 342 028c 70402DE9 		ldmfd	sp!, {r4, r5, r6, lr}
+ 343              		bx	lr
+ 344              	.LVL31:
+ 345 0290 0040A0E1 	.L53:
+ 346              	.LBB2:
+ 347 0294 0100000A 		.loc 1 208 0
+ 348              		bl	matrix_float_set_zero
+ 349              		.loc 1 212 0
+ 207:CmatrixLib.c  **** emcpy(a->data, b->data, a->height*a->width*sizeof(float));
+ 208:CmatrixLib.c  **** 	}
+ 209:CmatrixLib.c  **** }
+ 210:CmatrixLib.c  **** 
+ 211:CmatrixLib.c  **** // add two matrices
+ 212:CmatrixLib.c  **** void matrix_float_add(matrix_float * a, const matrix_float * b) {
+ 213:CmatrixLib.c  **** 	
+ 214:CmatrixLib.c  **** 	// matrices dimensions must agree
+ 215:CmatrixLib.c  **** 	if ((a->width == b->width) && (a->height == b->height)) {
+ 216:CmatrixLib.c  **** 		
+ 217:CmatrixLib.c  **** 		int16_t i, j;
+ 350              	4, #2]
+ 351 0298 7040BDE8 		cmp	r3, #0
+ 352 029c 1EFF2FE1 		ble	.L51
+ 353              		mov	r6, #1
+ 354              	.LVL32:
+ 355              		mov	r5, r6
+ 356              	.L50:
+ 357 02a0 FEFFFFEB 		.loc 1 214 0
+ 358              		mov	r2, r5
+ 359 02a4 F230D4E1 		mov	r1, r5
+ 360 02a8 000053E3 		mov	r3, #1065353216
+ 361 02ac F9FFFFDA 		mov	r0, r4
+ 362 02b0 0160A0E3 		bl	matrix_float_set
+ 363              		.loc 1 212 0
+ 364 02b4 0650A0E1 		add	r3, r6, #1
+ 365              		ldrsh	r2, [r4, #2]
+ 366              		mov	r3, r3, asl #16
+ 367 02b8 0520A0E1 		cmp	r2, r3, asr #16
+ 368 02bc 0510A0E1 		add	r5, r5, #1
+ 369 02c0 FE35A0E3 		mov	r6, r3, lsr #16
+ 370 02c4 0400A0E1 		bge	.L50
+ 371 02c8 FEFFFFEB 		b	.L51
+ 372              	.LBE2:
+ 373 02cc 013086E2 	.LFE16:
+ 375 02d4 0338A0E1 		.global	__addsf3
+ 376 02d8 430852E1 		.align	2
+ 377 02dc 015085E2 		.global	matrix_float_add
+ 379 02e4 F3FFFFAA 	matrix_float_add:
+ 380 02e8 EAFFFFEA 	.LFB18:
+ 381              		.loc 1 230 0
+ 382              		@ Function supports interworking.
+ 383              		@ args = 0, pretend = 0, frame = 0
+ 384              		@ frame_needed = 0, uses_anonymous_args = 0
+ 385              	.LVL33:
+ 386              		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
+ 387              	.LCFI6:
+ 388              		.loc 1 233 0
+ 389              		ldr	r2, [r0, #0]
+ 218:CmatrixLib.c  **** = 1; i <= a->height; i++) {
+ 219:CmatrixLib.c  **** 		
+ 220:CmatrixLib.c  **** 			for (j = 1; j <= a->width; j++) {
+ 221:CmatrixLib.c  **** 			
+ 222:CmatrixLib.c  **** 				matrix_float_set(a, i, j, matrix_float_get(a, i, j) + matrix_float_get((matrix_float *) b, i, j
+ 223:CmatrixLib.c  **** 			}
+ 224:CmatrixLib.c  **** 		}
+ 225:CmatrixLib.c  **** 	}
+ 226:CmatrixLib.c  **** }
+ 227:CmatrixLib.c  **** 
+ 228:CmatrixLib.c  **** 
+ 229:CmatrixLib.c  **** // subtract two matrices
+ 230:CmatrixLib.c  **** void matrix_float_sub(matrix_float * a, const matrix_float * b) {
+ 390              	0 0
+ 391              		mov	r6, r0
+ 392              		mov	sl, r1
+ 393              		.loc 1 233 0
+ 394              		beq	.L65
+ 395 02ec F0472DE9 	.LVL34:
+ 396              	.L62:
+ 231:CmatrixLib.c  **** s dimensions must agree
+ 232:CmatrixLib.c  **** 	if ((a->width == b->width) && (a->height == b->height)) {
+ 233:CmatrixLib.c  **** 		
+ 397              	 245 0
+ 398 02f0 002090E5 		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
+ 399 02f4 003091E5 		bx	lr
+ 400 02f8 030052E1 	.LVL35:
+ 401              	.L65:
+ 402 02fc 0060A0E1 	.LBB3:
+ 403 0300 01A0A0E1 		.loc 1 237 0
+ 404              		ldrsh	r1, [r0, #2]
+ 405 0304 0100000A 		cmp	r1, #0
+ 406              		ble	.L62
+ 407              	.LVL36:
+ 234:CmatrixLib.c  **** nt16_t i, j;
+ 235:CmatrixLib.c  **** 		
+ 236:CmatrixLib.c  **** 		for (i = 1; i <= a->height; i++) {
+ 237:CmatrixLib.c  **** 			
+ 238:CmatrixLib.c  **** 			for (j = 1; j <= a->width; j++) {
+ 239:CmatrixLib.c  **** 				
+ 240:CmatrixLib.c  **** 				matrix_float_set(a, i, j, matrix_float_get(a, i, j) - matrix_float_get((matrix_float *) b, i, j
+ 241:CmatrixLib.c  **** 			}
+ 242:CmatrixLib.c  **** 		}
+ 243:CmatrixLib.c  **** 	}			
+ 244:CmatrixLib.c  **** }
+ 245:CmatrixLib.c  **** 
+ 408              	
+ 409 0308 F047BDE8 	.LVL37:
+ 410 030c 1EFF2FE1 		ldrsh	r2, [r0, #0]
+ 411              		mov	r8, r9
+ 412              	.LVL38:
+ 413              	.L58:
+ 414              		.loc 1 239 0
+ 415 0310 F210D0E1 		cmp	r2, #0
+ 416 0314 000051E3 		movgt	r5, #1
+ 417 0318 FAFFFFDA 		movgt	r7, r5
+ 418              		ble	.L60
+ 419 031c 0190A0E3 	.LVL39:
+ 420              	.L59:
+ 421 0320 F020D0E1 		.loc 1 241 0
+ 422 0324 0980A0E1 		mov	r2, r5
+ 423              		mov	r1, r8
+ 424              		mov	r0, r6
+ 425              		bl	matrix_float_get
+ 426 0328 000052E3 	.LVL40:
+ 427 032c 0150A0C3 		mov	r2, r5
+ 428 0330 0570A0C1 		mov	r4, r0
+ 429 0334 180000DA 		mov	r1, r8
+ 430              		mov	r0, sl
+ 431              		bl	matrix_float_get
+ 432              		mov	r1, r0
+ 433 0338 0520A0E1 		mov	r0, r4
+ 434 033c 0810A0E1 		bl	__addsf3
+ 435 0340 0600A0E1 		mov	r2, r5
+ 436 0344 FEFFFFEB 		mov	r3, r0
+ 437              		mov	r1, r8
+ 438 0348 0520A0E1 		mov	r0, r6
+ 439 034c 0040A0E1 		bl	matrix_float_set
+ 440 0350 0810A0E1 		.loc 1 239 0
+ 441 0354 0A00A0E1 		add	r3, r7, #1
+ 442 0358 FEFFFFEB 		ldrsh	r2, [r6, #0]
+ 443 035c 0010A0E1 		mov	r3, r3, asl #16
+ 444 0360 0400A0E1 		cmp	r2, r3, asr #16
+ 445 0364 FEFFFFEB 		add	r5, r5, #1
+ 446 0368 0520A0E1 		mov	r7, r3, lsr #16
+ 447 036c 0030A0E1 		bge	.L59
+ 448 0370 0810A0E1 		ldrsh	r1, [r6, #2]
+ 449 0374 0600A0E1 	.LVL41:
+ 450 0378 FEFFFFEB 	.L60:
+ 451              		.loc 1 237 0
+ 452 037c 013087E2 		add	r3, r9, #1
+ 453 0380 F020D6E1 		mov	r3, r3, asl #16
+ 454 0384 0338A0E1 		cmp	r1, r3, asr #16
+ 455 0388 430852E1 		add	r8, r8, #1
+ 456 038c 015085E2 		mov	r9, r3, lsr #16
+ 457 0390 2378A0E1 		bge	.L58
+ 458 0394 E7FFFFAA 		b	.L62
+ 459 0398 F210D6E1 	.LBE3:
+ 460              	.LFE18:
+ 462              		.global	__subsf3
+ 463 039c 013089E2 		.align	2
+ 464 03a0 0338A0E1 		.global	matrix_float_sub
+ 466 03a8 018088E2 	matrix_float_sub:
+ 467 03ac 2398A0E1 	.LFB19:
+ 468 03b0 DCFFFFAA 		.loc 1 249 0
+ 469 03b4 D3FFFFEA 		@ Function supports interworking.
+ 470              		@ args = 0, pretend = 0, frame = 0
+ 471              		@ frame_needed = 0, uses_anonymous_args = 0
+ 472              	.LVL42:
+ 473              		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
+ 474              	.LCFI7:
+ 475              		.loc 1 252 0
+ 476              		ldr	r2, [r0, #0]
+ 477              		ldr	r3, [r1, #0]
+ 478              		cmp	r2, r3
+ 246:CmatrixLib.c  **** articular cell of the vector
+ 247:CmatrixLib.c  **** void vector_float_set(vector_float * v, const int16_t pos, const float value) {
+ 248:CmatrixLib.c  **** 	
+ 249:CmatrixLib.c  **** 	if (pos >= 1 && pos <= v->length) {
+ 479              	.L74:
+ 480              		.loc 1 264 0
+ 481              		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
+ 482              		bx	lr
+ 483              	.LVL44:
+ 484 03b8 F0472DE9 	.L77:
+ 485              	.LBB4:
+ 250:CmatrixLib.c  **** v->data[pos-1] = value;	
+ 251:CmatrixLib.c  **** 	} else {
+ 252:CmatrixLib.c  **** 		
+ 486              	 256 0
+ 487 03bc 002090E5 		ldrsh	r1, [r0, #2]
+ 488 03c0 003091E5 		cmp	r1, #0
+ 489 03c4 030052E1 		ble	.L74
+ 490              	.LVL45:
+ 491 03c8 0060A0E1 		mov	r9, #1
+ 492 03cc 01A0A0E1 	.LVL46:
+ 493              		ldrsh	r2, [r0, #0]
+ 494 03d0 0100000A 		mov	r8, r9
+ 495              	.LVL47:
+ 496              	.L70:
+ 253:CmatrixLib.c  **** / index out of bounds
+ 254:CmatrixLib.c  **** 	}
+ 255:CmatrixLib.c  **** }
+ 256:CmatrixLib.c  **** 
+ 257:CmatrixLib.c  **** // set the particular cell of the vector
+ 258:CmatrixLib.c  **** float vector_float_get(const vector_float * v, const int16_t pos) {
+ 259:CmatrixLib.c  **** 	
+ 260:CmatrixLib.c  **** 	if (pos >= 1 && pos <= v->length) {
+ 261:CmatrixLib.c  **** 	
+ 262:CmatrixLib.c  **** 		return v->data[pos-1];	
+ 263:CmatrixLib.c  **** 	}
+ 264:CmatrixLib.c  **** 	
+ 497              	 0
+ 498 03d4 F047BDE8 		cmp	r2, #0
+ 499 03d8 1EFF2FE1 		movgt	r5, #1
+ 500              		movgt	r7, r5
+ 501              		ble	.L72
+ 502              	.LVL48:
+ 503              	.L71:
+ 504 03dc F210D0E1 		.loc 1 260 0
+ 505 03e0 000051E3 		mov	r2, r5
+ 506 03e4 FAFFFFDA 		mov	r1, r8
+ 507              		mov	r0, r6
+ 508 03e8 0190A0E3 		bl	matrix_float_get
+ 509              	.LVL49:
+ 510 03ec F020D0E1 		mov	r2, r5
+ 511 03f0 0980A0E1 		mov	r4, r0
+ 512              		mov	r1, r8
+ 513              		mov	r0, sl
+ 514              		bl	matrix_float_get
+ 515 03f4 000052E3 		mov	r1, r0
+ 516 03f8 0150A0C3 		mov	r0, r4
+ 517 03fc 0570A0C1 		bl	__subsf3
+ 518 0400 180000DA 		mov	r2, r5
+ 519              		mov	r3, r0
+ 520              		mov	r1, r8
+ 521              		mov	r0, r6
+ 522 0404 0520A0E1 		bl	matrix_float_set
+ 523 0408 0810A0E1 		.loc 1 258 0
+ 524 040c 0600A0E1 		add	r3, r7, #1
+ 525 0410 FEFFFFEB 		ldrsh	r2, [r6, #0]
+ 526              		mov	r3, r3, asl #16
+ 527 0414 0520A0E1 		cmp	r2, r3, asr #16
+ 528 0418 0040A0E1 		add	r5, r5, #1
+ 529 041c 0810A0E1 		mov	r7, r3, lsr #16
+ 530 0420 0A00A0E1 		bge	.L71
+ 531 0424 FEFFFFEB 		ldrsh	r1, [r6, #2]
+ 532 0428 0010A0E1 	.LVL50:
+ 533 042c 0400A0E1 	.L72:
+ 534 0430 FEFFFFEB 		.loc 1 256 0
+ 535 0434 0520A0E1 		add	r3, r9, #1
+ 536 0438 0030A0E1 		mov	r3, r3, asl #16
+ 537 043c 0810A0E1 		cmp	r1, r3, asr #16
+ 538 0440 0600A0E1 		add	r8, r8, #1
+ 539 0444 FEFFFFEB 		mov	r9, r3, lsr #16
+ 540              		bge	.L70
+ 541 0448 013087E2 		b	.L74
+ 542 044c F020D6E1 	.LBE4:
+ 543 0450 0338A0E1 	.LFE19:
+ 545 0458 015085E2 		.align	2
+ 546 045c 2378A0E1 		.global	vector_float_set
+ 548 0464 F210D6E1 	vector_float_set:
+ 549              	.LFB20:
+ 550              		.loc 1 267 0
+ 551              		@ Function supports interworking.
+ 552 0468 013089E2 		@ args = 0, pretend = 0, frame = 0
+ 553 046c 0338A0E1 		@ frame_needed = 0, uses_anonymous_args = 0
+ 554 0470 430851E1 		@ link register save eliminated.
+ 555 0474 018088E2 	.LVL51:
+ 556 0478 2398A0E1 		.loc 1 269 0
+ 557 047c DCFFFFAA 		mov	r1, r1, asl #16
+ 558 0480 D3FFFFEA 	.LVL52:
+ 559              		mov	r1, r1, asr #16
+ 560              		cmp	r1, #0
+ 561              		.loc 1 267 0
+ 562              		@ lr needed for prologue
+ 563              		.loc 1 269 0
+ 564              		bxle	lr
+ 565              		ldrsh	r3, [r0, #0]
+ 566              		cmp	r3, r1
+ 265:CmatrixLib.c  **** ex out of bounds
+ 266:CmatrixLib.c  **** 	return 0;
+ 267:CmatrixLib.c  **** }
+ 567              	 [r3, #-4]	@ float
+ 568              		bx	lr
+ 569              	.LFE20:
+ 571              		.align	2
+ 572              		.global	vector_float_set_zero
+ 268:CmatrixLib.c  ****  transpose the vector
+ 269:CmatrixLib.c  **** void vector_float_transpose(vector_float * v) {
+ 573              		vector_float_set_zero, %function
+ 574 0484 0118A0E1 	vector_float_set_zero:
+ 575              	.LFB10:
+ 576 0488 4118A0E1 		.loc 1 130 0
+ 577 048c 000051E3 		@ Function supports interworking.
+ 578              		@ args = 0, pretend = 0, frame = 0
+ 579              		@ frame_needed = 0, uses_anonymous_args = 0
+ 580              	.LVL53:
+ 581 0490 1EFF2FD1 		.loc 1 134 0
+ 582 0494 F030D0E1 		ldrsh	r3, [r0, #0]
+ 583 0498 010053E1 		cmp	r3, #0
+ 270:CmatrixLib.c  **** if (v->orientation == 0)
+ 271:CmatrixLib.c  **** 		v->orientation = 1;
+ 584              	 0
+ 585 049c 043090A5 		stmfd	sp!, {r4, r5, r6, lr}
+ 586 04a0 013183A0 	.LCFI8:
+ 587 04a4 042003A5 		.loc 1 130 0
+ 588 04a8 1EFF2FE1 		mov	r4, r0
+ 589              		.loc 1 134 0
+ 590              		ble	.L87
+ 591              	.LVL54:
+ 592              		mov	r5, #1
+ 593              	.LVL55:
+ 594              		mov	r6, r5
+ 595              	.L86:
+ 596              		.loc 1 136 0
+ 597              		mov	r1, r6
+ 598              		mov	r2, #0
+ 599              		mov	r0, r4
+ 600              		bl	vector_float_set
+ 601              		.loc 1 134 0
+ 602 04ac F030D0E1 		add	r3, r5, #1
+ 603 04b0 000053E3 		ldrsh	r2, [r4, #0]
+ 604              		mov	r3, r3, asl #16
+ 605 04b4 70402DE9 		cmp	r2, r3, asr #16
+ 606              		add	r6, r6, #1
+ 607              		mov	r5, r3, lsr #16
+ 608 04b8 0040A0E1 		bge	.L86
+ 609              	.LVL56:
+ 610 04bc 0C0000DA 	.L87:
+ 611              		.loc 1 138 0
+ 612 04c0 0150A0E3 		ldmfd	sp!, {r4, r5, r6, lr}
+ 613              		bx	lr
+ 614 04c4 0560A0E1 	.LFE10:
+ 616              		.align	2
+ 617 04c8 0610A0E1 		.global	vector_float_set_to
+ 619 04d0 0400A0E1 	vector_float_set_to:
+ 620 04d4 FEFFFFEB 	.LFB9:
+ 621              		.loc 1 119 0
+ 622 04d8 013085E2 		@ Function supports interworking.
+ 623 04dc F020D4E1 		@ args = 0, pretend = 0, frame = 0
+ 624 04e0 0338A0E1 		@ frame_needed = 0, uses_anonymous_args = 0
+ 625 04e4 430852E1 	.LVL57:
+ 626 04e8 016086E2 		.loc 1 123 0
+ 627 04ec 2358A0E1 		ldrsh	r3, [r0, #0]
+ 628 04f0 F4FFFFAA 		cmp	r3, #0
+ 629              		.loc 1 119 0
+ 630              		stmfd	sp!, {r4, r5, r6, r7, lr}
+ 631              	.LCFI9:
+ 632 04f4 7040BDE8 		.loc 1 119 0
+ 633 04f8 1EFF2FE1 		mov	r4, r0
+ 634              		mov	r7, r1
+ 635              		.loc 1 123 0
+ 636              		ble	.L93
+ 637              	.LVL58:
+ 638              		mov	r5, #1
+ 639              	.LVL59:
+ 640              		mov	r6, r5
+ 641              	.L92:
+ 642              		.loc 1 125 0
+ 643              		mov	r1, r6
+ 644              		mov	r2, r7
+ 645              		mov	r0, r4
+ 646              		bl	vector_float_set
+ 647 04fc F030D0E1 		.loc 1 123 0
+ 648 0500 000053E3 		add	r3, r5, #1
+ 649              		ldrsh	r2, [r4, #0]
+ 650 0504 F0402DE9 		mov	r3, r3, asl #16
+ 651              		cmp	r2, r3, asr #16
+ 652              		add	r6, r6, #1
+ 653 0508 0040A0E1 		mov	r5, r3, lsr #16
+ 654 050c 0170A0E1 		bge	.L92
+ 655              	.LVL60:
+ 656 0510 0C0000DA 	.L93:
+ 657              		.loc 1 127 0
+ 658 0514 0150A0E3 		ldmfd	sp!, {r4, r5, r6, r7, lr}
+ 659              		bx	lr
+ 660 0518 0560A0E1 	.LFE9:
+ 662              		.align	2
+ 663 051c 0610A0E1 		.global	vector_float_get
+ 665 0524 0400A0E1 	vector_float_get:
+ 666 0528 FEFFFFEB 	.LFB21:
+ 667              		.loc 1 279 0
+ 668 052c 013085E2 		@ Function supports interworking.
+ 669 0530 F020D4E1 		@ args = 0, pretend = 0, frame = 0
+ 670 0534 0338A0E1 		@ frame_needed = 0, uses_anonymous_args = 0
+ 671 0538 430852E1 		@ link register save eliminated.
+ 672 053c 016086E2 	.LVL61:
+ 673 0540 2358A0E1 		.loc 1 281 0
+ 674 0544 F4FFFFAA 		mov	r1, r1, asl #16
+ 675              	.LVL62:
+ 676              		mov	r1, r1, asr #16
+ 677              		cmp	r1, #0
+ 678 0548 F040BDE8 		.loc 1 279 0
+ 679 054c 1EFF2FE1 		@ lr needed for prologue
+ 680              		.loc 1 281 0
+ 681              		ble	.L96
+ 682              		ldrsh	r3, [r0, #0]
+ 683              		cmp	r3, r1
+ 684              		blt	.L96
+ 685              		.loc 1 283 0
+ 686              		ldr	r3, [r0, #4]
+ 272:CmatrixLib.c  **** lse if (v->orientation == 1)
+ 273:CmatrixLib.c  **** 		v->orientation = 0;
+ 274:CmatrixLib.c  **** }
+ 275:CmatrixLib.c  **** 
+ 276:CmatrixLib.c  **** // get row from matrix
+ 277:CmatrixLib.c  **** void matrix_float_get_row(const matrix_float * m, vector_float * v, const int16_t row) {
+ 278:CmatrixLib.c  **** 	
+ 279:CmatrixLib.c  **** 	// the matrix width must be same as the vector length
+ 687              	oc 1 288 0
+ 688              		bx	lr
+ 689              	.LFE21:
+ 691              		.global	__mulsf3
+ 692              		.align	2
+ 280:CmatrixLib.c  **** >length == m->width)) {
+ 281:CmatrixLib.c  **** 		
+ 693              	al	vector_float_times
+ 695              	vector_float_times:
+ 696 0554 4118A0E1 	.LFB6:
+ 697 0558 000051E3 		.loc 1 91 0
+ 698              		@ Function supports interworking.
+ 699              		@ args = 0, pretend = 0, frame = 0
+ 700              		@ frame_needed = 0, uses_anonymous_args = 0
+ 701 055c 060000DA 	.LVL66:
+ 702 0560 F030D0E1 		.loc 1 95 0
+ 703 0564 010053E1 		ldrsh	r3, [r0, #0]
+ 704 0568 030000BA 		cmp	r3, #0
+ 282:CmatrixLib.c  **** int16_t i;
+ 283:CmatrixLib.c  **** 		
+ 705              	
+ 706 056c 043090E5 		stmfd	sp!, {r4, r5, r6, r7, lr}
+ 707 0570 013183E0 	.LCFI10:
+ 708 0574 040013E5 		.loc 1 91 0
+ 709              		mov	r4, r0
+ 710 0578 1EFF2FE1 		mov	r7, r1
+ 711              		.loc 1 95 0
+ 712              		ble	.L105
+ 713 057c 0000A0E3 	.LVL67:
+ 714              		mov	r6, #1
+ 284:CmatrixLib.c  **** for (i = 1; i <= m->width; i++) {
+ 285:CmatrixLib.c  **** 			
+ 286:CmatrixLib.c  **** 			vector_float_set(v, i, matrix_float_get(m, row, i));
+ 287:CmatrixLib.c  **** 		}
+ 288:CmatrixLib.c  **** 		
+ 715              	mov	r5, r6
+ 716 0580 1EFF2FE1 	.L104:
+ 717              		.loc 1 97 0
+ 718              		mov	r1, r5
+ 719              		mov	r0, r4
+ 720              		bl	vector_float_get
+ 721              		mov	r1, r7
+ 722              		bl	__mulsf3
+ 723              		mov	r1, r5
+ 724              		mov	r2, r0
+ 725              		mov	r0, r4
+ 726              		bl	vector_float_set
+ 727              		.loc 1 95 0
+ 728              		add	r3, r6, #1
+ 729              		ldrsh	r2, [r4, #0]
+ 730              		mov	r3, r3, asl #16
+ 731 0584 F030D0E1 		cmp	r2, r3, asr #16
+ 732 0588 000053E3 		add	r5, r5, #1
+ 733              		mov	r6, r3, lsr #16
+ 734 058c F0402DE9 		bge	.L104
+ 735              	.LVL69:
+ 736              	.L105:
+ 737 0590 0040A0E1 		.loc 1 99 0
+ 738 0594 0170A0E1 		ldmfd	sp!, {r4, r5, r6, r7, lr}
+ 739              		bx	lr
+ 740 0598 110000DA 	.LFE6:
+ 742 059c 0160A0E3 		.align	2
+ 743              		.global	vector_float_outer_product
+ 745              	vector_float_outer_product:
+ 746              	.LFB5:
+ 747 05a4 0510A0E1 		.loc 1 73 0
+ 748 05a8 0400A0E1 		@ Function supports interworking.
+ 749 05ac FEFFFFEB 		@ args = 0, pretend = 0, frame = 0
+ 750 05b0 0710A0E1 		@ frame_needed = 0, uses_anonymous_args = 0
+ 751 05b4 FEFFFFEB 	.LVL70:
+ 752 05b8 0510A0E1 		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 753 05bc 0020A0E1 	.LCFI11:
+ 754 05c0 0400A0E1 		.loc 1 76 0
+ 755 05c4 FEFFFFEB 		ldrsh	r3, [r0, #0]
+ 756              		.loc 1 73 0
+ 757 05c8 013086E2 		mov	r9, r2
+ 758 05cc F020D4E1 		.loc 1 76 0
+ 759 05d0 0338A0E1 		ldrsh	r2, [r2, #2]
+ 760 05d4 430852E1 	.LVL71:
+ 761 05d8 015085E2 		cmp	r2, r3
+ 762 05dc 2368A0E1 		.loc 1 73 0
+ 763 05e0 EFFFFFAA 		mov	sl, r0
+ 764              		mov	r7, r1
+ 765              		.loc 1 76 0
+ 766              		beq	.L118
+ 767 05e4 F040BDE8 	.LVL72:
+ 768 05e8 1EFF2FE1 	.L116:
+ 769              		.loc 1 88 0
+ 770              		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 771              		bx	lr
+ 772              	.LVL73:
+ 773              	.L118:
+ 774              		.loc 1 76 0
+ 775              		ldrsh	r1, [r1, #0]
+ 776              		ldrsh	r3, [r9, #0]
+ 777              		cmp	r1, r3
+ 778              		bne	.L116
+ 779              	.LBB5:
+ 780              		.loc 1 80 0
+ 781 05ec F04F2DE9 		cmp	r2, #0
+ 782              		movgt	fp, #1
+ 783              	.LVL74:
+ 784 05f0 F030D0E1 		movgt	r8, fp
+ 785              		ble	.L116
+ 786 05f4 0290A0E1 	.LVL75:
+ 787              	.L112:
+ 788 05f8 F220D2E1 		.loc 1 82 0
+ 789              		cmp	r1, #0
+ 790 05fc 030052E1 		movgt	r5, #1
+ 791              		movgt	r6, r5
+ 792 0600 00A0A0E1 		ble	.L114
+ 793 0604 0170A0E1 	.L113:
+ 794              		.loc 1 84 0
+ 795 0608 0100000A 		mov	r1, r8
+ 796              		mov	r0, sl
+ 797              		bl	vector_float_get
+ 798              		mov	r1, r5
+ 799 060c F04FBDE8 		mov	r4, r0
+ 800 0610 1EFF2FE1 		mov	r0, r7
+ 801              		bl	vector_float_get
+ 802              		mov	r1, r0
+ 803              		mov	r0, r4
+ 804 0614 F010D1E1 		bl	__mulsf3
+ 805 0618 F030D9E1 		mov	r1, r8
+ 806 061c 030051E1 		mov	r3, r0
+ 807 0620 F9FFFF1A 		mov	r2, r5
+ 808              		mov	r0, r9
+ 809              		bl	matrix_float_set
+ 810 0624 000052E3 		.loc 1 82 0
+ 811 0628 01B0A0C3 		add	r3, r6, #1
+ 812              		ldrsh	r1, [r7, #0]
+ 813 062c 0B80A0C1 		mov	r3, r3, asl #16
+ 814 0630 F5FFFFDA 		cmp	r1, r3, asr #16
+ 815              		add	r5, r5, #1
+ 816              		mov	r6, r3, lsr #16
+ 817              		bge	.L113
+ 818 0634 000051E3 	.LVL76:
+ 819 0638 0150A0C3 	.L114:
+ 820 063c 0560A0C1 		.loc 1 80 0
+ 821 0640 150000DA 		add	r3, fp, #1
+ 822              		ldrsh	r2, [sl, #0]
+ 823              		mov	r3, r3, asl #16
+ 824 0644 0810A0E1 		cmp	r2, r3, asr #16
+ 825 0648 0A00A0E1 		add	r8, r8, #1
+ 826 064c FEFFFFEB 		mov	fp, r3, lsr #16
+ 827 0650 0510A0E1 		bge	.L112
+ 828 0654 0040A0E1 		b	.L116
+ 829 0658 0700A0E1 	.LBE5:
+ 830 065c FEFFFFEB 	.LFE5:
+ 832 0664 0400A0E1 		.align	2
+ 833 0668 FEFFFFEB 		.global	vector_float_inner_product
+ 835 0670 0030A0E1 	vector_float_inner_product:
+ 836 0674 0520A0E1 	.LFB4:
+ 837 0678 0900A0E1 		.loc 1 55 0
+ 838 067c FEFFFFEB 		@ Function supports interworking.
+ 839              		@ args = 0, pretend = 0, frame = 0
+ 840 0680 013086E2 		@ frame_needed = 0, uses_anonymous_args = 0
+ 841 0684 F010D7E1 	.LVL77:
+ 842 0688 0338A0E1 		stmfd	sp!, {r4, r5, r6, r7, r8, sl, lr}
+ 843 068c 430851E1 	.LCFI12:
+ 844 0690 015085E2 		.loc 1 55 0
+ 845 0694 2368A0E1 		mov	r8, r1
+ 846 0698 E9FFFFAA 		.loc 1 60 0
+ 847              		ldrh	r1, [r0, #0]
+ 848              	.LVL78:
+ 849              		ldrsh	r2, [r8, #0]
+ 850 069c 01308BE2 		mov	r3, r1, asl #16
+ 851 06a0 F020DAE1 		cmp	r2, r3, asr #16
+ 852 06a4 0338A0E1 		.loc 1 55 0
+ 853 06a8 430852E1 		mov	sl, r0
+ 854 06ac 018088E2 		.loc 1 60 0
+ 855 06b0 23B8A0E1 		beq	.L127
+ 856 06b4 DEFFFFAA 	.LVL79:
+ 857 06b8 D3FFFFEA 	.L120:
+ 858              	.LBB6:
+ 859              		.loc 1 64 0
+ 860              		mov	r6, #0
+ 861              	.LVL80:
+ 862              	.L124:
+ 863              	.LBE6:
+ 864              		.loc 1 71 0
+ 865              		mov	r0, r6
+ 866              		ldmfd	sp!, {r4, r5, r6, r7, r8, sl, lr}
+ 867              		bx	lr
+ 868              	.LVL81:
+ 869              	.L127:
+ 870              	.LBB7:
+ 871 06bc F0452DE9 		.loc 1 64 0
+ 872              		cmp	r2, #0
+ 873              		ble	.L120
+ 874 06c0 0180A0E1 		sub	r3, r1, #1
+ 875              		mov	r3, r3, asl #16
+ 876 06c4 B010D0E1 		mov	r3, r3, lsr #16
+ 877              		mov	r6, #0
+ 878 06c8 F020D8E1 	.LVL82:
+ 879 06cc 0138A0E1 		add	r7, r3, #2
+ 880 06d0 430852E1 		mov	r5, #1
+ 881              	.L123:
+ 882 06d4 00A0A0E1 		.loc 1 66 0
+ 883              		mov	r1, r5
+ 884 06d8 0300000A 		mov	r0, sl
+ 885              		bl	vector_float_get
+ 886              		mov	r1, r5
+ 887              		mov	r4, r0
+ 888              		mov	r0, r8
+ 889 06dc 0060A0E3 		bl	vector_float_get
+ 890              		mov	r1, r0
+ 891              		mov	r0, r4
+ 892              		bl	__mulsf3
+ 893              		mov	r1, r0
+ 894 06e0 0600A0E1 		mov	r0, r6
+ 895 06e4 F045BDE8 		bl	__addsf3
+ 896 06e8 1EFF2FE1 		add	r5, r5, #1
+ 897              		.loc 1 64 0
+ 898              		cmp	r5, r7
+ 899              		.loc 1 66 0
+ 900              		mov	r6, r0
+ 901 06ec 000052E3 		.loc 1 64 0
+ 902 06f0 F9FFFFDA 		bne	.L123
+ 903 06f4 013041E2 		b	.L124
+ 904 06f8 0338A0E1 	.LBE7:
+ 905 06fc 2338A0E1 	.LFE4:
+ 907              		.align	2
+ 908 0704 027083E2 		.global	vector_float_subtract
+ 910              	vector_float_subtract:
+ 911              	.LFB3:
+ 912 070c 0510A0E1 		.loc 1 40 0
+ 913 0710 0A00A0E1 		@ Function supports interworking.
+ 914 0714 FEFFFFEB 		@ args = 0, pretend = 0, frame = 0
+ 915 0718 0510A0E1 		@ frame_needed = 0, uses_anonymous_args = 0
+ 916 071c 0040A0E1 	.LVL83:
+ 917 0720 0800A0E1 		.loc 1 43 0
+ 918 0724 FEFFFFEB 		ldrsh	r2, [r1, #0]
+ 919 0728 0010A0E1 		ldrsh	r3, [r0, #0]
+ 920 072c 0400A0E1 		cmp	r2, r3
+ 921 0730 FEFFFFEB 		.loc 1 40 0
+ 922 0734 0010A0E1 		stmfd	sp!, {r4, r5, r6, r7, r8, lr}
+ 923 0738 0600A0E1 	.LCFI13:
+ 924 073c FEFFFFEB 		.loc 1 40 0
+ 925 0740 015085E2 		mov	r5, r0
+ 926              		mov	r8, r1
+ 927 0744 070055E1 		.loc 1 43 0
+ 928              		beq	.L135
+ 929 0748 0060A0E1 	.LVL84:
+ 930              	.L133:
+ 931 074c EEFFFF1A 		.loc 1 52 0
+ 932 0750 E2FFFFEA 		ldmfd	sp!, {r4, r5, r6, r7, r8, lr}
+ 933              		bx	lr
+ 934              	.LVL85:
+ 935              	.L135:
+ 936              	.LBB8:
+ 937              		.loc 1 47 0
+ 938              		cmp	r2, #0
+ 939              		ble	.L133
+ 940              		mov	r7, #1
+ 941              	.LVL86:
+ 942              		mov	r6, r7
+ 943              	.L132:
+ 944              		.loc 1 49 0
+ 945              		mov	r1, r6
+ 946              		mov	r0, r5
+ 947 0754 F020D1E1 		bl	vector_float_get
+ 948 0758 F030D0E1 		mov	r1, r6
+ 949 075c 030052E1 		mov	r4, r0
+ 950              		mov	r0, r8
+ 951 0760 F0412DE9 		bl	vector_float_get
+ 952              		mov	r1, r0
+ 953              		mov	r0, r4
+ 954 0764 0050A0E1 		bl	__subsf3
+ 955 0768 0180A0E1 		mov	r1, r6
+ 956              		mov	r2, r0
+ 957 076c 0100000A 		mov	r0, r5
+ 958              		bl	vector_float_set
+ 959              		.loc 1 47 0
+ 960              		add	r3, r7, #1
+ 961 0770 F041BDE8 		ldrsh	r2, [r5, #0]
+ 962 0774 1EFF2FE1 		mov	r3, r3, asl #16
+ 963              		cmp	r2, r3, asr #16
+ 964              		add	r6, r6, #1
+ 965              		mov	r7, r3, lsr #16
+ 966              		bge	.L132
+ 967 0778 000052E3 		b	.L133
+ 968 077c FBFFFFDA 	.LBE8:
+ 969 0780 0170A0E3 	.LFE3:
+ 971 0784 0760A0E1 		.align	2
+ 972              		.global	vector_float_add
+ 974 0788 0610A0E1 	vector_float_add:
+ 975 078c 0500A0E1 	.LFB2:
+ 976 0790 FEFFFFEB 		.loc 1 25 0
+ 977 0794 0610A0E1 		@ Function supports interworking.
+ 978 0798 0040A0E1 		@ args = 0, pretend = 0, frame = 0
+ 979 079c 0800A0E1 		@ frame_needed = 0, uses_anonymous_args = 0
+ 980 07a0 FEFFFFEB 	.LVL87:
+ 981 07a4 0010A0E1 		.loc 1 28 0
+ 982 07a8 0400A0E1 		ldrsh	r2, [r1, #0]
+ 983 07ac FEFFFFEB 		ldrsh	r3, [r0, #0]
+ 984 07b0 0610A0E1 		cmp	r2, r3
+ 985 07b4 0020A0E1 		.loc 1 25 0
+ 986 07b8 0500A0E1 		stmfd	sp!, {r4, r5, r6, r7, r8, lr}
+ 987 07bc FEFFFFEB 	.LCFI14:
+ 988              		.loc 1 25 0
+ 989 07c0 013087E2 		mov	r5, r0
+ 990 07c4 F020D5E1 		mov	r8, r1
+ 991 07c8 0338A0E1 		.loc 1 28 0
+ 992 07cc 430852E1 		beq	.L143
+ 993 07d0 016086E2 	.LVL88:
+ 994 07d4 2378A0E1 	.L141:
+ 995 07d8 EAFFFFAA 		.loc 1 37 0
+ 996 07dc E3FFFFEA 		ldmfd	sp!, {r4, r5, r6, r7, r8, lr}
+ 997              		bx	lr
+ 998              	.LVL89:
+ 999              	.L143:
+ 1000              	.LBB9:
+ 1001              		.loc 1 32 0
+ 1002              		cmp	r2, #0
+ 1003              		ble	.L141
+ 1004              		mov	r7, #1
+ 1005              	.LVL90:
+ 1006              		mov	r6, r7
+ 1007              	.L140:
+ 1008              		.loc 1 34 0
+ 1009              		mov	r1, r6
+ 1010              		mov	r0, r5
+ 1011 07e0 F020D1E1 		bl	vector_float_get
+ 1012 07e4 F030D0E1 		mov	r1, r6
+ 1013 07e8 030052E1 		mov	r4, r0
+ 1014              		mov	r0, r8
+ 1015 07ec F0412DE9 		bl	vector_float_get
+ 1016              		mov	r1, r0
+ 1017              		mov	r0, r4
+ 1018 07f0 0050A0E1 		bl	__addsf3
+ 1019 07f4 0180A0E1 		mov	r1, r6
+ 1020              		mov	r2, r0
+ 1021 07f8 0100000A 		mov	r0, r5
+ 1022              		bl	vector_float_set
+ 1023              		.loc 1 32 0
+ 1024              		add	r3, r7, #1
+ 1025 07fc F041BDE8 		ldrsh	r2, [r5, #0]
+ 1026 0800 1EFF2FE1 		mov	r3, r3, asl #16
+ 1027              		cmp	r2, r3, asr #16
+ 1028              		add	r6, r6, #1
+ 1029              		mov	r7, r3, lsr #16
+ 1030              		bge	.L140
+ 1031 0804 000052E3 		b	.L141
+ 1032 0808 FBFFFFDA 	.LBE9:
+ 1033 080c 0170A0E3 	.LFE2:
+ 1035 0810 0760A0E1 		.align	2
+ 1036              		.global	vector_float_transpose
+ 1038 0814 0610A0E1 	vector_float_transpose:
+ 1039 0818 0500A0E1 	.LFB22:
+ 1040 081c FEFFFFEB 		.loc 1 291 0
+ 1041 0820 0610A0E1 		@ Function supports interworking.
+ 1042 0824 0040A0E1 		@ args = 0, pretend = 0, frame = 0
+ 1043 0828 0800A0E1 		@ frame_needed = 0, uses_anonymous_args = 0
+ 1044 082c FEFFFFEB 		@ link register save eliminated.
+ 1045 0830 0010A0E1 	.LVL91:
+ 1046 0834 0400A0E1 		.loc 1 293 0
+ 1047 0838 FEFFFFEB 		ldrb	r3, [r0, #2]	@ zero_extendqisi2
+ 1048 083c 0610A0E1 		cmp	r3, #0
+ 1049 0840 0020A0E1 		.loc 1 294 0
+ 1050 0844 0500A0E1 		addeq	r3, r3, #1
+ 1051 0848 FEFFFFEB 		.loc 1 291 0
+ 1052              		@ lr needed for prologue
+ 1053 084c 013087E2 		.loc 1 294 0
+ 1054 0850 F020D5E1 		streqb	r3, [r0, #2]
+ 1055 0854 0338A0E1 		.loc 1 293 0
+ 1056 0858 430852E1 		bxeq	lr
+ 1057 085c 016086E2 		.loc 1 295 0
+ 1058 0860 2378A0E1 		cmp	r3, #1
+ 1059 0864 EAFFFFAA 		.loc 1 296 0
+ 1060 0868 E3FFFFEA 		subeq	r3, r3, #1
+ 1061              		streqb	r3, [r0, #2]
+ 1062              		bx	lr
+ 1063              	.LFE22:
+ 1065              		.align	2
+ 1066              		.global	matrix_float_get_row
+ 1068              	matrix_float_get_row:
+ 289:CmatrixLib.c  **** set orientation to horizontal
+ 290:CmatrixLib.c  **** 		v->orientation = 1;
+ 291:CmatrixLib.c  **** 	}
+ 1069              	frame_needed = 0, uses_anonymous_args = 0
+ 1070              	.LVL92:
+ 1071              		stmfd	sp!, {r4, r5, r6, r7, r8, lr}
+ 1072              	.LCFI15:
+ 1073              		.loc 1 300 0
+ 1074              		mov	r7, r1
+ 292:CmatrixLib.c  **** // get column from matrix
+ 293:CmatrixLib.c  **** void matrix_float_get_col(const matrix_float * m, vector_float * v, const int16_t col) {
+ 1075              	1 303 0
+ 1076 086c 0230D0E5 		ldrsh	r3, [r7, #0]
+ 1077 0870 000053E3 		ldrsh	r1, [r0, #0]
+ 294:CmatrixLib.c  **** 	// the matrix width must be same as the vector length
+ 1078              	L93:
+ 1079 0874 01308302 		.loc 1 300 0
+ 1080              		mov	r2, r2, asl #16
+ 1081              	.LVL94:
+ 1082              		.loc 1 303 0
+ 1083 0878 0230C005 		cmp	r1, r3
+ 1084              		.loc 1 300 0
+ 1085 087c 1EFF2F01 		mov	r5, r0
+ 295:CmatrixLib.c  **** if ((v->length == m->height)) {
+ 1086              	 r2, lsr #16
+ 1087 0880 010053E3 	.LVL95:
+ 296:CmatrixLib.c  **** 	
+ 1088              	loc 1 303 0
+ 1089 0884 01304302 		beq	.L158
+ 1090 0888 0230C005 	.LVL96:
+ 1091 088c 1EFF2FE1 	.L156:
+ 1092              		.loc 1 315 0
+ 1093              		ldmfd	sp!, {r4, r5, r6, r7, r8, lr}
+ 1094              		bx	lr
+ 1095              	.LVL97:
+ 1096              	.L158:
+ 1097              	.LBB10:
+ 1098              		.loc 1 307 0
+ 297:CmatrixLib.c  **** 	int16_t i;
+ 298:CmatrixLib.c  **** 		
+ 299:CmatrixLib.c  **** 		for (i = 1; i <= m->height; i++) {
+ 300:CmatrixLib.c  **** 			
+ 1099              	
+ 1100              		ble	.L153
+ 1101              		mov	r3, r2, asl #16
+ 1102              		mov	r6, #1
+ 1103              	.LVL98:
+ 1104 0890 F0412DE9 		mov	r8, r3, asr #16
+ 1105              		mov	r4, r6
+ 1106              	.L155:
+ 1107 0894 0170A0E1 		.loc 1 309 0
+ 301:CmatrixLib.c  **** ector_float_set(v, i, matrix_float_get(m, i, col));
+ 302:CmatrixLib.c  **** 		}
+ 303:CmatrixLib.c  **** 		
+ 1108              	 r4
+ 1109 0898 F030D7E1 	.LVL99:
+ 1110 089c F010D0E1 		mov	r1, r8
+ 1111              		mov	r0, r5
+ 1112              		bl	matrix_float_get
+ 1113 08a0 0228A0E1 		mov	r1, r4
+ 1114              		mov	r2, r0
+ 1115              		mov	r0, r7
+ 1116 08a4 030051E1 		bl	vector_float_set
+ 1117              		.loc 1 307 0
+ 1118 08a8 0050A0E1 		add	r3, r6, #1
+ 1119 08ac 2228A0E1 		ldrsh	r2, [r5, #0]
+ 1120              		mov	r3, r3, asl #16
+ 1121              		cmp	r2, r3, asr #16
+ 1122 08b0 0100000A 		add	r4, r4, #1
+ 1123              		mov	r6, r3, lsr #16
+ 1124              		bge	.L155
+ 304:CmatrixLib.c  **** / set orientation to vertical
+ 305:CmatrixLib.c  **** 		v->orientation = 0;
+ 306:CmatrixLib.c  **** 	}
+ 307:CmatrixLib.c  **** }
+ 308:CmatrixLib.c  **** 
+ 309:CmatrixLib.c  **** // multiply two matrices
+ 310:CmatrixLib.c  **** void matrix_float_mul(const matrix_float * a, const matrix_float * b, matrix_float * C) {
+ 311:CmatrixLib.c  **** 	
+ 312:CmatrixLib.c  **** 	int16_t i, j, k;
+ 313:CmatrixLib.c  **** 	float tempSum;
+ 314:CmatrixLib.c  **** 	
+ 315:CmatrixLib.c  **** 	// dimensions must agree
+ 1125              	.loc 1 313 0
+ 1126 08b4 F041BDE8 		mov	r3, #1
+ 1127 08b8 1EFF2FE1 		strb	r3, [r7, #2]
+ 1128              		b	.L156
+ 1129              	.LBE10:
+ 1130              	.LFE23:
+ 1132 08bc 000051E3 		.align	2
+ 1133 08c0 120000DA 		.global	matrix_float_get_col
+ 1135 08c8 0160A0E3 	matrix_float_get_col:
+ 1136              	.LFB24:
+ 1137 08cc 4388A0E1 		.loc 1 318 0
+ 1138 08d0 0640A0E1 		@ Function supports interworking.
+ 1139              		@ args = 0, pretend = 0, frame = 0
+ 1140              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1141 08d4 0420A0E1 	.LVL101:
+ 1142              		stmfd	sp!, {r4, r5, r6, r7, r8, lr}
+ 1143 08d8 0810A0E1 	.LCFI16:
+ 1144 08dc 0500A0E1 		.loc 1 318 0
+ 1145 08e0 FEFFFFEB 		mov	r7, r1
+ 1146 08e4 0410A0E1 		.loc 1 321 0
+ 1147 08e8 0020A0E1 		ldrsh	r3, [r7, #0]
+ 1148 08ec 0700A0E1 		ldrsh	r1, [r0, #2]
+ 1149 08f0 FEFFFFEB 	.LVL102:
+ 1150              		.loc 1 318 0
+ 1151 08f4 013086E2 		mov	r2, r2, asl #16
+ 1152 08f8 F020D5E1 	.LVL103:
+ 1153 08fc 0338A0E1 		.loc 1 321 0
+ 1154 0900 430852E1 		cmp	r1, r3
+ 1155 0904 014084E2 		.loc 1 318 0
+ 1156 0908 2368A0E1 		mov	r5, r0
+ 1157 090c F0FFFFAA 		mov	r2, r2, lsr #16
+ 1158              	.LVL104:
+ 1159              		.loc 1 321 0
+ 1160              		beq	.L167
+ 1161 0910 0130A0E3 	.LVL105:
+ 1162 0914 0230C7E5 	.L165:
+ 1163 0918 E5FFFFEA 		.loc 1 333 0
+ 1164              		ldmfd	sp!, {r4, r5, r6, r7, r8, lr}
+ 1165              		bx	lr
+ 1166              	.LVL106:
+ 1167              	.L167:
+ 1168              	.LBB11:
+ 1169              		.loc 1 325 0
+ 1170              		cmp	r1, #0
+ 1171              		ble	.L162
+ 316:CmatrixLib.c  **** h == b->height && a->height == C->height && b->width == C->width) {
+ 317:CmatrixLib.c  **** 		
+ 318:CmatrixLib.c  **** 		for (i = 1; i <= C->height; i++) {
+ 1172              	r8, r3, asr #16
+ 1173              		mov	r4, r6
+ 1174              	.L164:
+ 1175              		.loc 1 327 0
+ 1176              		mov	r1, r4
+ 1177 091c F0412DE9 		mov	r2, r8
+ 1178              	.LVL108:
+ 1179              		mov	r0, r5
+ 1180 0920 0170A0E1 		bl	matrix_float_get
+ 319:CmatrixLib.c  **** 
+ 320:CmatrixLib.c  **** 			for (j = 1; j <= C->width; j++) {
+ 321:CmatrixLib.c  **** 				
+ 1181              	r4
+ 1182 0924 F030D7E1 		mov	r2, r0
+ 1183 0928 F210D0E1 		mov	r0, r7
+ 1184              		bl	vector_float_set
+ 1185              		.loc 1 325 0
+ 1186 092c 0228A0E1 		add	r3, r6, #1
+ 1187              		ldrsh	r2, [r5, #2]
+ 1188              		mov	r3, r3, asl #16
+ 1189 0930 030051E1 		cmp	r2, r3, asr #16
+ 1190              		add	r4, r4, #1
+ 1191 0934 0050A0E1 		mov	r6, r3, lsr #16
+ 1192 0938 2228A0E1 		bge	.L164
+ 1193              	.LVL109:
+ 1194              	.L162:
+ 1195 093c 0100000A 		.loc 1 331 0
+ 1196              		mov	r3, #0
+ 1197              		strb	r3, [r7, #2]
+ 322:CmatrixLib.c  **** 		tempSum = 0;
+ 323:CmatrixLib.c  **** 				for (k = 1; k <= a->width; k++) {
+ 324:CmatrixLib.c  **** 					tempSum += matrix_float_get(a, i, k)*matrix_float_get(b, k, j);
+ 325:CmatrixLib.c  **** 				}
+ 326:CmatrixLib.c  **** 				
+ 327:CmatrixLib.c  **** 				matrix_float_set(C, i, j, tempSum);
+ 328:CmatrixLib.c  **** 			}
+ 329:CmatrixLib.c  **** 		}
+ 330:CmatrixLib.c  **** 	}
+ 331:CmatrixLib.c  **** }
+ 332:CmatrixLib.c  **** 
+ 333:CmatrixLib.c  **** // multiply two matrices, one of which is transposed, a*b'
+ 1198              	.LFE24:
+ 1200 0944 1EFF2FE1 		.align	2
+ 1201              		.global	matrix_float_mul
+ 1203              	matrix_float_mul:
+ 1204              	.LFB25:
+ 1205 0948 000051E3 		.loc 1 336 0
+ 1206 094c 120000DA 		@ Function supports interworking.
+ 1207 0950 0238A0E1 		@ args = 0, pretend = 0, frame = 12
+ 1208 0954 0160A0E3 		@ frame_needed = 0, uses_anonymous_args = 0
+ 1209              	.LVL110:
+ 1210 0958 4388A0E1 		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 1211 095c 0640A0E1 	.LCFI17:
+ 1212              		mov	r9, r1
+ 1213              		.loc 1 342 0
+ 1214 0960 0410A0E1 		ldrsh	r3, [r9, #2]
+ 1215 0964 0820A0E1 		ldrsh	r1, [r0, #0]
+ 1216              	.LVL111:
+ 1217 0968 0500A0E1 		.loc 1 336 0
+ 1218 096c FEFFFFEB 		sub	sp, sp, #12
+ 1219 0970 0410A0E1 	.LCFI18:
+ 1220 0974 0020A0E1 		.loc 1 342 0
+ 1221 0978 0700A0E1 		cmp	r1, r3
+ 1222 097c FEFFFFEB 		.loc 1 336 0
+ 1223              		mov	sl, r0
+ 1224 0980 013086E2 		str	r2, [sp, #0]
+ 1225 0984 F220D5E1 		.loc 1 342 0
+ 1226 0988 0338A0E1 		beq	.L185
+ 1227 098c 430852E1 	.LVL112:
+ 1228 0990 014084E2 	.L182:
+ 1229 0994 2368A0E1 		.loc 1 357 0
+ 1230 0998 F0FFFFAA 		add	sp, sp, #12
+ 1231              		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 1232              		bx	lr
+ 1233              	.LVL113:
+ 1234 099c 0030A0E3 	.L185:
+ 1235 09a0 0230C7E5 		.loc 1 342 0
+ 1236 09a4 E5FFFFEA 		ldrsh	r1, [r2, #2]
+ 1237              		ldrsh	r3, [r0, #2]
+ 1238              		cmp	r1, r3
+ 1239              		bne	.L182
+ 1240              	.LVL114:
+ 1241              		ldrsh	r3, [r9, #0]
+ 1242              		ldrsh	r2, [r2, #0]
+ 1243              	.LVL115:
+ 1244              		cmp	r3, r2
+ 334:CmatrixLib.c  **** float_mul_trans(const matrix_float * a, const matrix_float * b, matrix_float * C) {
+ 335:CmatrixLib.c  **** 	
+ 336:CmatrixLib.c  **** 	int16_t i, j, k;
+ 1245              	 #1
+ 1246              	.LVL116:
+ 1247              		strgt	r0, [sp, #4]
+ 1248              	.LVL117:
+ 1249              		movgt	fp, r0
+ 1250 09a8 F04F2DE9 		ble	.L182
+ 1251              	.LVL118:
+ 1252 09ac 0190A0E1 	.L174:
+ 337:CmatrixLib.c  **** oat tempSum;
+ 338:CmatrixLib.c  **** 	
+ 339:CmatrixLib.c  **** 	// dimensions must agree
+ 340:CmatrixLib.c  **** 	if (a->width == b->width && a->height == C->height && b->height == C->width) {
+ 341:CmatrixLib.c  **** 		
+ 342:CmatrixLib.c  **** 		for (i = 1; i <= C->height; i++) {
+ 1253              	346 0
+ 1254 09b0 F230D9E1 		cmp	r2, #0
+ 1255 09b4 F010D0E1 		movgt	r7, #1
+ 1256              		strgt	r7, [sp, #8]
+ 1257              		ble	.L177
+ 1258 09b8 0CD04DE2 	.L178:
+ 1259              		.loc 1 349 0
+ 1260              		ldrh	r2, [sl, #0]
+ 1261 09bc 030051E1 		mov	r3, r2, asl #16
+ 1262              		cmp	r3, #0
+ 1263 09c0 00A0A0E1 		movle	r6, #0
+ 1264 09c4 00208DE5 		movgt	r6, #0
+ 1265              		subgt	r8, r2, #1
+ 1266 09c8 0200000A 		movgt	r5, #1
+ 1267              		ble	.L176
+ 1268              	.L175:
+ 343:CmatrixLib.c  **** 	for (j = 1; j <= C->width; j++) {
+ 344:CmatrixLib.c  **** 				
+ 345:CmatrixLib.c  **** 				tempSum = 0;
+ 346:CmatrixLib.c  **** 				for (k = 1; k <= a->width; k++) {
+ 347:CmatrixLib.c  **** 					tempSum += matrix_float_get(a, i, k)*matrix_float_get(b, j, k);
+ 348:CmatrixLib.c  **** 				}
+ 349:CmatrixLib.c  **** 				
+ 350:CmatrixLib.c  **** 				matrix_float_set(C, i, j, tempSum);
+ 351:CmatrixLib.c  **** 			}
+ 352:CmatrixLib.c  **** 		}
+ 353:CmatrixLib.c  **** 	}
+ 354:CmatrixLib.c  **** }
+ 355:CmatrixLib.c  **** 
+ 356:CmatrixLib.c  **** // multiply matrix by a constant
+ 357:CmatrixLib.c  **** void matrix_float_times(matrix_float * a, const float C) {
+ 1269              	ov	r2, r5
+ 1270 09cc 0CD08DE2 		mov	r1, fp
+ 1271 09d0 F04FBDE8 		mov	r0, sl
+ 1272 09d4 1EFF2FE1 		bl	matrix_float_get
+ 1273              		mov	r1, r5
+ 1274              		mov	r2, r7
+ 1275              		mov	r4, r0
+ 1276 09d8 F210D2E1 		mov	r0, r9
+ 1277 09dc F230D0E1 		bl	matrix_float_get
+ 1278 09e0 030051E1 		mov	r1, r0
+ 1279 09e4 F8FFFF1A 		mov	r0, r4
+ 1280              		bl	__mulsf3
+ 1281 09e8 F030D9E1 		mov	r1, r0
+ 1282 09ec F020D2E1 		mov	r0, r6
+ 1283              		bl	__addsf3
+ 1284 09f0 020053E1 		.loc 1 349 0
+ 1285 09f4 F4FFFF1A 		mov	r3, r8, asl #16
+ 1286              		mov	r3, r3, lsr #16
+ 1287 09f8 000051E3 		.loc 1 350 0
+ 1288 09fc 0100A0C3 		add	r5, r5, #1
+ 1289              		.loc 1 349 0
+ 1290 0a00 04008DC5 		add	r3, r3, #2
+ 1291              		cmp	r5, r3
+ 1292 0a04 00B0A0C1 		.loc 1 350 0
+ 1293 0a08 EFFFFFDA 		mov	r6, r0
+ 1294              		.loc 1 349 0
+ 1295              		bne	.L175
+ 1296              	.L176:
+ 1297 0a0c 000052E3 		.loc 1 353 0
+ 1298 0a10 0170A0C3 		mov	r2, r7
+ 1299 0a14 08708DC5 		mov	r3, r6
+ 1300 0a18 2E0000DA 		ldr	r0, [sp, #0]
+ 1301              		mov	r1, fp
+ 1302              		bl	matrix_float_set
+ 1303 0a1c B020DAE1 		.loc 1 346 0
+ 1304 0a20 0238A0E1 		ldr	r1, [sp, #8]
+ 1305 0a24 000053E3 		ldr	r0, [sp, #0]
+ 1306 0a28 0060A0D3 		add	r3, r1, #1
+ 1307 0a2c 0060A0C3 		ldrsh	r2, [r0, #0]
+ 1308 0a30 018042C2 		mov	r3, r3, asl #16
+ 1309 0a34 0150A0C3 		cmp	r2, r3, asr #16
+ 1310 0a38 150000DA 		mov	r3, r3, lsr #16
+ 1311              		add	r7, r7, #1
+ 1312              		str	r3, [sp, #8]
+ 1313 0a3c 0520A0E1 		bge	.L178
+ 1314 0a40 0B10A0E1 		ldr	r3, [sp, #0]
+ 1315 0a44 0A00A0E1 		ldrsh	r1, [r3, #2]
+ 1316 0a48 FEFFFFEB 	.L177:
+ 1317 0a4c 0510A0E1 		.loc 1 344 0
+ 1318 0a50 0720A0E1 		ldr	r0, [sp, #4]
+ 1319 0a54 0040A0E1 		add	r3, r0, #1
+ 1320 0a58 0900A0E1 		mov	r3, r3, asl #16
+ 1321 0a5c FEFFFFEB 		cmp	r1, r3, asr #16
+ 1322 0a60 0010A0E1 		mov	r3, r3, lsr #16
+ 1323 0a64 0400A0E1 		add	fp, fp, #1
+ 1324 0a68 FEFFFFEB 		str	r3, [sp, #4]
+ 1325 0a6c 0010A0E1 		bge	.L174
+ 1326 0a70 0600A0E1 		b	.L182
+ 1327 0a74 FEFFFFEB 	.LFE25:
+ 1329 0a78 0838A0E1 		.align	2
+ 1330 0a7c 2338A0E1 		.global	matrix_float_mul_trans
+ 1332 0a80 015085E2 	matrix_float_mul_trans:
+ 1333              	.LFB26:
+ 1334 0a84 023083E2 		.loc 1 360 0
+ 1335 0a88 030055E1 		@ Function supports interworking.
+ 1336              		@ args = 0, pretend = 0, frame = 12
+ 1337 0a8c 0060A0E1 		@ frame_needed = 0, uses_anonymous_args = 0
+ 1338              	.LVL119:
+ 1339 0a90 E9FFFF1A 		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 1340              	.LCFI19:
+ 1341              		mov	r9, r1
+ 1342 0a94 0720A0E1 		.loc 1 366 0
+ 1343 0a98 0630A0E1 		ldrsh	r3, [r9, #0]
+ 1344 0a9c 00009DE5 		ldrsh	r1, [r0, #0]
+ 1345 0aa0 0B10A0E1 	.LVL120:
+ 1346 0aa4 FEFFFFEB 		.loc 1 360 0
+ 1347              		sub	sp, sp, #12
+ 1348 0aa8 08109DE5 	.LCFI20:
+ 1349 0aac 00009DE5 		.loc 1 366 0
+ 1350 0ab0 013081E2 		cmp	r1, r3
+ 1351 0ab4 F020D0E1 		.loc 1 360 0
+ 1352 0ab8 0338A0E1 		mov	sl, r0
+ 1353 0abc 430852E1 		str	r2, [sp, #0]
+ 1354 0ac0 2338A0E1 		.loc 1 366 0
+ 1355 0ac4 017087E2 		beq	.L203
+ 1356 0ac8 08308DE5 	.LVL121:
+ 1357 0acc D2FFFFAA 	.L200:
+ 1358 0ad0 00309DE5 		.loc 1 381 0
+ 1359 0ad4 F210D3E1 		add	sp, sp, #12
+ 1360              		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 1361              		bx	lr
+ 1362 0ad8 04009DE5 	.LVL122:
+ 1363 0adc 013080E2 	.L203:
+ 1364 0ae0 0338A0E1 		.loc 1 366 0
+ 1365 0ae4 430851E1 		ldrsh	r1, [r2, #2]
+ 1366 0ae8 2338A0E1 		ldrsh	r3, [r0, #2]
+ 1367 0aec 01B08BE2 		cmp	r1, r3
+ 1368 0af0 04308DE5 		bne	.L200
+ 1369 0af4 C4FFFFAA 	.LVL123:
+ 1370 0af8 B3FFFFEA 		ldrsh	r3, [r9, #2]
+ 1371              		ldrsh	r2, [r2, #0]
+ 1372              	.LVL124:
+ 1373              		cmp	r3, r2
+ 1374              		bne	.L200
+ 1375              		.loc 1 368 0
+ 1376              		cmp	r1, #0
+ 1377              		movgt	r0, #1
+ 358:CmatrixLib.c  **** ;
+ 359:CmatrixLib.c  **** 	
+ 360:CmatrixLib.c  **** 	for (i = 1; i <= a->height; i++) {
+ 1378              	gt	r7, #1
+ 1379              		strgt	r7, [sp, #8]
+ 1380              		ble	.L195
+ 1381              	.L196:
+ 1382              		.loc 1 373 0
+ 1383 0afc F04F2DE9 		ldrh	r2, [sl, #0]
+ 1384              		mov	r3, r2, asl #16
+ 1385 0b00 0190A0E1 		cmp	r3, #0
+ 361:CmatrixLib.c  **** 		for (j = 1; j <= a->width; j++) {
+ 362:CmatrixLib.c  **** 			
+ 363:CmatrixLib.c  **** 			matrix_float_set(a, i, j, C*matrix_float_get(a, i, j));
+ 364:CmatrixLib.c  **** 		}
+ 365:CmatrixLib.c  **** 	}
+ 366:CmatrixLib.c  **** }
+ 1386              	6, #0
+ 1387 0b04 F030D9E1 		movgt	r6, #0
+ 1388 0b08 F010D0E1 		subgt	r8, r2, #1
+ 1389              		movgt	r5, #1
+ 1390              		ble	.L194
+ 1391 0b0c 0CD04DE2 	.L193:
+ 1392              		.loc 1 374 0
+ 1393              		mov	r2, r5
+ 1394 0b10 030051E1 		mov	r1, fp
+ 1395              		mov	r0, sl
+ 1396 0b14 00A0A0E1 		bl	matrix_float_get
+ 1397 0b18 00208DE5 		mov	r2, r5
+ 1398              		mov	r4, r0
+ 1399 0b1c 0200000A 		mov	r1, r7
+ 1400              		mov	r0, r9
+ 1401              		bl	matrix_float_get
+ 367:CmatrixLib.c  **** ltiply a matrix by a vector from the right
+ 368:CmatrixLib.c  **** void matrix_float_mul_vec_right(const matrix_float * m, const vector_float * v, vector_float * C) {
+ 369:CmatrixLib.c  **** 	
+ 370:CmatrixLib.c  **** 	int16_t i, j;
+ 371:CmatrixLib.c  **** 	float tempSum;
+ 372:CmatrixLib.c  **** 	
+ 373:CmatrixLib.c  **** 	// dimensions must agree
+ 374:CmatrixLib.c  **** 	if ((m->width == v->length) && (m->height == C->length)) {
+ 375:CmatrixLib.c  **** 		
+ 376:CmatrixLib.c  **** 		for (i = 1; i <= m->height; i++) {
+ 377:CmatrixLib.c  **** 			
+ 378:CmatrixLib.c  **** 			tempSum = 0;
+ 379:CmatrixLib.c  **** 			
+ 380:CmatrixLib.c  **** 			for (j = 1; j <= m->width; j++) {
+ 381:CmatrixLib.c  **** 			
+ 1402              		r0, r4
+ 1403 0b20 0CD08DE2 		bl	__mulsf3
+ 1404 0b24 F04FBDE8 		mov	r1, r0
+ 1405 0b28 1EFF2FE1 		mov	r0, r6
+ 1406              		bl	__addsf3
+ 1407              		.loc 1 373 0
+ 1408              		mov	r3, r8, asl #16
+ 1409 0b2c F210D2E1 		mov	r3, r3, lsr #16
+ 1410 0b30 F230D0E1 		.loc 1 374 0
+ 1411 0b34 030051E1 		add	r5, r5, #1
+ 1412 0b38 F8FFFF1A 		.loc 1 373 0
+ 1413              		add	r3, r3, #2
+ 1414 0b3c F230D9E1 		cmp	r5, r3
+ 1415 0b40 F020D2E1 		.loc 1 374 0
+ 1416              		mov	r6, r0
+ 1417 0b44 020053E1 		.loc 1 373 0
+ 1418 0b48 F4FFFF1A 		bne	.L193
+ 1419              	.L194:
+ 1420 0b4c 000051E3 		.loc 1 377 0
+ 1421 0b50 0100A0C3 		mov	r2, r7
+ 1422              		mov	r3, r6
+ 1423 0b54 04008DC5 		ldr	r0, [sp, #0]
+ 1424              		mov	r1, fp
+ 1425 0b58 00B0A0C1 		bl	matrix_float_set
+ 1426 0b5c EFFFFFDA 		.loc 1 370 0
+ 1427              		ldr	r1, [sp, #8]
+ 1428              		ldr	r0, [sp, #0]
+ 1429              		add	r3, r1, #1
+ 1430 0b60 000052E3 		ldrsh	r2, [r0, #0]
+ 1431 0b64 0170A0C3 		mov	r3, r3, asl #16
+ 1432 0b68 08708DC5 		cmp	r2, r3, asr #16
+ 1433 0b6c 2E0000DA 		mov	r3, r3, lsr #16
+ 1434              		add	r7, r7, #1
+ 1435              		str	r3, [sp, #8]
+ 1436 0b70 B020DAE1 		bge	.L196
+ 1437 0b74 0238A0E1 		ldr	r3, [sp, #0]
+ 1438 0b78 000053E3 		ldrsh	r1, [r3, #2]
+ 1439 0b7c 0060A0D3 	.L195:
+ 1440 0b80 0060A0C3 		.loc 1 368 0
+ 1441 0b84 018042C2 		ldr	r0, [sp, #4]
+ 1442 0b88 0150A0C3 		add	r3, r0, #1
+ 1443 0b8c 150000DA 		mov	r3, r3, asl #16
+ 1444              		cmp	r1, r3, asr #16
+ 1445              		mov	r3, r3, lsr #16
+ 1446 0b90 0520A0E1 		add	fp, fp, #1
+ 1447 0b94 0B10A0E1 		str	r3, [sp, #4]
+ 1448 0b98 0A00A0E1 		bge	.L192
+ 1449 0b9c FEFFFFEB 		b	.L200
+ 1450 0ba0 0520A0E1 	.LFE26:
+ 1452 0ba8 0710A0E1 		.align	2
+ 1453 0bac 0900A0E1 		.global	matrix_float_times
+ 1455 0bb4 0010A0E1 	matrix_float_times:
+ 1456 0bb8 0400A0E1 	.LFB27:
+ 1457 0bbc FEFFFFEB 		.loc 1 384 0
+ 1458 0bc0 0010A0E1 		@ Function supports interworking.
+ 1459 0bc4 0600A0E1 		@ args = 0, pretend = 0, frame = 0
+ 1460 0bc8 FEFFFFEB 		@ frame_needed = 0, uses_anonymous_args = 0
+ 1461              	.LVL128:
+ 1462 0bcc 0838A0E1 		stmfd	sp!, {r4, r5, r6, r7, r8, sl, lr}
+ 1463 0bd0 2338A0E1 	.LCFI21:
+ 1464              		.loc 1 384 0
+ 1465 0bd4 015085E2 		mov	r5, r0
+ 1466              		.loc 1 388 0
+ 1467 0bd8 023083E2 		ldrsh	r0, [r0, #2]
+ 1468 0bdc 030055E1 	.LVL129:
+ 1469              		cmp	r0, #0
+ 1470 0be0 0060A0E1 		.loc 1 384 0
+ 1471              		mov	r8, r1
+ 1472 0be4 E9FFFF1A 		.loc 1 388 0
+ 1473              		ble	.L211
+ 1474              	.LVL130:
+ 1475 0be8 0720A0E1 		mov	sl, #1
+ 1476 0bec 0630A0E1 	.LVL131:
+ 1477 0bf0 00009DE5 		ldrsh	r2, [r5, #0]
+ 1478 0bf4 0B10A0E1 		mov	r7, sl
+ 1479 0bf8 FEFFFFEB 	.LVL132:
+ 1480              	.L207:
+ 1481 0bfc 08109DE5 		.loc 1 390 0
+ 1482 0c00 00009DE5 		cmp	r2, #0
+ 1483 0c04 013081E2 		movgt	r4, #1
+ 1484 0c08 F020D0E1 		movgt	r6, r4
+ 1485 0c0c 0338A0E1 		ble	.L209
+ 1486 0c10 430852E1 	.L208:
+ 1487 0c14 2338A0E1 		.loc 1 392 0
+ 1488 0c18 017087E2 		mov	r2, r4
+ 1489 0c1c 08308DE5 		mov	r1, r7
+ 1490 0c20 D2FFFFAA 		mov	r0, r5
+ 1491 0c24 00309DE5 		bl	matrix_float_get
+ 1492 0c28 F210D3E1 		mov	r1, r8
+ 1493              		bl	__mulsf3
+ 1494              		mov	r2, r4
+ 1495 0c2c 04009DE5 		mov	r3, r0
+ 1496 0c30 013080E2 		mov	r1, r7
+ 1497 0c34 0338A0E1 		mov	r0, r5
+ 1498 0c38 430851E1 		bl	matrix_float_set
+ 1499 0c3c 2338A0E1 		.loc 1 390 0
+ 1500 0c40 01B08BE2 		add	r3, r6, #1
+ 1501 0c44 04308DE5 		ldrsh	r2, [r5, #0]
+ 1502 0c48 C4FFFFAA 		mov	r3, r3, asl #16
+ 1503 0c4c B3FFFFEA 		cmp	r2, r3, asr #16
+ 1504              		add	r4, r4, #1
+ 1505              		mov	r6, r3, lsr #16
+ 1506              		bge	.L208
+ 1507              		ldrsh	r0, [r5, #2]
+ 1508              	.LVL133:
+ 1509              	.L209:
+ 1510              		.loc 1 388 0
+ 382:CmatrixLib.c  **** matrix_float_get(m, i, j)*vector_float_get(v, j);	
+ 383:CmatrixLib.c  **** 			}
+ 384:CmatrixLib.c  **** 			vector_float_set(C, i, tempSum);
+ 1511              	11:
+ 1512              		.loc 1 395 0
+ 1513              		ldmfd	sp!, {r4, r5, r6, r7, r8, sl, lr}
+ 1514              		bx	lr
+ 1515              	.LFE27:
+ 1517              		.align	2
+ 1518              		.global	matrix_float_mul_vec_right
+ 385:CmatrixLib.c  **** 
+ 386:CmatrixLib.c  **** 	
+ 387:CmatrixLib.c  **** 		// set orientation to vertical
+ 388:CmatrixLib.c  **** 		C->orientation = 0;
+ 1520              	oat_mul_vec_right:
+ 1521 0c58 F200D0E1 	.LFB28:
+ 1522              		.loc 1 398 0
+ 1523 0c5c 000050E3 		@ Function supports interworking.
+ 1524              		@ args = 0, pretend = 0, frame = 4
+ 1525 0c60 0180A0E1 		@ frame_needed = 0, uses_anonymous_args = 0
+ 1526              	.LVL134:
+ 1527 0c64 1F0000DA 		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 1528              	.LCFI22:
+ 1529 0c68 01A0A0E3 		mov	r9, r1
+ 1530              		.loc 1 404 0
+ 1531 0c6c F020D5E1 		ldrsh	r3, [r9, #0]
+ 1532 0c70 0A70A0E1 		ldrsh	r1, [r0, #0]
+ 1533              	.LVL135:
+ 1534              		cmp	r1, r3
+ 389:CmatrixLib.c  **** 
+ 390:CmatrixLib.c  **** }
+ 1535              	sub	sp, sp, #4
+ 1536 0c74 000052E3 	.LCFI23:
+ 1537 0c78 0140A0C3 		.loc 1 398 0
+ 1538 0c7c 0460A0C1 		mov	r7, r0
+ 1539 0c80 120000DA 		mov	fp, r2
+ 1540              		.loc 1 404 0
+ 391:CmatrixLib.c  **** // multiply a matrix by a vector from the left
+ 392:CmatrixLib.c  **** void matrix_float_mul_vec_left(const matrix_float * m, const vector_float * v, vector_float * C) {
+ 1541              	L227
+ 1542 0c84 0420A0E1 	.LVL136:
+ 1543 0c88 0710A0E1 	.L225:
+ 1544 0c8c 0500A0E1 		.loc 1 420 0
+ 1545 0c90 FEFFFFEB 		add	sp, sp, #4
+ 1546 0c94 0810A0E1 		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 1547 0c98 FEFFFFEB 		bx	lr
+ 1548 0c9c 0420A0E1 	.LVL137:
+ 1549 0ca0 0030A0E1 	.L227:
+ 1550 0ca4 0710A0E1 		.loc 1 404 0
+ 1551 0ca8 0500A0E1 		ldrsh	r2, [r2, #0]
+ 1552 0cac FEFFFFEB 		ldrsh	r3, [r0, #2]
+ 1553              		cmp	r2, r3
+ 1554 0cb0 013086E2 		bne	.L225
+ 1555 0cb4 F020D5E1 	.LVL138:
+ 1556 0cb8 0338A0E1 		.loc 1 406 0
+ 1557 0cbc 430852E1 		cmp	r2, #0
+ 1558 0cc0 014084E2 		movgt	r2, #1
+ 1559 0cc4 2368A0E1 		strgt	r2, [sp, #0]
+ 1560 0cc8 EDFFFFAA 	.LVL139:
+ 1561 0ccc F200D5E1 		movgt	sl, r2
+ 1562              		ble	.L218
+ 1563              	.LVL140:
+ 1564              	.L220:
+ 1565 0cd0 01308AE2 		.loc 1 410 0
+ 1566 0cd4 0338A0E1 		ldrh	r2, [r7, #0]
+ 1567 0cd8 430850E1 		mov	r3, r2, asl #16
+ 1568 0cdc 017087E2 		cmp	r3, #0
+ 1569 0ce0 23A8A0E1 		movle	r6, #0
+ 1570 0ce4 E2FFFFAA 		movgt	r6, #0
+ 1571              		subgt	r8, r2, #1
+ 393:CmatrixLib.c  **** 	int16_t i, j;
+ 394:CmatrixLib.c  **** 	float tempSum;
+ 395:CmatrixLib.c  **** 	
+ 1572              	
+ 1573 0ce8 F045BDE8 		.loc 1 412 0
+ 1574 0cec 1EFF2FE1 		mov	r2, r5
+ 1575              		mov	r1, sl
+ 1576              		mov	r0, r7
+ 1577              		bl	matrix_float_get
+ 1578              		mov	r1, r5
+ 1579              		mov	r4, r0
+ 1580              		mov	r0, r9
+ 1581              		bl	vector_float_get
+ 396:CmatrixLib.c  ****  dimensions must agree
+ 397:CmatrixLib.c  **** 	if ((m->height == v->length) && (m->width == C->length)) {
+ 398:CmatrixLib.c  **** 		
+ 1582              	r0
+ 1583              		mov	r0, r4
+ 1584              		bl	__mulsf3
+ 1585              		mov	r1, r0
+ 1586              		mov	r0, r6
+ 1587 0cf0 F04F2DE9 		bl	__addsf3
+ 1588              		.loc 1 410 0
+ 1589 0cf4 0190A0E1 		mov	r3, r8, asl #16
+ 399:CmatrixLib.c  **** or (i = 1; i <= m->width; i++) {
+ 400:CmatrixLib.c  **** 			
+ 401:CmatrixLib.c  **** 			tempSum = 0;
+ 402:CmatrixLib.c  **** 			
+ 403:CmatrixLib.c  **** 			for (j = 1; j <= m->height; j++) {
+ 404:CmatrixLib.c  **** 				
+ 1590              	 r3, lsr #16
+ 1591 0cf8 F030D9E1 		.loc 1 412 0
+ 1592 0cfc F010D0E1 		add	r5, r5, #1
+ 1593              		.loc 1 410 0
+ 1594 0d00 030051E1 		add	r3, r3, #2
+ 1595              		cmp	r5, r3
+ 1596 0d04 04D04DE2 		.loc 1 412 0
+ 1597              		mov	r6, r0
+ 1598              		.loc 1 410 0
+ 1599 0d08 0070A0E1 		bne	.L221
+ 1600 0d0c 02B0A0E1 	.LVL141:
+ 1601              	.L222:
+ 1602 0d10 0200000A 		.loc 1 414 0
+ 1603              		mov	r2, r6
+ 1604              		mov	r1, sl
+ 405:CmatrixLib.c  **** mpSum += matrix_float_get(m, j, i)*vector_float_get(v, j);
+ 406:CmatrixLib.c  **** 			}
+ 407:CmatrixLib.c  **** 			vector_float_set(C, i, tempSum);
+ 408:CmatrixLib.c  **** 		}
+ 409:CmatrixLib.c  **** 
+ 410:CmatrixLib.c  **** 		// set orientation to horizontal
+ 411:CmatrixLib.c  **** 		C->orientation = 1;
+ 412:CmatrixLib.c  **** 	}
+ 413:CmatrixLib.c  **** }
+ 414:CmatrixLib.c  **** 
+ 415:CmatrixLib.c  **** // compute the determinant of a matrix
+ 416:CmatrixLib.c  **** float matrix_float_determinant(const matrix_float * a) {
+ 417:CmatrixLib.c  **** 	
+ 418:CmatrixLib.c  **** 	// the matrix should be a square matrix
+ 419:CmatrixLib.c  **** 	if (a->width == a->height) {
+ 420:CmatrixLib.c  **** 		
+ 1605              		vector_float_set
+ 1606 0d14 04D08DE2 		.loc 1 406 0
+ 1607 0d18 F04FBDE8 		ldr	r2, [sp, #0]
+ 1608 0d1c 1EFF2FE1 		add	r3, r2, #1
+ 1609              		ldrsh	r2, [r7, #2]
+ 1610              		mov	r3, r3, asl #16
+ 1611              		cmp	r2, r3, asr #16
+ 1612 0d20 F020D2E1 		mov	r3, r3, lsr #16
+ 1613 0d24 F230D0E1 		add	sl, sl, #1
+ 1614 0d28 030052E1 		str	r3, [sp, #0]
+ 1615 0d2c F8FFFF1A 		bge	.L220
+ 1616              	.LVL142:
+ 1617              	.L218:
+ 1618 0d30 000052E3 		.loc 1 418 0
+ 1619 0d34 0120A0C3 		mov	r3, #0
+ 1620 0d38 00208DC5 		strb	r3, [fp, #2]
+ 1621              		b	.L225
+ 1622 0d3c 02A0A0C1 	.LFE28:
+ 1624              		.align	2
+ 1625              		.global	matrix_float_mul_vec_left
+ 1627 0d44 B020D7E1 	matrix_float_mul_vec_left:
+ 1628 0d48 0238A0E1 	.LFB29:
+ 1629 0d4c 000053E3 		.loc 1 423 0
+ 1630 0d50 0060A0D3 		@ Function supports interworking.
+ 1631 0d54 0060A0C3 		@ args = 0, pretend = 0, frame = 4
+ 1632 0d58 018042C2 		@ frame_needed = 0, uses_anonymous_args = 0
+ 1633 0d5c 0150A0C3 	.LVL143:
+ 1634 0d60 140000DA 		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 1635              	.LCFI24:
+ 1636              		mov	r9, r1
+ 1637 0d64 0520A0E1 		.loc 1 429 0
+ 1638 0d68 0A10A0E1 		ldrsh	r3, [r9, #0]
+ 1639 0d6c 0700A0E1 		ldrsh	r1, [r0, #2]
+ 1640 0d70 FEFFFFEB 	.LVL144:
+ 1641 0d74 0510A0E1 		cmp	r1, r3
+ 1642 0d78 0040A0E1 		.loc 1 423 0
+ 1643 0d7c 0900A0E1 		sub	sp, sp, #4
+ 1644 0d80 FEFFFFEB 	.LCFI25:
+ 1645 0d84 0010A0E1 		.loc 1 423 0
+ 1646 0d88 0400A0E1 		mov	r7, r0
+ 1647 0d8c FEFFFFEB 		mov	fp, r2
+ 1648 0d90 0010A0E1 		.loc 1 429 0
+ 1649 0d94 0600A0E1 		beq	.L241
+ 1650 0d98 FEFFFFEB 	.LVL145:
+ 1651              	.L239:
+ 1652 0d9c 0838A0E1 		.loc 1 445 0
+ 1653 0da0 2338A0E1 		add	sp, sp, #4
+ 1654              		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 1655 0da4 015085E2 		bx	lr
+ 1656              	.LVL146:
+ 1657 0da8 023083E2 	.L241:
+ 1658 0dac 030055E1 		.loc 1 429 0
+ 1659              		ldrsh	r2, [r2, #0]
+ 1660 0db0 0060A0E1 		ldrsh	r3, [r0, #0]
+ 1661              		cmp	r2, r3
+ 1662 0db4 EAFFFF1A 		bne	.L239
+ 1663              	.LVL147:
+ 1664              		.loc 1 431 0
+ 1665              		cmp	r2, #0
+ 1666 0db8 0620A0E1 		movgt	r2, #1
+ 1667 0dbc 0A10A0E1 		strgt	r2, [sp, #0]
+ 1668 0dc0 0B00A0E1 	.LVL148:
+ 1669 0dc4 FEFFFFEB 		movgt	sl, r2
+ 1670              		ble	.L232
+ 1671 0dc8 00209DE5 	.LVL149:
+ 1672 0dcc 013082E2 	.L234:
+ 1673 0dd0 F220D7E1 		.loc 1 435 0
+ 1674 0dd4 0338A0E1 		ldrh	r2, [r7, #2]
+ 1675 0dd8 430852E1 		mov	r3, r2, asl #16
+ 1676 0ddc 2338A0E1 		cmp	r3, #0
+ 1677 0de0 01A08AE2 		movle	r6, #0
+ 1678 0de4 00308DE5 		movgt	r6, #0
+ 1679 0de8 D5FFFFAA 		subgt	r8, r2, #1
+ 1680              		movgt	r5, #1
+ 1681              		ble	.L236
+ 1682              	.L235:
+ 1683 0dec 0030A0E3 		.loc 1 437 0
+ 1684 0df0 0230CBE5 		mov	r2, sl
+ 1685 0df4 C6FFFFEA 		mov	r1, r5
+ 1686              		mov	r0, r7
+ 1687              		bl	matrix_float_get
+ 1688              		mov	r1, r5
+ 1689              		mov	r4, r0
+ 1690              		mov	r0, r9
+ 1691              		bl	vector_float_get
+ 1692              		mov	r1, r0
+ 421:CmatrixLib.c  **** e, 1x1 matrix
+ 422:CmatrixLib.c  **** 		if (a->width == 1) {
+ 423:CmatrixLib.c  **** 			
+ 1693              	 asl #16
+ 1694              		mov	r3, r3, lsr #16
+ 1695              		.loc 1 437 0
+ 1696              		add	r5, r5, #1
+ 1697              		.loc 1 435 0
+ 1698 0df8 F04F2DE9 		add	r3, r3, #2
+ 1699              		cmp	r5, r3
+ 1700 0dfc 0190A0E1 		.loc 1 437 0
+ 424:CmatrixLib.c  **** _float * a) {
+ 425:CmatrixLib.c  **** 	
+ 426:CmatrixLib.c  **** 	// the matrix should be a square matrix
+ 427:CmatrixLib.c  **** 	if (a->width == a->height) {
+ 428:CmatrixLib.c  **** 		
+ 429:CmatrixLib.c  **** 		// special case, 1x1 matrix
+ 1701              	 r0
+ 1702 0e00 F030D9E1 		.loc 1 435 0
+ 1703 0e04 F210D0E1 		bne	.L235
+ 1704              	.LVL150:
+ 1705 0e08 030051E1 	.L236:
+ 1706              		.loc 1 439 0
+ 1707 0e0c 04D04DE2 		mov	r2, r6
+ 1708              		mov	r1, sl
+ 1709              		mov	r0, fp
+ 1710 0e10 0070A0E1 		bl	vector_float_set
+ 1711 0e14 02B0A0E1 		.loc 1 431 0
+ 1712              		ldr	r2, [sp, #0]
+ 1713 0e18 0200000A 		add	r3, r2, #1
+ 1714              		ldrsh	r2, [r7, #0]
+ 1715              		mov	r3, r3, asl #16
+ 430:CmatrixLib.c  **** a->width == 1) {
+ 431:CmatrixLib.c  **** 			
+ 432:CmatrixLib.c  **** 			matrix_float_get(a, 1, 1);
+ 433:CmatrixLib.c  **** 		}
+ 434:CmatrixLib.c  **** 	
+ 435:CmatrixLib.c  **** 		int16_t i, j, k;
+ 436:CmatrixLib.c  **** 		float coeficient;
+ 437:CmatrixLib.c  **** 		float determinant = 1;
+ 438:CmatrixLib.c  **** 
+ 439:CmatrixLib.c  **** 		// copy matrix a to a local temporary matrix
+ 440:CmatrixLib.c  **** 		int16_t n = a->height;
+ 441:CmatrixLib.c  **** 
+ 442:CmatrixLib.c  **** 		float temp_matrix_data[n*n];
+ 443:CmatrixLib.c  **** 		matrix_float temp_matrix;
+ 444:CmatrixLib.c  **** 		temp_matrix.data = (float *) &temp_matrix_data;
+ 445:CmatrixLib.c  **** 		temp_matrix.height = n;
+ 1716              	r #16
+ 1717 0e1c 04D08DE2 		mov	r3, r3, lsr #16
+ 1718 0e20 F04FBDE8 		add	sl, sl, #1
+ 1719 0e24 1EFF2FE1 		str	r3, [sp, #0]
+ 1720              		bge	.L234
+ 1721              	.LVL151:
+ 1722              	.L232:
+ 1723 0e28 F020D2E1 		.loc 1 443 0
+ 1724 0e2c F030D0E1 		mov	r3, #1
+ 1725 0e30 030052E1 		strb	r3, [fp, #2]
+ 1726 0e34 F8FFFF1A 		b	.L239
+ 1727              	.LFE29:
+ 1729 0e38 000052E3 		.align	2
+ 1730 0e3c 0120A0C3 		.global	matrix_float_copy
+ 1732              	matrix_float_copy:
+ 1733 0e44 02A0A0C1 	.LFB17:
+ 1734 0e48 290000DA 		.loc 1 220 0
+ 1735              		@ Function supports interworking.
+ 1736              		@ args = 0, pretend = 0, frame = 0
+ 1737              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1738 0e4c B220D7E1 	.LVL152:
+ 1739 0e50 0238A0E1 		str	lr, [sp, #-4]!
+ 1740 0e54 000053E3 	.LCFI26:
+ 1741 0e58 0060A0D3 		.loc 1 223 0
+ 1742 0e5c 0060A0C3 		ldr	r2, [r0, #0]
+ 1743 0e60 018042C2 		ldr	r3, [r1, #0]
+ 1744 0e64 0150A0C3 		cmp	r2, r3
+ 1745 0e68 140000DA 		.loc 1 220 0
+ 1746              		mov	ip, r1
+ 1747              		.loc 1 223 0
+ 1748 0e6c 0A20A0E1 		beq	.L246
+ 1749 0e70 0510A0E1 	.LVL153:
+ 1750 0e74 0700A0E1 	.L245:
+ 1751 0e78 FEFFFFEB 		.loc 1 227 0
+ 1752 0e7c 0510A0E1 		ldr	lr, [sp], #4
+ 1753 0e80 0040A0E1 		bx	lr
+ 1754 0e84 0900A0E1 	.L246:
+ 1755 0e88 FEFFFFEB 		.loc 1 225 0
+ 1756 0e8c 0010A0E1 		ldrsh	r3, [r0, #2]
+ 1757 0e90 0400A0E1 		ldrsh	r1, [r0, #0]
+ 1758 0e94 FEFFFFEB 		mul	r2, r1, r3
+ 1759 0e98 0010A0E1 		ldr	r0, [r0, #4]
+ 1760 0e9c 0600A0E1 	.LVL154:
+ 1761 0ea0 FEFFFFEB 		ldr	r1, [ip, #4]
+ 1762              		mov	r2, r2, asl #2
+ 1763 0ea4 0838A0E1 		bl	memcpy
+ 1764 0ea8 2338A0E1 	.LVL155:
+ 1765              		b	.L245
+ 1766 0eac 015085E2 	.LFE17:
+ 1768 0eb0 023083E2 		.section	.rodata.str1.4,"aMS",%progbits,1
+ 1769 0eb4 030055E1 		.align	2
+ 1770              	.LC0:
+ 1771 0eb8 0060A0E1 		.ascii	"Vypocet determinantu\000"
+ 1772              		.global	__divsf3
+ 1773 0ebc EAFFFF1A 		.text
+ 1774              		.align	2
+ 1775              		.global	matrix_float_determinant
+ 1777 0ec0 0620A0E1 	matrix_float_determinant:
+ 1778 0ec4 0A10A0E1 	.LFB30:
+ 1779 0ec8 0B00A0E1 		.loc 1 448 0
+ 1780 0ecc FEFFFFEB 		@ Function supports interworking.
+ 1781              		@ args = 0, pretend = 0, frame = 36
+ 1782 0ed0 00209DE5 		@ frame_needed = 1, uses_anonymous_args = 0
+ 1783 0ed4 013082E2 	.LVL156:
+ 1784 0ed8 F020D7E1 		mov	ip, sp
+ 1785 0edc 0338A0E1 	.LCFI27:
+ 1786 0ee0 430852E1 		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, ip, lr, pc}
+ 1787 0ee4 2338A0E1 	.LCFI28:
+ 1788 0ee8 01A08AE2 		sub	fp, ip, #4
+ 1789 0eec 00308DE5 	.LCFI29:
+ 1790 0ef0 D5FFFFAA 		sub	sp, sp, #36
+ 1791              	.LCFI30:
+ 1792              		.loc 1 451 0
+ 1793              		ldrsh	r2, [r0, #0]
+ 1794 0ef4 0130A0E3 		ldrsh	r3, [r0, #2]
+ 1795 0ef8 0230CBE5 		cmp	r2, r3
+ 1796 0efc C6FFFFEA 		.loc 1 448 0
+ 1797              		str	r0, [fp, #-72]
+ 1798              		.loc 1 451 0
+ 1799              		movne	r5, #0
+ 1800              	.LVL157:
+ 1801              		beq	.L269
+ 1802              	.LVL158:
+ 1803              	.L250:
+ 1804              		.loc 1 501 0
+ 1805              		mov	r0, r5
+ 1806              		sub	sp, fp, #40
+ 1807              		ldmfd	sp, {r4, r5, r6, r7, r8, r9, sl, fp, sp, lr}
+ 1808              		bx	lr
+ 1809 0f00 04E02DE5 	.LVL159:
+ 1810              	.L269:
+ 1811              	.LBB12:
+ 1812 0f04 002090E5 		.loc 1 464 0
+ 1813 0f08 003091E5 		ldr	r1, [fp, #-72]
+ 1814 0f0c 030052E1 		ldrh	ip, [r1, #2]
+ 1815              	.LVL160:
+ 1816 0f10 01C0A0E1 		.loc 1 466 0
+ 1817              		mov	r3, ip, asl #16
+ 1818 0f14 0100000A 		mov	r3, r3, asr #16
+ 1819              		mul	r2, r3, r3
+ 1820              		mov	r2, r2, asl #2
+ 1821              		add	r2, r2, #4
+ 1822 0f18 04E09DE4 		.loc 1 471 0
+ 1823 0f1c 1EFF2FE1 		ldr	r3, .L270
+ 1824              		.loc 1 474 0
+ 1825              		sub	sl, fp, #52
+ 1826 0f20 F230D0E1 	.LBE12:
+ 1827 0f24 F010D0E1 		.loc 1 451 0
+ 1828 0f28 910302E0 		str	sp, [fp, #-68]
+ 1829 0f2c 040090E5 	.LBB13:
+ 1830              		.loc 1 474 0
+ 1831 0f30 04109CE5 		mov	r0, sl
+ 1832 0f34 0221A0E1 		.loc 1 466 0
+ 1833 0f38 FEFFFFEB 		rsb	sp, r2, sp
+ 1834              		.loc 1 471 0
+ 1835 0f3c F5FFFFEA 		str	r3, [fp, #-44]
+ 1836              		.loc 1 470 0
+ 1837              		strh	ip, [fp, #-52]	@ movhi
+ 1838              		.loc 1 468 0
+ 1839              		str	sp, [fp, #-48]
+ 1840              		.loc 1 469 0
+ 1841 0000 5679706F 		strh	ip, [fp, #-50]	@ movhi
+ 1841      63657420 
+ 1841      64657465 
+ 1841      726D696E 
+ 1841      616E7475 
+ 1842              		.loc 1 474 0
+ 1843              		bl	matrix_float_copy
+ 1844              	.LVL161:
+ 1845              		.loc 1 478 0
+ 1846              		ldr	r3, [fp, #-72]
+ 1847              		ldrh	r2, [r3, #2]
+ 1848              		mov	r1, r2, asl #16
+ 446:CmatrixLib.c  **** float temp_matrix_data[n*n];
+ 447:CmatrixLib.c  **** 		matrix_float temp_matrix;
+ 448:CmatrixLib.c  **** 		temp_matrix.data = (float *) &temp_matrix_data;
+ 1849              		r3, [fp, #-76]
+ 1850              	.LVL164:
+ 1851              	.L253:
+ 1852              		.loc 1 481 0
+ 1853              		ldr	r3, [fp, #-76]
+ 1854 0f40 0DC0A0E1 		cmp	r1, r3
+ 1855              		ble	.L258
+ 1856 0f44 F0DF2DE9 		ldr	r2, [fp, #-72]
+ 1857              		ldrsh	r6, [r2, #0]
+ 1858 0f48 04B04CE2 	.L254:
+ 1859              		.loc 1 483 0
+ 1860 0f4c 24D04DE2 		mov	r7, r1, asr #16
+ 1861              		mov	r1, r7
+ 449:CmatrixLib.c  **** 	int16_t n = a->height;
+ 450:CmatrixLib.c  **** 
+ 451:CmatrixLib.c  **** 		float temp_matrix_data[n*n];
+ 1862              	 #-56]
+ 1863 0f50 F020D0E1 		mov	r0, sl
+ 1864 0f54 F230D0E1 		bl	matrix_float_get
+ 1865 0f58 030052E1 		ldr	r1, [fp, #-56]
+ 1866              		mov	r4, r0
+ 1867 0f5c 48000BE5 		mov	r2, r1
+ 1868              		mov	r0, sl
+ 1869 0f60 0050A013 		bl	matrix_float_get
+ 1870              		mov	r1, r0
+ 1871 0f64 0300000A 		mov	r0, r4
+ 1872              		bl	__divsf3
+ 1873              		.loc 1 485 0
+ 452:CmatrixLib.c  **** ient;
+ 453:CmatrixLib.c  **** 		float determinant = 1;
+ 454:CmatrixLib.c  **** 
+ 455:CmatrixLib.c  **** 		// copy matrix a to a local temporary matrix
+ 456:CmatrixLib.c  **** 		int16_t n = a->height;
+ 457:CmatrixLib.c  **** 
+ 458:CmatrixLib.c  **** 		float temp_matrix_data[n*n];
+ 459:CmatrixLib.c  **** 		matrix_float temp_matrix;
+ 460:CmatrixLib.c  **** 		temp_matrix.data = (float *) &temp_matrix_data;
+ 461:CmatrixLib.c  **** 		temp_matrix.height = n;
+ 462:CmatrixLib.c  **** 		temp_matrix.width = n;
+ 463:CmatrixLib.c  **** 		temp_matrix.name = "Vypocet determinantu";
+ 464:CmatrixLib.c  **** 	
+ 465:CmatrixLib.c  **** 		// copy the specified matrix into temp_matrix
+ 466:CmatrixLib.c  **** 		matrix_float_copy(&temp_matrix, a);
+ 467:CmatrixLib.c  **** 	
+ 468:CmatrixLib.c  **** 		// start gauss elimination
+ 469:CmatrixLib.c  **** 		// for all rows
+ 470:CmatrixLib.c  **** 		for (i = 1; i <= a->height; i++) {
+ 471:CmatrixLib.c  **** 			
+ 472:CmatrixLib.c  **** 			// for all rows bellow it
+ 473:CmatrixLib.c  **** 			for (j = a->height; j > i; j--) {
+ 474:CmatrixLib.c  **** 				
+ 475:CmatrixLib.c  **** 				coeficient = matrix_float_get(&temp_matrix, j, i)/matrix_float_get(&temp_matrix, i, i);
+ 476:CmatrixLib.c  **** 				
+ 477:CmatrixLib.c  **** 				for (k = 1; k <= a->width; k++) {
+ 478:CmatrixLib.c  **** 				
+ 479:CmatrixLib.c  **** 					matrix_float_set(&temp_matrix, j, k, matrix_float_get(&temp_matrix, j, k) - coeficient*matrix_
+ 480:CmatrixLib.c  **** 				}
+ 481:CmatrixLib.c  **** 			}
+ 482:CmatrixLib.c  **** 		}
+ 483:CmatrixLib.c  **** 	
+ 484:CmatrixLib.c  **** 		for (i = 1; i <= a->width; i++) {
+ 485:CmatrixLib.c  **** 			
+ 486:CmatrixLib.c  **** 			determinant *= matrix_float_get(&temp_matrix, i, i);
+ 487:CmatrixLib.c  **** 		}
+ 488:CmatrixLib.c  **** 		
+ 489:CmatrixLib.c  **** 		return determinant;
+ 490:CmatrixLib.c  **** 	}
+ 491:CmatrixLib.c  **** 	
+ 492:CmatrixLib.c  **** 	return (float) 0;
+ 493:CmatrixLib.c  **** }
+ 494:CmatrixLib.c  **** 
+ 495:CmatrixLib.c  **** // computer the inversion of matrix A, returns 0 if the inversion doesn't exist, 1 otherwise
+ 496:CmatrixLib.c  **** int matrix_float_inverse(matrix_float * a) {
+ 497:CmatrixLib.c  **** 	
+ 498:CmatrixLib.c  **** 	// the matrix should be a square matrix
+ 499:CmatrixLib.c  **** 	if (a->width == a->height) {
+ 500:CmatrixLib.c  **** 	
+ 501:CmatrixLib.c  **** 		// special case, 1x1 matrix
+ 1874              		.loc 1 483 0
+ 1875 0f68 0500A0E1 		mov	r9, r0
+ 1876 0f6c 28D04BE2 		.loc 1 485 0
+ 1877 0f70 F06F9DE8 		ble	.L255
+ 1878 0f74 1EFF2FE1 		mov	r8, #1
+ 1879              		mov	r5, r8
+ 1880              	.LVL165:
+ 1881              	.L257:
+ 1882              		.loc 1 487 0
+ 1883 0f78 48101BE5 		mov	r2, r5
+ 1884 0f7c B2C0D1E1 		mov	r1, r7
+ 1885              		mov	r0, sl
+ 1886              		bl	matrix_float_get
+ 1887 0f80 0C38A0E1 		mov	r2, r5
+ 1888 0f84 4338A0E1 		ldr	r1, [fp, #-56]
+ 1889 0f88 930302E0 		mov	r4, r0
+ 1890 0f8c 0221A0E1 		mov	r0, sl
+ 1891 0f90 042082E2 		bl	matrix_float_get
+ 1892              		mov	r1, r0
+ 1893 0f94 E0319FE5 		mov	r0, r9
+ 1894              		bl	__mulsf3
+ 1895 0f98 34A04BE2 		mov	r1, r0
+ 1896              		mov	r0, r4
+ 1897              		bl	__subsf3
+ 1898 0f9c 44D00BE5 		mov	r1, r7
+ 1899              		mov	r3, r0
+ 1900              		mov	r2, r5
+ 1901 0fa0 0A00A0E1 		mov	r0, sl
+ 1902              		bl	matrix_float_set
+ 1903 0fa4 0DD062E0 		.loc 1 485 0
+ 1904              		ldr	r1, [fp, #-72]
+ 1905 0fa8 2C300BE5 		add	r3, r8, #1
+ 1906              		ldrsh	r6, [r1, #0]
+ 1907 0fac B4C34BE1 		mov	r3, r3, asl #16
+ 1908              		cmp	r6, r3, asr #16
+ 1909 0fb0 30D00BE5 		add	r5, r5, #1
+ 1910              		mov	r8, r3, lsr #16
+ 1911 0fb4 B2C34BE1 		bge	.L257
+ 1912              	.LVL166:
+ 1913 0fb8 FEFFFFEB 	.L255:
+ 1914              		.loc 1 481 0
+ 1915              		ldr	r2, [fp, #-60]
+ 1916 0fbc 48301BE5 		sub	r3, r2, #1
+ 1917 0fc0 B220D3E1 		mov	r3, r3, asl #16
+ 1918 0fc4 0218A0E1 		mov	r3, r3, lsr #16
+ 1919 0fc8 000051E3 		mov	r1, r3, asl #16
+ 1920 0fcc 3C200BE5 		str	r3, [fp, #-60]
+ 1921              		ldr	r3, [fp, #-76]
+ 1922 0fd0 500000DA 		cmp	r1, r3
+ 1923 0fd4 0130A0E3 		bgt	.L254
+ 1924 0fd8 40300BE5 		ldr	r1, [fp, #-72]
+ 1925              		ldrh	r2, [r1, #2]
+ 1926 0fdc 38300BE5 	.L258:
+ 1927 0fe0 0138A0E3 		.loc 1 478 0
+ 1928 0fe4 4C300BE5 		ldr	r1, [fp, #-64]
+ 1929              		add	r3, r1, #1
+ 1930              		mov	r3, r3, asl #16
+ 1931              		mov	r3, r3, lsr #16
+ 1932 0fe8 4C301BE5 		str	r3, [fp, #-64]
+ 1933 0fec 030051E1 		mov	r1, r2, asl #16
+ 1934 0ff0 3A0000DA 		mov	r3, r3, asl #16
+ 1935 0ff4 48201BE5 		str	r3, [fp, #-76]
+ 1936 0ff8 F060D2E1 		cmp	r1, r3
+ 1937              		ldr	r3, [fp, #-56]
+ 1938              		add	r3, r3, #1
+ 1939 0ffc 4178A0E1 		str	r3, [fp, #-56]
+ 1940 1000 0710A0E1 		str	r2, [fp, #-60]
+ 1941 1004 38201BE5 		bge	.L253
+ 1942 1008 0A00A0E1 	.L251:
+ 1943 100c FEFFFFEB 		.loc 1 492 0
+ 1944 1010 38101BE5 		ldr	r3, [fp, #-72]
+ 1945 1014 0040A0E1 		ldrh	r0, [r3, #0]
+ 1946 1018 0120A0E1 		mov	r3, r0, asl #16
+ 1947 101c 0A00A0E1 		cmp	r3, #0
+ 1948 1020 FEFFFFEB 		movle	r5, #1065353216
+ 1949 1024 0010A0E1 		ble	.L262
+ 1950 1028 0400A0E1 		sub	r3, r0, #1
+ 1951 102c FEFFFFEB 		mov	r3, r3, asl #16
+ 1952              		mov	r3, r3, lsr #16
+ 1953 1030 000056E3 		mov	r5, #1065353216
+ 1954              		add	r6, r3, #2
+ 1955 1034 0090A0E1 		mov	r4, #1
+ 1956              	.L263:
+ 1957 1038 1D0000DA 		.loc 1 494 0
+ 1958 103c 0180A0E3 		mov	r2, r4
+ 1959 1040 0850A0E1 		mov	r1, r4
+ 1960              		mov	r0, sl
+ 1961              		bl	matrix_float_get
+ 1962              		mov	r1, r0
+ 1963 1044 0520A0E1 		mov	r0, r5
+ 1964 1048 0710A0E1 		bl	__mulsf3
+ 1965 104c 0A00A0E1 		add	r4, r4, #1
+ 1966 1050 FEFFFFEB 		.loc 1 492 0
+ 1967 1054 0520A0E1 		cmp	r6, r4
+ 1968 1058 38101BE5 		.loc 1 494 0
+ 1969 105c 0040A0E1 		mov	r5, r0
+ 1970 1060 0A00A0E1 		.loc 1 492 0
+ 1971 1064 FEFFFFEB 		bne	.L263
+ 1972 1068 0010A0E1 	.L262:
+ 1973 106c 0900A0E1 		ldr	sp, [fp, #-68]
+ 1974 1070 FEFFFFEB 		b	.L250
+ 1975 1074 0010A0E1 	.L271:
+ 1976 1078 0400A0E1 		.align	2
+ 1977 107c FEFFFFEB 	.L270:
+ 1978 1080 0710A0E1 		.word	.LC0
+ 1979 1084 0030A0E1 	.LBE13:
+ 1980 1088 0520A0E1 	.LFE30:
+ 1982 1090 FEFFFFEB 		.global	__extendsfdf2
+ 1983              		.global	__gedf2
+ 1984 1094 48101BE5 		.section	.rodata.str1.4
+ 1985 1098 013088E2 		.align	2
+ 1986 109c F060D1E1 	.LC1:
+ 1987 10a0 0338A0E1 		.ascii	"Puvodni\000"
+ 1988 10a4 430856E1 		.align	2
+ 1989 10a8 015085E2 	.LC2:
+ 1990 10ac 2388A0E1 		.ascii	"Nova\000"
+ 1991 10b0 E3FFFFAA 		.text
+ 1992              		.align	2
+ 1993              		.global	matrix_float_inverse
+ 1995 10b4 3C201BE5 	matrix_float_inverse:
+ 1996 10b8 013042E2 	.LFB31:
+ 1997 10bc 0338A0E1 		.loc 1 504 0
+ 1998 10c0 2338A0E1 		@ Function supports interworking.
+ 1999 10c4 0318A0E1 		@ args = 0, pretend = 0, frame = 68
+ 2000 10c8 3C300BE5 		@ frame_needed = 1, uses_anonymous_args = 0
+ 2001 10cc 4C301BE5 	.LVL167:
+ 2002 10d0 030051E1 		mov	ip, sp
+ 2003 10d4 C8FFFFCA 	.LCFI31:
+ 2004 10d8 48101BE5 		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, ip, lr, pc}
+ 2005 10dc B220D1E1 	.LCFI32:
+ 2006              		sub	fp, ip, #4
+ 2007              	.LCFI33:
+ 2008 10e0 40101BE5 		sub	sp, sp, #68
+ 2009 10e4 013081E2 	.LCFI34:
+ 2010 10e8 0338A0E1 		.loc 1 507 0
+ 2011 10ec 2338A0E1 		ldrsh	r4, [r0, #2]
+ 2012 10f0 40300BE5 		ldrsh	r3, [r0, #0]
+ 2013 10f4 0218A0E1 		cmp	r4, r3
+ 2014 10f8 0338A0E1 		.loc 1 504 0
+ 2015 10fc 4C300BE5 		str	r0, [fp, #-92]
+ 2016 1100 030051E1 		.loc 1 507 0
+ 2017 1104 38301BE5 		beq	.L308
+ 2018 1108 013083E2 	.LVL168:
+ 2019 110c 38300BE5 	.L307:
+ 2020 1110 3C200BE5 	.LBB14:
+ 2021 1114 B3FFFFAA 	.LBB15:
+ 2022              		.loc 1 592 0
+ 2023              		mov	r0, #1
+ 2024 1118 48301BE5 	.L275:
+ 2025 111c B000D3E1 	.LBE15:
+ 2026 1120 0038A0E1 	.LBE14:
+ 2027 1124 000053E3 		.loc 1 602 0
+ 2028 1128 FE55A0D3 		sub	sp, fp, #40
+ 2029 112c 100000DA 		ldmfd	sp, {r4, r5, r6, r7, r8, r9, sl, fp, sp, lr}
+ 2030 1130 013040E2 		bx	lr
+ 2031 1134 0338A0E1 	.LVL169:
+ 2032 1138 2338A0E1 	.L308:
+ 2033 113c FE55A0E3 	.LBB16:
+ 2034 1140 026083E2 		.loc 1 510 0
+ 2035 1144 0140A0E3 		cmp	r4, #1
+ 2036              		beq	.L309
+ 2037              		.loc 1 516 0
+ 2038 1148 0420A0E1 		bl	matrix_float_determinant
+ 2039 114c 0410A0E1 		.loc 1 519 0
+ 2040 1150 0A00A0E1 		bic	r0, r0, #-2147483648
+ 2041 1154 FEFFFFEB 		bl	__extendsfdf2
+ 2042 1158 0010A0E1 		adr	r2, .L310
+ 2043 115c 0500A0E1 		ldmia	r2, {r2-r3}
+ 2044 1160 FEFFFFEB 		bl	__gedf2
+ 2045 1164 014084E2 		cmp	r0, #0
+ 2046              		movlt	r0, #0
+ 2047 1168 040056E1 		blt	.L275
+ 2048              	.LBB17:
+ 2049 116c 0050A0E1 		.loc 1 525 0
+ 2050              		ldr	r1, [fp, #-92]
+ 2051 1170 F4FFFF1A 		ldrh	r5, [r1, #2]
+ 2052              	.LVL170:
+ 2053 1174 44D01BE5 		.loc 1 527 0
+ 2054 1178 7AFFFFEA 		mov	r2, r5, asl #16
+ 2055              		mov	r4, r2, asr #16
+ 2056              		mul	r3, r4, r4
+ 2057              		mov	r3, r3, asl #2
+ 2058 117c 00000000 		add	r3, r3, #4
+ 2059              	.LBE17:
+ 2060              		.loc 1 519 0
+ 2061              		str	sp, [fp, #-88]
+ 2062              	.LBB18:
+ 2063              		.loc 1 527 0
+ 2064              		rsb	sp, r3, sp
+ 2065 0015 000000   		str	r2, [fp, #-104]
+ 2066              		.loc 1 529 0
+ 2067 0018 5075766F 		str	sp, [fp, #-60]
+ 2067      646E6900 
+ 2068              		.loc 1 540 0
+ 2069              		ldr	r2, .L310+8
+ 2070 0020 4E6F7661 		.loc 1 535 0
+ 2070      00
+ 2071 0025 000000   		rsb	sp, r3, sp
+ 2072              		.loc 1 543 0
+ 2073              		sub	r9, fp, #64
+ 2074              		.loc 1 532 0
+ 2075              		ldr	r3, .L310+12
+ 2076              		.loc 1 543 0
+ 502:CmatrixLib.c  **** trix should be a square matrix
+ 503:CmatrixLib.c  **** 	if (a->width == a->height) {
+ 504:CmatrixLib.c  **** 	
+ 2077              	oc 1 538 0
+ 2078              		strh	r5, [fp, #-50]	@ movhi
+ 2079              		.loc 1 539 0
+ 2080              		strh	r5, [fp, #-52]	@ movhi
+ 2081              		.loc 1 543 0
+ 2082 1180 0DC0A0E1 		bl	matrix_float_copy
+ 2083              		.loc 1 546 0
+ 2084 1184 F0DF2DE9 		sub	r0, fp, #52
+ 2085              		bl	matrix_float_set_identity
+ 2086 1188 04B04CE2 		.loc 1 552 0
+ 2087              		cmp	r4, #0
+ 2088 118c 44D04DE2 		ble	.L280
+ 2089              		ldr	r3, [fp, #-92]
+ 505:CmatrixLib.c  **** atrix_float * a) {
+ 506:CmatrixLib.c  **** 	
+ 507:CmatrixLib.c  **** 	// the matrix should be a square matrix
+ 2090              	#1
+ 2091 1190 F240D0E1 	.LVL171:
+ 2092 1194 F030D0E1 		ldrsh	r6, [r3, #0]
+ 2093 1198 030054E1 		str	r5, [fp, #-96]
+ 2094              		mov	sl, #1
+ 2095 119c 5C000BE5 	.LVL172:
+ 2096              	.L282:
+ 2097 11a0 0300000A 		.loc 1 555 0
+ 2098              		ldr	r3, [fp, #-104]
+ 2099              		mov	r2, sl, asl #16
+ 2100              		cmp	r3, r2
+ 2101              		movgt	r1, r3, lsr #16
+ 508:CmatrixLib.c  **** herwise
+ 509:CmatrixLib.c  **** int matrix_float_inverse(matrix_float * a) {
+ 510:CmatrixLib.c  **** 	
+ 511:CmatrixLib.c  **** 	// the matrix should be a square matrix
+ 512:CmatrixLib.c  **** 	if (a->width == a->height) {
+ 513:CmatrixLib.c  **** 	
+ 514:CmatrixLib.c  **** 		// special case, 1x1 matrix
+ 515:CmatrixLib.c  **** 		if (a->width == 1) {
+ 516:CmatrixLib.c  **** 			
+ 517:CmatrixLib.c  **** 			matrix_float_set(a, 1, 1, ((float) 1)/matrix_float_get(a, 1, 1));
+ 518:CmatrixLib.c  **** 			return 1;
+ 519:CmatrixLib.c  **** 		}	
+ 520:CmatrixLib.c  **** 		
+ 521:CmatrixLib.c  **** 		float determinant = matrix_float_determinant(a);
+ 522:CmatrixLib.c  **** 		
+ 523:CmatrixLib.c  **** 		// check the matrix regularity
+ 524:CmatrixLib.c  **** 		if (fabs(determinant) >= 0.000000000000000000001) {
+ 525:CmatrixLib.c  **** 			
+ 526:CmatrixLib.c  **** 			int16_t i, j, k;
+ 527:CmatrixLib.c  **** 			float coeficient;
+ 528:CmatrixLib.c  **** 	
+ 529:CmatrixLib.c  **** 			// copy matrix a to a local temporary matrix
+ 530:CmatrixLib.c  **** 			int16_t n = a->height;
+ 531:CmatrixLib.c  **** 
+ 532:CmatrixLib.c  **** 			float temp_matrix_data[n*n];
+ 533:CmatrixLib.c  **** 			matrix_float temp_matrix;
+ 534:CmatrixLib.c  **** 			temp_matrix.data = (float *) &temp_matrix_data;
+ 535:CmatrixLib.c  **** 			temp_matrix.height = n;
+ 536:CmatrixLib.c  **** 			temp_matrix.width = n;
+ 537:CmatrixLib.c  **** 			temp_matrix.name = "Puvodni";
+ 538:CmatrixLib.c  **** 			
+ 539:CmatrixLib.c  **** 			// temp matrix2 for computing the covariance matrix
+ 540:CmatrixLib.c  **** 			float temp_matrix2_data[n*n];
+ 541:CmatrixLib.c  **** 			matrix_float temp_matrix2;
+ 542:CmatrixLib.c  **** 			temp_matrix2.data = (float *) &temp_matrix2_data;
+ 543:CmatrixLib.c  **** 			temp_matrix2.height = n;
+ 544:CmatrixLib.c  **** 			temp_matrix2.width = n;
+ 545:CmatrixLib.c  **** 			temp_matrix2.name = "Nova";
+ 546:CmatrixLib.c  **** 			
+ 547:CmatrixLib.c  **** 			// set one matrix as the specified matrix
+ 548:CmatrixLib.c  **** 			matrix_float_copy(&temp_matrix, a);
+ 549:CmatrixLib.c  **** 			
+ 550:CmatrixLib.c  **** 			// set the other as diagonal
+ 551:CmatrixLib.c  **** 			matrix_float_set_identity(&temp_matrix2);
+ 552:CmatrixLib.c  **** 			
+ 553:CmatrixLib.c  **** 			// do complete gauss elimination
+ 554:CmatrixLib.c  **** 			
+ 555:CmatrixLib.c  **** 			// start elimination the bottom triangular matrix
+ 556:CmatrixLib.c  **** 			// for all rows
+ 557:CmatrixLib.c  **** 			for (i = 1; i <= n; i++) {
+ 558:CmatrixLib.c  **** 						
+ 559:CmatrixLib.c  **** 				// for all rows bellow it
+ 560:CmatrixLib.c  **** 				for (j = n; j > i; j--) {
+ 561:CmatrixLib.c  **** 							
+ 562:CmatrixLib.c  **** 					coeficient = matrix_float_get(&temp_matrix, j, i)/matrix_float_get(&temp_matrix, i, i);
+ 563:CmatrixLib.c  **** 							
+ 564:CmatrixLib.c  **** 					for (k = 1; k <= a->width; k++) {
+ 565:CmatrixLib.c  **** 								
+ 566:CmatrixLib.c  **** 						matrix_float_set(&temp_matrix, j, k, matrix_float_get(&temp_matrix, j, k) - coeficient*matrix
+ 567:CmatrixLib.c  **** 						matrix_float_set(&temp_matrix2, j, k, matrix_float_get(&temp_matrix2, j, k) - coeficient*matr
+ 568:CmatrixLib.c  **** 					}
+ 569:CmatrixLib.c  **** 				}
+ 570:CmatrixLib.c  **** 			}
+ 571:CmatrixLib.c  **** 			
+ 572:CmatrixLib.c  **** 			// start elimination the top triangular matrix
+ 573:CmatrixLib.c  **** 			// for all rows
+ 574:CmatrixLib.c  **** 			for (i = n; i >= 1; i--) {
+ 575:CmatrixLib.c  **** 							
+ 576:CmatrixLib.c  **** 				// make 1 in bottom right corner
+ 577:CmatrixLib.c  **** 				coeficient = matrix_float_get(&temp_matrix, i, i);
+ 578:CmatrixLib.c  **** 				for (k = 1; k <= a->width; k++) {
+ 579:CmatrixLib.c  **** 								
+ 580:CmatrixLib.c  **** 					matrix_float_set(&temp_matrix2, i, k, matrix_float_get(&temp_matrix2, i, k)/coeficient);
+ 581:CmatrixLib.c  **** 				}
+ 582:CmatrixLib.c  **** 				matrix_float_set(&temp_matrix, i, i, (float) 1);
+ 583:CmatrixLib.c  **** 				
+ 584:CmatrixLib.c  **** 				// for all rows bellow it
+ 585:CmatrixLib.c  **** 				for (j = 1; j < i; j++) {
+ 586:CmatrixLib.c  **** 					
+ 587:CmatrixLib.c  **** 					coeficient = matrix_float_get(&temp_matrix, j, i)/matrix_float_get(&temp_matrix, i, i);
+ 588:CmatrixLib.c  **** 					
+ 589:CmatrixLib.c  **** 					for (k = 1; k <= a->width; k++) {
+ 590:CmatrixLib.c  **** 						
+ 591:CmatrixLib.c  **** 						matrix_float_set(&temp_matrix, j, k, matrix_float_get(&temp_matrix, j, k) - coeficient*matrix
+ 592:CmatrixLib.c  **** 						matrix_float_set(&temp_matrix2, j, k, matrix_float_get(&temp_matrix2, j, k) - coeficient*matr
+ 2102              	fp, #-76]
+ 2103 11a4 0100A0E3 		str	r2, [fp, #-100]
+ 2104              		movgt	r1, r1, asl #16
+ 2105              		ble	.L287
+ 2106              	.L283:
+ 593:CmatrixLib.c  **** trix2, i, k));
+ 594:CmatrixLib.c  **** 					}
+ 595:CmatrixLib.c  **** 				}
+ 596:CmatrixLib.c  **** 			}
+ 597:CmatrixLib.c  **** 			
+ 598:CmatrixLib.c  **** 			matrix_float_copy(a, &temp_matrix2);
+ 599:CmatrixLib.c  **** 			
+ 600:CmatrixLib.c  **** 		// matrix does not have its inversion
+ 601:CmatrixLib.c  **** 		} else {
+ 602:CmatrixLib.c  **** 			
+ 2107              	 1 557 0
+ 2108 11a8 28D04BE2 		mov	r7, r1, asr #16
+ 2109 11ac F06F9DE8 		mov	r1, r7
+ 2110 11b0 1EFF2FE1 		mov	r2, sl
+ 2111              		mov	r0, r9
+ 2112              		bl	matrix_float_get
+ 2113              		mov	r1, sl
+ 2114              		mov	r4, r0
+ 2115 11b4 010054E3 		mov	r2, sl
+ 2116 11b8 0F01000A 		mov	r0, r9
+ 2117              		bl	matrix_float_get
+ 2118 11bc FEFFFFEB 		mov	r1, r0
+ 2119              		mov	r0, r4
+ 2120 11c0 0201C0E3 		bl	__divsf3
+ 2121 11c4 FEFFFFEB 		.loc 1 559 0
+ 2122 11c8 FA2F8FE2 		cmp	r6, #0
+ 2123 11cc 0C0092E8 		.loc 1 557 0
+ 2124 11d0 FEFFFFEB 		str	r0, [fp, #-68]	@ float
+ 2125 11d4 000050E3 		.loc 1 559 0
+ 2126 11d8 0000A0B3 		ble	.L284
+ 2127 11dc F1FFFFBA 		mov	r8, #1
+ 2128              		mov	r5, r8
+ 2129              	.L286:
+ 2130 11e0 5C101BE5 		.loc 1 561 0
+ 2131 11e4 B250D1E1 		mov	r2, r5
+ 2132              		mov	r1, r7
+ 2133              		mov	r0, r9
+ 2134 11e8 0528A0E1 		bl	matrix_float_get
+ 2135 11ec 4248A0E1 		mov	r2, r5
+ 2136 11f0 940403E0 		mov	r4, r0
+ 2137 11f4 0331A0E1 		mov	r1, sl
+ 2138 11f8 043083E2 		mov	r0, r9
+ 2139              		bl	matrix_float_get
+ 2140              		mov	r1, r0
+ 2141 11fc 58D00BE5 		ldr	r0, [fp, #-68]	@ float
+ 2142              		bl	__mulsf3
+ 2143              		mov	r1, r0
+ 2144 1200 0DD063E0 		mov	r0, r4
+ 2145 1204 68200BE5 		bl	__subsf3
+ 2146              		mov	r2, r5
+ 2147 1208 3CD00BE5 		mov	r3, r0
+ 2148              		mov	r1, r7
+ 2149 120c AC239FE5 		mov	r0, r9
+ 2150              		bl	matrix_float_set
+ 2151 1210 0DD063E0 		.loc 1 562 0
+ 2152              		mov	r2, r5
+ 2153 1214 40904BE2 		mov	r1, r7
+ 2154              		sub	r0, fp, #52
+ 2155 1218 A4339FE5 		bl	matrix_float_get
+ 2156              		mov	r2, r5
+ 2157 121c 0900A0E1 		mov	r4, r0
+ 2158              		mov	r1, sl
+ 2159 1220 38300BE5 		sub	r0, fp, #52
+ 2160              		bl	matrix_float_get
+ 2161 1224 2C200BE5 		mov	r1, r0
+ 2162              		ldr	r0, [fp, #-68]	@ float
+ 2163 1228 BE534BE1 		bl	__mulsf3
+ 2164              		mov	r1, r0
+ 2165 122c B0544BE1 		mov	r0, r4
+ 2166              		bl	__subsf3
+ 2167 1230 30D00BE5 		mov	r1, r7
+ 2168              		mov	r3, r0
+ 2169 1234 B2534BE1 		mov	r2, r5
+ 2170              		sub	r0, fp, #52
+ 2171 1238 B4534BE1 		bl	matrix_float_set
+ 2172              		.loc 1 559 0
+ 2173 123c FEFFFFEB 		ldr	r1, [fp, #-92]
+ 2174              		add	r3, r8, #1
+ 2175 1240 34004BE2 		ldrsh	r6, [r1, #0]
+ 2176 1244 FEFFFFEB 		mov	r3, r3, asl #16
+ 2177              		cmp	r6, r3, asr #16
+ 2178 1248 000054E3 		add	r5, r5, #1
+ 2179 124c E50000DA 		mov	r8, r3, lsr #16
+ 2180 1250 5C301BE5 		bge	.L286
+ 2181 1254 015045E2 	.L284:
+ 2182              		.loc 1 555 0
+ 2183 1258 F060D3E1 		ldr	r2, [fp, #-76]
+ 2184 125c 60500BE5 		sub	r3, r2, #1
+ 2185 1260 01A0A0E3 		mov	r3, r3, asl #16
+ 2186              		mov	r3, r3, lsr #16
+ 2187              		mov	r1, r3, asl #16
+ 2188              		str	r3, [fp, #-76]
+ 2189 1264 68301BE5 		ldr	r3, [fp, #-100]
+ 2190 1268 0A28A0E1 		cmp	r1, r3
+ 2191 126c 020053E1 		bgt	.L283
+ 2192 1270 2318A0C1 	.L287:
+ 2193 1274 4C100BC5 		.loc 1 552 0
+ 2194 1278 64200BE5 		ldr	r1, [fp, #-96]
+ 2195 127c 0118A0C1 		mov	r3, r1, asl #16
+ 2196 1280 4A0000DA 		mov	r3, r3, lsr #16
+ 2197              		.loc 1 555 0
+ 2198              		add	sl, sl, #1
+ 2199 1284 4178A0E1 		.loc 1 552 0
+ 2200 1288 0710A0E1 		add	r3, r3, #2
+ 2201 128c 0A20A0E1 		cmp	r3, sl
+ 2202 1290 0900A0E1 		bne	.L282
+ 2203 1294 FEFFFFEB 		.loc 1 555 0
+ 2204 1298 0A10A0E1 		ldr	r2, [fp, #-104]
+ 2205 129c 0040A0E1 		mov	r2, r2, lsr #16
+ 2206 12a0 0A20A0E1 		str	r2, [fp, #-84]
+ 2207 12a4 0900A0E1 	.LVL173:
+ 2208 12a8 FEFFFFEB 	.L290:
+ 2209 12ac 0010A0E1 		.loc 1 572 0
+ 2210 12b0 0400A0E1 		ldr	r1, [fp, #-84]
+ 2211 12b4 FEFFFFEB 		mov	r1, r1, asl #16
+ 2212              		mov	r8, r1, asr #16
+ 2213 12b8 000056E3 	.LVL174:
+ 2214              		str	r1, [fp, #-108]
+ 2215 12bc 44000BE5 		mov	r0, r9
+ 2216              		mov	r1, r8
+ 2217 12c0 310000DA 		mov	r2, r8
+ 2218 12c4 0180A0E3 		bl	matrix_float_get
+ 2219 12c8 0850A0E1 		.loc 1 573 0
+ 2220              		cmp	r6, #0
+ 2221              		.loc 1 572 0
+ 2222 12cc 0520A0E1 		mov	r7, r0
+ 2223 12d0 0710A0E1 		.loc 1 573 0
+ 2224 12d4 0900A0E1 		ble	.L291
+ 2225 12d8 FEFFFFEB 		mov	r5, #1
+ 2226 12dc 0520A0E1 		mov	r4, r5
+ 2227 12e0 0040A0E1 	.L293:
+ 2228 12e4 0A10A0E1 		.loc 1 575 0
+ 2229 12e8 0900A0E1 		mov	r2, r4
+ 2230 12ec FEFFFFEB 		mov	r1, r8
+ 2231 12f0 0010A0E1 		sub	r0, fp, #52
+ 2232 12f4 44001BE5 		bl	matrix_float_get
+ 2233 12f8 FEFFFFEB 		mov	r1, r7
+ 2234 12fc 0010A0E1 		bl	__divsf3
+ 2235 1300 0400A0E1 		mov	r2, r4
+ 2236 1304 FEFFFFEB 		mov	r3, r0
+ 2237 1308 0520A0E1 		mov	r1, r8
+ 2238 130c 0030A0E1 		sub	r0, fp, #52
+ 2239 1310 0710A0E1 		bl	matrix_float_set
+ 2240 1314 0900A0E1 		.loc 1 573 0
+ 2241 1318 FEFFFFEB 		ldr	r1, [fp, #-92]
+ 2242              		add	r3, r5, #1
+ 2243 131c 0520A0E1 		ldrsh	r2, [r1, #0]
+ 2244 1320 0710A0E1 		mov	r3, r3, asl #16
+ 2245 1324 34004BE2 		cmp	r2, r3, asr #16
+ 2246 1328 FEFFFFEB 		add	r4, r4, #1
+ 2247 132c 0520A0E1 		mov	r5, r3, lsr #16
+ 2248 1330 0040A0E1 		bge	.L293
+ 2249 1334 0A10A0E1 	.L291:
+ 2250 1338 34004BE2 		.loc 1 577 0
+ 2251 133c FEFFFFEB 		mov	r2, r8
+ 2252 1340 0010A0E1 		mov	r0, r9
+ 2253 1344 44001BE5 		mov	r1, r8
+ 2254 1348 FEFFFFEB 		mov	r3, #1065353216
+ 2255 134c 0010A0E1 		bl	matrix_float_set
+ 2256 1350 0400A0E1 		.loc 1 580 0
+ 2257 1354 FEFFFFEB 		ldr	r2, [fp, #-108]
+ 2258 1358 0710A0E1 		cmp	r2, #65536
+ 2259 135c 0030A0E1 		ble	.L294
+ 2260 1360 0520A0E1 		ldr	r1, [fp, #-92]
+ 2261 1364 34004BE2 		mov	r3, #1
+ 2262 1368 FEFFFFEB 		str	r3, [fp, #-80]
+ 2263              		ldrsh	r6, [r1, #0]
+ 2264 136c 5C101BE5 		mov	r7, r3
+ 2265 1370 013088E2 	.LVL175:
+ 2266 1374 F060D1E1 	.L296:
+ 2267 1378 0338A0E1 		.loc 1 582 0
+ 2268 137c 430856E1 		mov	r1, r7
+ 2269 1380 015085E2 		mov	r2, r8
+ 2270 1384 2388A0E1 		mov	r0, r9
+ 2271 1388 CFFFFFAA 		bl	matrix_float_get
+ 2272              		mov	r1, r8
+ 2273              		mov	r4, r0
+ 2274 138c 4C201BE5 		mov	r2, r8
+ 2275 1390 013042E2 		mov	r0, r9
+ 2276 1394 0338A0E1 		bl	matrix_float_get
+ 2277 1398 2338A0E1 		mov	r1, r0
+ 2278 139c 0318A0E1 		mov	r0, r4
+ 2279 13a0 4C300BE5 		bl	__divsf3
+ 2280 13a4 64301BE5 		.loc 1 584 0
+ 2281 13a8 030051E1 		cmp	r6, #0
+ 2282 13ac B4FFFFCA 		.loc 1 582 0
+ 2283              		str	r0, [fp, #-72]	@ float
+ 2284              		.loc 1 584 0
+ 2285 13b0 60101BE5 		ble	.L297
+ 2286 13b4 0138A0E1 		mov	sl, #1
+ 2287 13b8 2338A0E1 		mov	r5, sl
+ 2288              	.LVL176:
+ 2289 13bc 01A08AE2 	.L299:
+ 2290              		.loc 1 586 0
+ 2291 13c0 023083E2 		mov	r2, r5
+ 2292 13c4 0A0053E1 		mov	r1, r7
+ 2293 13c8 A5FFFF1A 		mov	r0, r9
+ 2294              		bl	matrix_float_get
+ 2295 13cc 68201BE5 		mov	r2, r5
+ 2296 13d0 2228A0E1 		mov	r4, r0
+ 2297 13d4 54200BE5 		mov	r1, r8
+ 2298              		mov	r0, r9
+ 2299              		bl	matrix_float_get
+ 2300              		mov	r1, r0
+ 2301 13d8 54101BE5 		ldr	r0, [fp, #-72]	@ float
+ 2302 13dc 0118A0E1 		bl	__mulsf3
+ 2303 13e0 4188A0E1 		mov	r1, r0
+ 2304              		mov	r0, r4
+ 2305 13e4 6C100BE5 		bl	__subsf3
+ 2306 13e8 0900A0E1 		mov	r2, r5
+ 2307 13ec 0810A0E1 		mov	r3, r0
+ 2308 13f0 0820A0E1 		mov	r1, r7
+ 2309 13f4 FEFFFFEB 		mov	r0, r9
+ 2310              		bl	matrix_float_set
+ 2311 13f8 000056E3 		.loc 1 587 0
+ 2312              		mov	r2, r5
+ 2313 13fc 0070A0E1 		mov	r1, r7
+ 2314              		sub	r0, fp, #52
+ 2315 1400 140000DA 		bl	matrix_float_get
+ 2316 1404 0150A0E3 		mov	r2, r5
+ 2317 1408 0540A0E1 		mov	r4, r0
+ 2318              		mov	r1, r8
+ 2319              		sub	r0, fp, #52
+ 2320 140c 0420A0E1 		bl	matrix_float_get
+ 2321 1410 0810A0E1 		mov	r1, r0
+ 2322 1414 34004BE2 		ldr	r0, [fp, #-72]	@ float
+ 2323 1418 FEFFFFEB 		bl	__mulsf3
+ 2324 141c 0710A0E1 		mov	r1, r0
+ 2325 1420 FEFFFFEB 		mov	r0, r4
+ 2326 1424 0420A0E1 		bl	__subsf3
+ 2327 1428 0030A0E1 		mov	r2, r5
+ 2328 142c 0810A0E1 		mov	r3, r0
+ 2329 1430 34004BE2 		mov	r1, r7
+ 2330 1434 FEFFFFEB 		sub	r0, fp, #52
+ 2331              		bl	matrix_float_set
+ 2332 1438 5C101BE5 		.loc 1 584 0
+ 2333 143c 013085E2 		ldr	r2, [fp, #-92]
+ 2334 1440 F020D1E1 		add	r3, sl, #1
+ 2335 1444 0338A0E1 		ldrsh	r6, [r2, #0]
+ 2336 1448 430852E1 		mov	r3, r3, asl #16
+ 2337 144c 014084E2 		cmp	r6, r3, asr #16
+ 2338 1450 2358A0E1 		add	r5, r5, #1
+ 2339 1454 ECFFFFAA 		mov	sl, r3, lsr #16
+ 2340              		bge	.L299
+ 2341              	.LVL177:
+ 2342 1458 0820A0E1 	.L297:
+ 2343 145c 0900A0E1 		.loc 1 580 0
+ 2344 1460 0810A0E1 		ldr	r1, [fp, #-80]
+ 2345 1464 FE35A0E3 		ldr	r2, [fp, #-108]
+ 2346 1468 FEFFFFEB 		add	r3, r1, #1
+ 2347              		mov	r3, r3, asl #16
+ 2348 146c 6C201BE5 		cmp	r3, r2
+ 2349 1470 010852E3 		mov	r3, r3, lsr #16
+ 2350 1474 530000DA 		add	r7, r7, #1
+ 2351 1478 5C101BE5 		str	r3, [fp, #-80]
+ 2352 147c 0130A0E3 		bne	.L296
+ 2353 1480 50300BE5 		b	.L311
+ 2354 1484 F060D1E1 	.L312:
+ 2355 1488 0370A0E1 		.align	2
+ 2356              	.L310:
+ 2357              		.word	999482292
+ 2358              		.word	168729423
+ 2359 148c 0710A0E1 		.word	.LC2
+ 2360 1490 0820A0E1 		.word	.LC1
+ 2361 1494 0900A0E1 	.L311:
+ 2362 1498 FEFFFFEB 	.LVL178:
+ 2363 149c 0810A0E1 	.L294:
+ 2364 14a0 0040A0E1 		.loc 1 569 0
+ 2365 14a4 0820A0E1 		ldr	r1, [fp, #-84]
+ 2366 14a8 0900A0E1 		sub	r3, r1, #1
+ 2367 14ac FEFFFFEB 		mov	r3, r3, asl #16
+ 2368 14b0 0010A0E1 		movs	r3, r3, lsr #16
+ 2369 14b4 0400A0E1 		str	r3, [fp, #-84]
+ 2370 14b8 FEFFFFEB 		ldrne	r3, [fp, #-92]
+ 2371              		ldrnesh	r6, [r3, #0]
+ 2372 14bc 000056E3 		bne	.L290
+ 2373              	.LVL179:
+ 2374 14c0 48000BE5 	.L280:
+ 2375              		.loc 1 592 0
+ 2376 14c4 310000DA 		ldr	r0, [fp, #-92]
+ 2377 14c8 01A0A0E3 		sub	r1, fp, #52
+ 2378 14cc 0A50A0E1 		bl	matrix_float_copy
+ 2379              		ldr	sp, [fp, #-88]
+ 2380              		b	.L307
+ 2381              	.LVL180:
+ 2382 14d0 0520A0E1 	.L309:
+ 2383 14d4 0710A0E1 	.LBE18:
+ 2384 14d8 0900A0E1 		.loc 1 512 0
+ 2385 14dc FEFFFFEB 		mov	r2, r4
+ 2386 14e0 0520A0E1 		mov	r1, r4
+ 2387 14e4 0040A0E1 		bl	matrix_float_get
+ 2388 14e8 0810A0E1 		mov	r1, r0
+ 2389 14ec 0900A0E1 		mov	r0, #1065353216
+ 2390 14f0 FEFFFFEB 		bl	__divsf3
+ 2391 14f4 0010A0E1 		mov	r1, r4
+ 2392 14f8 48001BE5 		mov	r3, r0
+ 2393 14fc FEFFFFEB 		mov	r2, r4
+ 2394 1500 0010A0E1 		ldr	r0, [fp, #-92]
+ 2395 1504 0400A0E1 		bl	matrix_float_set
+ 2396 1508 FEFFFFEB 		mov	r0, r4
+ 2397 150c 0520A0E1 		b	.L275
+ 2398 1510 0030A0E1 	.LBE16:
+ 2399 1514 0710A0E1 	.LFE31:
+ 2401 151c FEFFFFEB 		.align	2
+ 2402              		.global	vector_float_copy
+ 2404 1524 0710A0E1 	vector_float_copy:
+ 2405 1528 34004BE2 	.LFB7:
+ 2406 152c FEFFFFEB 		.loc 1 102 0
+ 2407 1530 0520A0E1 		@ Function supports interworking.
+ 2408 1534 0040A0E1 		@ args = 0, pretend = 0, frame = 0
+ 2409 1538 0810A0E1 		@ frame_needed = 0, uses_anonymous_args = 0
+ 2410 153c 34004BE2 	.LVL181:
+ 2411 1540 FEFFFFEB 		stmfd	sp!, {r4, r5, lr}
+ 2412 1544 0010A0E1 	.LCFI35:
+ 2413 1548 48001BE5 		.loc 1 105 0
+ 2414 154c FEFFFFEB 		ldrsh	r3, [r0, #0]
+ 2415 1550 0010A0E1 		.loc 1 102 0
+ 2416 1554 0400A0E1 		mov	r4, r1
+ 2417 1558 FEFFFFEB 		.loc 1 105 0
+ 2418 155c 0520A0E1 		ldrsh	r1, [r1, #0]
+ 2419 1560 0030A0E1 	.LVL182:
+ 2420 1564 0710A0E1 		cmp	r1, r3
+ 2421 1568 34004BE2 		.loc 1 102 0
+ 2422 156c FEFFFFEB 		mov	r5, r0
+ 2423              		.loc 1 107 0
+ 2424 1570 5C201BE5 		mov	r2, r1, asl #2
+ 2425 1574 01308AE2 		.loc 1 105 0
+ 2426 1578 F060D2E1 		beq	.L317
+ 2427 157c 0338A0E1 	.LVL183:
+ 2428 1580 430856E1 	.L316:
+ 2429 1584 015085E2 		.loc 1 110 0
+ 2430 1588 23A8A0E1 		ldmfd	sp!, {r4, r5, lr}
+ 2431 158c CFFFFFAA 		bx	lr
+ 2432              	.L317:
+ 2433              		.loc 1 107 0
+ 2434              		ldr	r0, [r0, #4]
+ 2435 1590 50101BE5 		ldr	r1, [r4, #4]
+ 2436 1594 6C201BE5 		bl	memcpy
+ 2437 1598 013081E2 		.loc 1 108 0
+ 2438 159c 0338A0E1 		ldrb	r3, [r4, #2]	@ zero_extendqisi2
+ 2439 15a0 020053E1 		strb	r3, [r5, #2]
+ 2440 15a4 2338A0E1 		b	.L316
+ 2441 15a8 017087E2 	.LFE7:
+ 2443 15b0 B5FFFF1A 		.section	.debug_frame,"",%progbits
+ 2444 15b4 030000EA 	.Lframe0:
+ 2445              		.4byte	.LECIE0-.LSCIE0
+ 2446              	.LSCIE0:
+ 2447              		.4byte	0xffffffff
+ 2448 15b8 B4E3923B 		.byte	0x1
+ 2449 15bc 4F9B0E0A 		.ascii	"\000"
+ 2450 15c0 20000000 		.uleb128 0x1
+ 2451 15c4 18000000 		.sleb128 -4
+ 2452              		.byte	0xe
+ 2453              		.byte	0xc
+ 2454              		.uleb128 0xd
+ 2455              		.uleb128 0x0
+ 2456 15c8 54101BE5 		.align	2
+ 2457 15cc 013041E2 	.LECIE0:
+ 2458 15d0 0338A0E1 	.LSFDE0:
+ 2459 15d4 2338B0E1 		.4byte	.LEFDE0-.LASFDE0
+ 2460 15d8 54300BE5 	.LASFDE0:
+ 2461 15dc 5C301B15 		.4byte	.Lframe0
+ 2462 15e0 F060D311 		.4byte	.LFB8
+ 2463 15e4 7BFFFF1A 		.4byte	.LFE8-.LFB8
+ 2464              		.byte	0x4
+ 2465              		.4byte	.LCFI0-.LFB8
+ 2466              		.byte	0xe
+ 2467 15e8 5C001BE5 		.uleb128 0x4
+ 2468 15ec 34104BE2 		.byte	0x8e
+ 2469 15f0 FEFFFFEB 		.uleb128 0x1
+ 2470 15f4 58D01BE5 		.align	2
+ 2471 15f8 E9FEFFEA 	.LEFDE0:
+ 2472              	.LSFDE2:
+ 2473              		.4byte	.LEFDE2-.LASFDE2
+ 2474              	.LASFDE2:
+ 2475              		.4byte	.Lframe0
+ 2476 15fc 0420A0E1 		.4byte	.LFB11
+ 2477 1600 0410A0E1 		.4byte	.LFE11-.LFB11
+ 2478 1604 FEFFFFEB 		.byte	0x4
+ 2479 1608 0010A0E1 		.4byte	.LCFI1-.LFB11
+ 2480 160c FE05A0E3 		.byte	0xe
+ 2481 1610 FEFFFFEB 		.uleb128 0x4
+ 2482 1614 0410A0E1 		.byte	0x8e
+ 2483 1618 0030A0E1 		.uleb128 0x1
+ 2484 161c 0420A0E1 		.align	2
+ 2485 1620 5C001BE5 	.LEFDE2:
+ 2486 1624 FEFFFFEB 	.LSFDE4:
+ 2487 1628 0400A0E1 		.4byte	.LEFDE4-.LASFDE4
+ 2488 162c DDFEFFEA 	.LASFDE4:
+ 2489              		.4byte	.Lframe0
+ 2490              		.4byte	.LFB12
+ 2491              		.4byte	.LFE12-.LFB12
+ 2492              		.byte	0x4
+ 2493              		.4byte	.LCFI2-.LFB12
+ 2494              		.byte	0xe
+ 2495              		.uleb128 0x1c
+ 2496              		.byte	0x8e
+ 2497              		.uleb128 0x1
+ 2498              		.byte	0x8a
+ 2499              		.uleb128 0x2
+ 2500              		.byte	0x88
+ 2501              		.uleb128 0x3
+ 2502 1630 30402DE9 		.byte	0x87
+ 2503              		.uleb128 0x4
+ 2504              		.byte	0x86
+ 2505 1634 F030D0E1 		.uleb128 0x5
+ 2506              		.byte	0x85
+ 2507 1638 0140A0E1 		.uleb128 0x6
+ 2508              		.byte	0x84
+ 2509 163c F010D1E1 		.uleb128 0x7
+ 2510              		.align	2
+ 2511 1640 030051E1 	.LEFDE4:
+ 2512              	.LSFDE6:
+ 2513 1644 0050A0E1 		.4byte	.LEFDE6-.LASFDE6
+ 2514              	.LASFDE6:
+ 2515 1648 0121A0E1 		.4byte	.Lframe0
+ 2516              		.4byte	.LFB13
+ 2517 164c 0100000A 		.4byte	.LFE13-.LFB13
+ 2518              		.byte	0x4
+ 2519              		.4byte	.LCFI3-.LFB13
+ 2520              		.byte	0xe
+ 2521 1650 3040BDE8 		.uleb128 0x1c
+ 2522 1654 1EFF2FE1 		.byte	0x8e
+ 2523              		.uleb128 0x1
+ 2524              		.byte	0x8a
+ 2525 1658 040090E5 		.uleb128 0x2
+ 2526 165c 041094E5 		.byte	0x88
+ 2527 1660 FEFFFFEB 		.uleb128 0x3
+ 2528              		.byte	0x87
+ 2529 1664 0230D4E5 		.uleb128 0x4
+ 2530 1668 0230C5E5 		.byte	0x86
+ 2531 166c F7FFFFEA 		.uleb128 0x5
+ 2532              		.byte	0x85
+ 2533              		.uleb128 0x6
+ 3254              		.4byte	0x0
+DEFINED SYMBOLS
+                            *ABS*:00000000 CmatrixLib.c
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:13     .text:00000000 matrix_float_set
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:22     .text:00000000 $a
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:46     .text:00000034 matrix_float_get
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:77     .text:00000068 matrix_float_transpose
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:162    .text:00000128 matrix_float_transpose_square
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:244    .text:000001f0 matrix_float_set_all
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:309    .text:00000278 matrix_float_set_zero
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:330    .text:00000280 matrix_float_set_identity
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:388    .text:000002ec matrix_float_add
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:477    .text:000003b8 matrix_float_sub
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:565    .text:00000484 vector_float_set
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:594    .text:000004ac vector_float_set_zero
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:639    .text:000004fc vector_float_set_to
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:685    .text:00000550 vector_float_get
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:723    .text:00000584 vector_float_times
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:774    .text:000005ec vector_float_outer_product
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:864    .text:000006bc vector_float_inner_product
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:939    .text:00000754 vector_float_subtract
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:1003   .text:000007e0 vector_float_add
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:1067   .text:0000086c vector_float_transpose
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:1097   .text:00000890 matrix_float_get_row
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:1170   .text:0000091c matrix_float_get_col
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:1243   .text:000009a8 matrix_float_mul
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:1376   .text:00000afc matrix_float_mul_trans
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:1509   .text:00000c50 matrix_float_times
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:1580   .text:00000cf0 matrix_float_mul_vec_right
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:1691   .text:00000df8 matrix_float_mul_vec_left
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:1802   .text:00000f00 matrix_float_copy
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:1847   .text:00000f40 matrix_float_determinant
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:2058   .text:0000117c $d
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:2075   .text:00001180 matrix_float_inverse
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:2082   .text:00001180 $a
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:2448   .text:000015b8 $d
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:2456   .text:000015c8 $a
+C:\Users\XY\AppData\Local\Temp/cc6tdaaa.s:2495   .text:00001630 vector_float_copy
+
+UNDEFINED SYMBOLS
+__addsf3
+__subsf3
+__mulsf3
+memcpy
+__divsf3
+__extendsfdf2
+__gedf2

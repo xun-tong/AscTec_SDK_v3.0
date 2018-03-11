@@ -1,0 +1,376 @@
+   1              		.file	"mpc.c"
+   9              	.Ltext0:
+  10              		.global	__subsf3
+  11              		.global	__mulsf3
+  12              		.global	__gtsf2
+  13              		.global	__ltsf2
+  14              		.align	2
+  15              		.global	filterReferenceTrajectory
+  17              	filterReferenceTrajectory:
+  18              	.LFB2:
+  19              		.file 1 "mpc.c"
+   1:mpc.c         **** /*
+   2:mpc.c         ****  * mpc.c
+   3:mpc.c         ****  *
+   4:mpc.c         ****  *  Author: Tomas Baca
+   5:mpc.c         ****  */
+   6:mpc.c         **** 
+   7:mpc.c         **** #include "CMatrixLib.h"
+   8:mpc.c         **** #include "mpc.h"
+   9:mpc.c         **** 
+  10:mpc.c         **** void filterReferenceTrajectory(mpcHandler_t * handler) {
+  20              	ction supports interworking.
+  21              		@ args = 0, pretend = 0, frame = 0
+  22              		@ frame_needed = 0, uses_anonymous_args = 0
+  23              	.LVL0:
+  24              		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
+  25 0000 F0472DE9 	.LCFI0:
+  26              		.loc 1 14 0
+  11:mpc.c         **** "
+  12:mpc.c         **** #include "mpc.h"
+  13:mpc.c         **** 
+  14:mpc.c         **** void filterReferenceTrajectory(mpcHandler_t * handler) {
+  27              	, #1
+  28 0004 0110A0E3 		ldr	r4, [r0, #24]
+  29 0008 184090E5 		.loc 1 10 0
+  30              		mov	r8, r0
+  31 000c 0080A0E1 		.loc 1 14 0
+  32              		ldr	r0, [r0, #16]
+  33 0010 100090E5 	.LVL1:
+  34              		bl	vector_float_get
+  35 0014 FEFFFFEB 		mov	r1, #1
+  36 0018 0110A0E3 		mov	r2, r0
+  37 001c 0020A0E1 		mov	r0, r4
+  38 0020 0400A0E1 		bl	vector_float_set
+  39 0024 FEFFFFEB 		.loc 1 17 0
+  15:mpc.c         **** "
+  16:mpc.c         **** #include "mpc.h"
+  17:mpc.c         **** 
+  40              	 #20]
+  41 0028 143098E5 		ldrsh	r2, [r3, #0]
+  42 002c F020D3E1 		cmp	r2, #1
+  43 0030 010052E3 		ble	.L8
+  44 0034 3D0000DA 		mov	sl, #2
+  45 0038 02A0A0E3 	.LVL2:
+  46              	.LVL3:
+  47              	.L4:
+  48              		.loc 1 20 0
+  18:mpc.c         **** pc.c
+  19:mpc.c         ****  *
+  20:mpc.c         ****  *  Author: Tomas Baca
+  49              	[r8, #28]
+  50 003c 1C3098E5 		.loc 1 10 0
+  51              		sub	r9, sl, #2
+  52 0040 02904AE2 		.loc 1 20 0
+  53              		mul	r1, r3, r9
+  54 0044 930901E0 		add	r1, r1, #1
+  55 0048 011081E2 		mov	r1, r1, asl #16
+  56 004c 0118A0E1 		mov	r1, r1, asr #16
+  57 0050 4118A0E1 		ldr	r0, [r8, #24]
+  58 0054 180098E5 		bl	vector_float_get
+  59 0058 FEFFFFEB 		mov	r1, sl
+  60 005c 0A10A0E1 		mov	r4, r0
+  61 0060 0040A0E1 		ldr	r0, [r8, #20]
+  62 0064 140098E5 		bl	vector_float_get
+  63 0068 FEFFFFEB 		mov	r1, r0
+  64 006c 0010A0E1 		mov	r0, r4
+  65 0070 0400A0E1 		bl	__subsf3
+  66 0074 FEFFFFEB 		.loc 1 23 0
+  21:mpc.c         **** /*
+  22:mpc.c         ****  * mpc.c
+  23:mpc.c         ****  *
+  67              		@ float
+  68 0078 2C4098E5 		ldr	r5, [r8, #40]	@ float
+  69 007c 285098E5 		.loc 1 20 0
+  70              		mov	r6, r0
+  71 0080 0060A0E1 		.loc 1 23 0
+  72              		mov	r1, r5
+  73 0084 0510A0E1 		mov	r0, r4
+  74 0088 0400A0E1 		bl	__mulsf3
+  75 008c FEFFFFEB 		mov	r7, r0
+  76 0090 0070A0E1 		mov	r1, r7
+  77 0094 0710A0E1 		mov	r0, r6
+  78 0098 0600A0E1 	.LVL4:
+  79              		bl	__gtsf2
+  80 009c FEFFFFEB 	.LVL5:
+  81              		.loc 1 25 0
+  24:mpc.c         **** /*
+  25:mpc.c         ****  * mpc.c
+  82              	2147483648
+  83 00a0 024184E2 		.loc 1 23 0
+  84              		cmp	r0, #0
+  85 00a4 000050E3 		.loc 1 25 0
+  86              		mov	r1, r4
+  87 00a8 0410A0E1 		mov	r0, r5
+  88 00ac 0500A0E1 		.loc 1 23 0
+  89              		bgt	.L5
+  90 00b0 060000CA 		.loc 1 25 0
+  91              		bl	__mulsf3
+  92 00b4 FEFFFFEB 		mov	r7, r0
+  93 00b8 0070A0E1 		mov	r1, r7
+  94 00bc 0710A0E1 		mov	r0, r6
+  95 00c0 0600A0E1 	.LVL6:
+  96              		bl	__ltsf2
+  97 00c4 FEFFFFEB 	.LVL7:
+  98              		cmp	r0, #0
+  99 00c8 000050E3 		movge	r7, r6
+ 100 00cc 0670A0A1 	.L5:
+ 101              		.loc 1 28 0
+  26:mpc.c         **** /*
+  27:mpc.c         ****  * mpc.c
+  28:mpc.c         ****  *
+ 102              	mul	r1, r5, r9
+ 103 00d0 1C5098E5 		ldr	r6, [r8, #24]
+ 104 00d4 950901E0 		add	r1, r1, #1
+ 105 00d8 186098E5 		mov	r1, r1, asl #16
+ 106 00dc 011081E2 		mov	r1, r1, asr #16
+ 107 00e0 0118A0E1 		mov	r0, r6
+ 108 00e4 4118A0E1 		bl	vector_float_get
+ 109 00e8 0600A0E1 		sub	r3, sl, #1
+ 110 00ec FEFFFFEB 		mov	r1, r7
+ 111 00f0 01304AE2 		mul	r4, r3, r5
+ 112 00f4 0710A0E1 		bl	__subsf3
+ 113 00f8 930504E0 		add	r4, r4, #1
+ 114 00fc FEFFFFEB 		mov	r4, r4, asl #16
+ 115 0100 014084E2 		mov	r4, r4, asr #16
+ 116 0104 0448A0E1 		mov	r2, r0
+ 117 0108 4448A0E1 		mov	r1, r4
+ 118 010c 0020A0E1 		mov	r0, r6
+ 119 0110 0410A0E1 		bl	vector_float_set
+ 120 0114 0600A0E1 		.loc 1 17 0
+ 121 0118 FEFFFFEB 		ldr	r3, [r8, #20]
+ 122              		ldrsh	r2, [r3, #0]
+ 123 011c 143098E5 		add	sl, sl, #1
+ 124 0120 F020D3E1 		cmp	r2, sl
+ 125 0124 01A08AE2 		bge	.L4
+ 126 0128 0A0052E1 	.L8:
+ 127 012c C2FFFFAA 		.loc 1 30 0
+ 128              		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
+  29:mpc.c         **** /*
+  30:mpc.c         ****  * mpc.c
+ 129              	ReferenceTrajectory, .-filterReferenceTrajectory
+ 130 0130 F047BDE8 		.align	2
+ 131 0134 1EFF2FE1 		.global	calculateMPC
+ 133              	calculateMPC:
+ 134              	.LFB3:
+ 135              		.loc 1 32 0
+ 136              		@ Function supports interworking.
+ 137              		@ args = 0, pretend = 0, frame = 36
+ 138              		@ frame_needed = 1, uses_anonymous_args = 0
+  31:mpc.c         **** /*
+  32:mpc.c         ****  * mpc.c
+ 139              	v	ip, sp
+ 140              	.LCFI1:
+ 141              		stmfd	sp!, {r4, r5, r6, r7, r8, fp, ip, lr, pc}
+ 142              	.LCFI2:
+ 143              		sub	fp, ip, #4
+ 144 0138 0DC0A0E1 	.LCFI3:
+ 145              		sub	sp, sp, #36
+ 146 013c F0D92DE9 	.LCFI4:
+ 147              		.loc 1 39 0
+ 148 0140 04B04CE2 		add	r2, r0, #28
+ 149              		ldmia	r2, {r2, r3}	@ phole ldm
+ 150 0144 24D04DE2 		mul	lr, r3, r2
+ 151              		.loc 1 45 0
+  33:mpc.c         **** /*
+  34:mpc.c         ****  * mpc.c
+  35:mpc.c         ****  *
+  36:mpc.c         ****  *  Author: Tomas Baca
+  37:mpc.c         ****  */
+  38:mpc.c         **** 
+  39:mpc.c         **** #include "CMatrixLib.h"
+ 152              	 #36]
+ 153 0148 1C2080E2 		.loc 1 39 0
+ 154 014c 0C0092E8 		mov	r3, lr, asl #2
+ 155 0150 93020EE0 		.loc 1 45 0
+  40:mpc.c         **** /*
+  41:mpc.c         ****  * mpc.c
+  42:mpc.c         ****  *
+  43:mpc.c         ****  *  Author: Tomas Baca
+  44:mpc.c         ****  */
+  45:mpc.c         **** 
+ 156              		r2, ip, asl #2
+ 157 0154 24C090E5 		.loc 1 39 0
+ 158              		add	r3, r3, #4
+ 159 0158 0E31A0E1 		.loc 1 45 0
+ 160              		add	r2, r2, #4
+ 161 015c 0C21A0E1 		.loc 1 32 0
+ 162              		mov	r8, sp
+ 163 0160 043083E2 		.loc 1 39 0
+ 164              		rsb	sp, r3, sp
+ 165 0164 042082E2 		.loc 1 40 0
+ 166              		str	sp, [fp, #-64]
+ 167 0168 0D80A0E1 		.loc 1 61 0
+ 168              		sub	r7, fp, #68
+ 169 016c 0DD063E0 		.loc 1 45 0
+ 170              		rsb	sp, r2, sp
+ 171 0170 40D00BE5 		.loc 1 61 0
+  46:mpc.c         **** /*
+  47:mpc.c         ****  * mpc.c
+  48:mpc.c         ****  *
+  49:mpc.c         ****  *  Author: Tomas Baca
+  50:mpc.c         ****  */
+  51:mpc.c         **** 
+  52:mpc.c         **** #include "CMatrixLib.h"
+  53:mpc.c         **** #include "mpc.h"
+  54:mpc.c         **** 
+  55:mpc.c         **** void filterReferenceTrajectory(mpcHandler_t * handler) {
+  56:mpc.c         **** 
+  57:mpc.c         **** 	float difference;
+  58:mpc.c         **** 
+  59:mpc.c         **** 	vector_float_set(handler->allstate_reference, 1, vector_float_get(handler->initial_cond, 1));
+  60:mpc.c         **** 
+  61:mpc.c         **** 	int i;
+ 172              	6]
+ 173 0174 44704BE2 		.loc 1 42 0
+ 174              		mov	r3, #0
+ 175 0178 0DD062E0 		.loc 1 32 0
+ 176              		mov	r6, r0
+ 177 017c 101090E5 		.loc 1 46 0
+ 178              		str	sp, [fp, #-40]
+ 179 0180 0030A0E3 		.loc 1 61 0
+ 180              		ldr	r0, [r0, #0]
+ 181 0184 0060A0E1 	.LVL9:
+ 182              		.loc 1 51 0
+ 183 0188 28D00BE5 		rsb	sp, r2, sp
+ 184              		.loc 1 48 0
+ 185 018c 000090E5 		mov	r4, #1
+ 186              		.loc 1 61 0
+ 187              		mov	r2, r7
+ 188 0190 0DD062E0 		.loc 1 54 0
+ 189              		strb	r3, [fp, #-54]
+ 190 0194 0140A0E3 		.loc 1 42 0
+ 191              		strb	r3, [fp, #-66]
+ 192 0198 0720A0E1 		.loc 1 41 0
+ 193              		strh	lr, [fp, #-68]	@ movhi
+ 194 019c 36304BE5 		.loc 1 53 0
+ 195              		strh	ip, [fp, #-56]	@ movhi
+ 196 01a0 42304BE5 		.loc 1 47 0
+ 197              		strh	ip, [fp, #-44]	@ movhi
+ 198 01a4 B4E44BE1 		.loc 1 48 0
+ 199              		strb	r4, [fp, #-42]
+ 200 01a8 B8C34BE1 		.loc 1 52 0
+ 201              		str	sp, [fp, #-52]
+ 202 01ac BCC24BE1 		.loc 1 61 0
+ 203              		bl	matrix_float_mul_vec_right
+ 204 01b0 2A404BE5 		.loc 1 64 0
+ 205              		ldr	r1, [r6, #24]
+ 206 01b4 34D00BE5 		mov	r0, r7
+ 207              		bl	vector_float_subtract
+ 208 01b8 FEFFFFEB 		.loc 1 69 0
+  62:mpc.c         **** te_reference, 1, vector_float_get(handler->initial_cond, 1));
+  63:mpc.c         **** 
+  64:mpc.c         **** 	int i;
+ 209              	
+ 210 01bc 181096E5 		mul	r2, r3, r1
+ 211 01c0 0700A0E1 		cmp	r2, #0
+ 212 01c4 FEFFFFEB 		ble	.L12
+  65:mpc.c         **** te_reference, 1, vector_float_get(handler->initial_cond, 1));
+  66:mpc.c         **** 
+  67:mpc.c         **** 	int i;
+  68:mpc.c         **** 	for (i = 2; i <= handler->position_reference->length; i++) {
+  69:mpc.c         **** 
+ 213              	v	r5, r4
+ 214 01c8 201096E5 	.LVL10:
+ 215 01cc 1C3096E5 	.L14:
+ 216 01d0 930102E0 		.loc 1 70 0
+ 217 01d4 000052E3 		mov	r1, r5
+ 218 01d8 140000DA 		mov	r0, r7
+ 219 01dc 0450A0E1 		bl	vector_float_get
+ 220              		mov	r1, r5
+ 221              		mov	r4, r0
+  70:mpc.c         **** nt i;
+ 222              	[r6, #8]
+ 223 01e0 0510A0E1 		bl	vector_float_get
+ 224 01e4 0700A0E1 		mov	r1, r0
+ 225 01e8 FEFFFFEB 		mov	r0, r4
+ 226 01ec 0510A0E1 		bl	__mulsf3
+ 227 01f0 0040A0E1 		mov	r1, r5
+ 228 01f4 080096E5 		mov	r2, r0
+ 229 01f8 FEFFFFEB 		mov	r0, r7
+ 230 01fc 0010A0E1 		bl	vector_float_set
+ 231 0200 0400A0E1 		.loc 1 69 0
+ 232 0204 FEFFFFEB 		add	r2, r6, #28
+ 233 0208 0510A0E1 		ldmia	r2, {r2, r3}	@ phole ldm
+ 234 020c 0020A0E1 		mul	r1, r3, r2
+ 235 0210 0700A0E1 		add	r5, r5, #1
+ 236 0214 FEFFFFEB 		cmp	r1, r5
+ 237              		bge	.L14
+ 238 0218 1C2086E2 	.L12:
+ 239 021c 0C0092E8 		.loc 1 75 0
+ 240 0220 930201E0 		sub	r4, fp, #44
+ 241 0224 015085E2 		.loc 1 72 0
+ 242 0228 050051E1 		mov	r0, r7
+ 243 022c EBFFFFAA 		bl	vector_float_transpose
+ 244              		.loc 1 75 0
+  71:mpc.c         **** te_reference, 1, vector_float_get(handler->initial_cond, 1));
+  72:mpc.c         **** 
+  73:mpc.c         **** 	int i;
+  74:mpc.c         **** 	for (i = 2; i <= handler->position_reference->length; i++) {
+  75:mpc.c         **** 
+ 245              	
+ 246 0230 2C404BE2 		ldr	r0, [r6, #4]
+ 247              		bl	matrix_float_mul_vec_left
+ 248 0234 0700A0E1 		.loc 1 77 0
+ 249 0238 FEFFFFEB 		mov	r0, r4
+ 250              		bl	vector_float_transpose
+ 251 023c 0420A0E1 		.loc 1 83 0
+ 252 0240 0710A0E1 		sub	r5, fp, #56
+ 253 0244 040096E5 	.LVL11:
+ 254 0248 FEFFFFEB 		.loc 1 80 0
+  76:mpc.c         **** nt i;
+  77:mpc.c         **** 	for (i = 2; i <= handler->position_reference->length; i++) {
+ 255              	r4
+ 256 024c 0400A0E1 		mov	r1, #-1090519040
+ 257 0250 FEFFFFEB 		bl	vector_float_times
+  78:mpc.c         **** 	int i;
+  79:mpc.c         **** 	for (i = 2; i <= handler->position_reference->length; i++) {
+  80:mpc.c         **** 
+  81:mpc.c         **** 		// compute the difference
+  82:mpc.c         **** 		difference = vector_float_get(handler->allstate_reference, (i-2)*handler->number_of_states + 1) -
+  83:mpc.c         **** 
+ 258              	oc 1 83 0
+ 259 0254 38504BE2 		mov	r1, r4
+ 260              		ldr	r0, [r6, #12]
+ 261              		mov	r2, r5
+ 262 0258 0400A0E1 		bl	matrix_float_mul_vec_right
+ 263 025c BF14A0E3 		.loc 1 86 0
+ 264 0260 FEFFFFEB 		mov	r0, r5
+ 265              		mov	r1, #1
+ 266 0264 0410A0E1 		bl	vector_float_get
+ 267 0268 0C0096E5 		mov	sp, r8
+ 268 026c 0520A0E1 		.loc 1 87 0
+ 269 0270 FEFFFFEB 		sub	sp, fp, #32
+  84:mpc.c         **** _states + 1) - vector_float_get(handler->position_reference, i);
+  85:mpc.c         **** 
+  86:mpc.c         **** 		// saturate the difference
+ 270              	r4, r5, r6, r7, r8, fp, sp, lr}
+ 271 0274 0500A0E1 		bx	lr
+ 272 0278 0110A0E3 	.LFE3:
+ 274 0280 08D0A0E1 		.section	.debug_frame,"",%progbits
+  87:mpc.c         **** t(handler->position_reference, i);
+ 275              	me0:
+ 276 0284 20D04BE2 		.4byte	.LECIE0-.LSCIE0
+ 277 0288 F0699DE8 	.LSCIE0:
+ 278 028c 1EFF2FE1 		.4byte	0xffffffff
+ 279              		.byte	0x1
+ 280              		.ascii	"\000"
+ 363              		.byte	0x5d
+DEFINED SYMBOLS
+                            *ABS*:00000000 mpc.c
+C:\Users\XY\AppData\Local\Temp/ccWEaaaa.s:17     .text:00000000 filterReferenceTrajectory
+C:\Users\XY\AppData\Local\Temp/ccWEaaaa.s:25     .text:00000000 $a
+C:\Users\XY\AppData\Local\Temp/ccWEaaaa.s:137    .text:00000138 calculateMPC
+
+UNDEFINED SYMBOLS
+__subsf3
+__mulsf3
+__gtsf2
+__ltsf2
+vector_float_get
+vector_float_set
+matrix_float_mul_vec_right
+vector_float_subtract
+vector_float_transpose
+matrix_float_mul_vec_left
+vector_float_times

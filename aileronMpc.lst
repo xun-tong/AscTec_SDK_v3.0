@@ -1,0 +1,167 @@
+   1              		.file	"aileronMpc.c"
+   9              	.Ltext0:
+  10              		.align	2
+  11              		.global	initializeAileronMPC
+  13              	initializeAileronMPC:
+  14              	.LFB2:
+  15              		.file 1 "aileronMpc.c"
+   1:aileronMpc.c  **** /*
+   2:aileronMpc.c  ****  * aileronMpc.c
+   3:aileronMpc.c  ****  *
+   4:aileronMpc.c  ****  *  Author: Tomas Baca
+   5:aileronMpc.c  ****  */
+   6:aileronMpc.c  **** 
+   7:aileronMpc.c  **** #include "aileronMpc.h"
+   8:aileronMpc.c  **** #include "elevAileMpcMatrices.h"
+   9:aileronMpc.c  **** #include "mpc.h"
+  10:aileronMpc.c  **** #include "miscellaneous.h"
+  11:aileronMpc.c  **** 
+  12:aileronMpc.c  **** mpcHandler_t aileronMpcHandler;
+  13:aileronMpc.c  **** 
+  14:aileronMpc.c  **** mpcHandler_t * initializeAileronMPC() {
+  16              	 Function supports interworking.
+  17              		@ args = 0, pretend = 0, frame = 0
+  18              		@ frame_needed = 0, uses_anonymous_args = 0
+  19              		stmfd	sp!, {r4, lr}
+  20 0000 10402DE9 	.LCFI0:
+  21              		.loc 1 16 0
+  15:aileronMpc.c  **** t * initializeAileronMPC() {
+  16:aileronMpc.c  **** 
+  22              	1, #5
+  23 0004 0510A0E3 		ldr	r2, .L3
+  24 0008 BC209FE5 		mov	r0, #1000
+  25 000c FA0FA0E3 		bl	matrix_float_alloc_hollow
+  26 0010 FEFFFFEB 		ldr	r4, .L3+4
+  27 0014 B4409FE5 		.loc 1 18 0
+  17:aileronMpc.c  **** * initializeAileronMPC() {
+  18:aileronMpc.c  **** 
+  28              	1, #0
+  29 0018 0010A0E3 		.loc 1 16 0
+  30              		str	r0, [r4, #0]
+  31 001c 000084E5 		.loc 1 18 0
+  32              		ldr	r2, .L3+8
+  33 0020 AC209FE5 		mov	r0, #1000
+  34 0024 FA0FA0E3 		bl	vector_float_alloc_hollow
+  35 0028 FEFFFFEB 		.loc 1 20 0
+  19:aileronMpc.c  **** * initializeAileronMPC() {
+  20:aileronMpc.c  **** 
+  36              	 #20
+  37 002c 1410A0E3 		.loc 1 18 0
+  38              		str	r0, [r4, #8]
+  39 0030 080084E5 		.loc 1 20 0
+  40              		ldr	r2, .L3+12
+  41 0034 9C209FE5 		mov	r0, #1000
+  42 0038 FA0FA0E3 		bl	matrix_float_alloc_hollow
+  43 003c FEFFFFEB 		str	r0, [r4, #4]
+  44 0040 040084E5 		.loc 1 22 0
+  21:aileronMpc.c  **** * initializeAileronMPC() {
+  22:aileronMpc.c  **** 
+  45              	#20
+  46 0044 1400A0E3 		ldr	r2, .L3+16
+  47 0048 8C209FE5 		mov	r1, r0
+  48 004c 0010A0E1 		bl	matrix_float_alloc_hollow
+  49 0050 FEFFFFEB 		.loc 1 24 0
+  23:aileronMpc.c  **** * initializeAileronMPC() {
+  24:aileronMpc.c  **** 
+  50              	r1, #0
+  51 0054 0010A0E3 		.loc 1 22 0
+  52              		str	r0, [r4, #12]
+  53 0058 0C0084E5 		.loc 1 24 0
+  54              		mov	r0, #200
+  55 005c C800A0E3 		bl	vector_float_alloc
+  56 0060 FEFFFFEB 		str	r0, [r4, #20]
+  57 0064 140084E5 		.loc 1 25 0
+  25:aileronMpc.c  **** * initializeAileronMPC() {
+  58              	or_float_set_zero
+  59 0068 FEFFFFEB 		.loc 1 27 0
+  26:aileronMpc.c  **** t * initializeAileronMPC() {
+  27:aileronMpc.c  **** 
+  60              	ov	r1, #0
+  61 006c 0010A0E3 		mov	r0, #1000
+  62 0070 FA0FA0E3 		bl	vector_float_alloc
+  63 0074 FEFFFFEB 		str	r0, [r4, #24]
+  64 0078 180084E5 		.loc 1 28 0
+  28:aileronMpc.c  **** * initializeAileronMPC() {
+  65              	ector_float_set_zero
+  66 007c FEFFFFEB 		.loc 1 30 0
+  29:aileronMpc.c  **** t * initializeAileronMPC() {
+  30:aileronMpc.c  **** 
+  67              	ov	r1, #0
+  68 0080 0010A0E3 		mov	r0, #5
+  69 0084 0500A0E3 		bl	vector_float_alloc
+  70 0088 FEFFFFEB 		.loc 1 32 0
+  31:aileronMpc.c  **** * initializeAileronMPC() {
+  32:aileronMpc.c  **** 
+  71              		r3, .L3+20
+  72 008c 4C309FE5 		.loc 1 34 0
+  33:aileronMpc.c  **** * initializeAileronMPC() {
+  34:aileronMpc.c  **** 
+  73              	vn	r2, #1671168
+  74 0090 6629E0E3 		sub	r2, r2, #6528
+  75 0094 662D42E2 		.loc 1 32 0
+  76              		str	r3, [r4, #40]	@ float
+  77 0098 283084E5 		.loc 1 34 0
+  78              		sub	r2, r2, #-1073741799
+  79 009c 672142E2 		.loc 1 36 0
+  35:aileronMpc.c  **** * initializeAileronMPC() {
+  36:aileronMpc.c  **** 
+  80              	, #5
+  81 00a0 0530A0E3 		.loc 1 30 0
+  82              		str	r0, [r4, #16]
+  83 00a4 100084E5 		.loc 1 34 0
+  84              		str	r2, [r4, #44]	@ float
+  85 00a8 2C2084E5 		.loc 1 36 0
+  86              		str	r3, [r4, #28]
+  87 00ac 1C3084E5 		.loc 1 38 0
+  37:aileronMpc.c  **** * initializeAileronMPC() {
+  38:aileronMpc.c  **** 
+  88              	 #200
+  89 00b0 C820A0E3 		.loc 1 40 0
+  39:aileronMpc.c  **** * initializeAileronMPC() {
+  40:aileronMpc.c  **** 
+  90              	dd	r3, r3, #15
+  91 00b4 0F3083E2 		.loc 1 43 0
+  41:aileronMpc.c  **** * initializeAileronMPC() {
+  42:aileronMpc.c  **** 
+  43:aileronMpc.c  **** 	aileronMpcHandler.A_roof = matrix_float_alloc_hollow(ATTITUDE_A_ROOF_HEIGHT, ATTITUDE_A_ROOF_WIDTH
+  92              	ov	r0, r4
+  93 00b8 0400A0E1 		.loc 1 38 0
+  94              		str	r2, [r4, #32]
+  95 00bc 202084E5 		.loc 1 40 0
+  96              		str	r3, [r4, #36]
+  97 00c0 243084E5 		.loc 1 43 0
+  98              		ldmfd	sp!, {r4, lr}
+  99 00c4 1040BDE8 		bx	lr
+ 100 00c8 1EFF2FE1 	.L4:
+ 101              		.align	2
+ 102              	.L3:
+ 103              		.word	A_roof_data_Attitude
+ 104 00cc 00000000 		.word	aileronMpcHandler
+ 105 00d0 00000000 		.word	Q_roof_diag_data_Attitude
+ 106 00d4 00000000 		.word	B_roof_data_Attitude
+ 107 00d8 00000000 		.word	H_inv_data_Attitude
+ 108 00dc 00000000 		.word	1009089144
+ 109 00e0 787A253C 	.LFE2:
+ 111              		.comm	A_roof_data_Attitude,20000,4
+ 112              		.comm	Q_roof_diag_data_Attitude,4000,4
+ 113              		.comm	B_roof_data_Attitude,80000,4
+ 114              		.comm	H_inv_data_Attitude,1600,4
+ 115              		.comm	aileronMpcHandler,48,4
+ 116              		.section	.debug_frame,"",%progbits
+ 153              		.section	.debug_loc,"",%progbits
+DEFINED SYMBOLS
+                            *ABS*:00000000 aileronMpc.c
+C:\Users\XY\AppData\Local\Temp/ccycaaaa.s:13     .text:00000000 initializeAileronMPC
+C:\Users\XY\AppData\Local\Temp/ccycaaaa.s:20     .text:00000000 $a
+C:\Users\XY\AppData\Local\Temp/ccycaaaa.s:104    .text:000000cc $d
+                            *COM*:00004e20 A_roof_data_Attitude
+                            *COM*:00000030 aileronMpcHandler
+                            *COM*:00000fa0 Q_roof_diag_data_Attitude
+                            *COM*:00013880 B_roof_data_Attitude
+                            *COM*:00000640 H_inv_data_Attitude
+
+UNDEFINED SYMBOLS
+matrix_float_alloc_hollow
+vector_float_alloc_hollow
+vector_float_alloc
+vector_float_set_zero

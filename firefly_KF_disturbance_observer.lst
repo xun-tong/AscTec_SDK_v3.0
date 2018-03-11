@@ -1,0 +1,2289 @@
+   1              		.file	"firefly_KF_disturbance_observer.c"
+   9              	.Ltext0:
+  10              		.global	__mulsf3
+  11              		.global	__extendsfdf2
+  12              		.global	__muldf3
+  13              		.global	__adddf3
+  14              		.global	__truncdfsf2
+  15              		.align	2
+  16              		.global	systemDynamics
+  18              	systemDynamics:
+  19              	.LFB4:
+  20              		.file 1 "firefly_KF_disturbance_observer.c"
+   1:firefly_KF_disturbance_observer.c **** /*
+   2:firefly_KF_disturbance_observer.c ****  * firefly_KF_disturbance_observer.c
+   3:firefly_KF_disturbance_observer.c ****  */
+   4:firefly_KF_disturbance_observer.c **** 
+   5:firefly_KF_disturbance_observer.c **** #include "firefly_KF_disturbance_observer.h"
+   6:firefly_KF_disturbance_observer.c **** 
+   7:firefly_KF_disturbance_observer.c **** kalmanHandler KalmanHandler;
+   8:firefly_KF_disturbance_observer.c **** 
+   9:firefly_KF_disturbance_observer.c **** void initialize(void){
+  10:firefly_KF_disturbance_observer.c **** 	KalmanHandler.kStateSize = 18;
+  11:firefly_KF_disturbance_observer.c **** 	KalmanHandler.kMeasurementSize = 9;
+  12:firefly_KF_disturbance_observer.c **** 
+  13:firefly_KF_disturbance_observer.c **** 	/* continous system matrix F_continous_time */
+  14:firefly_KF_disturbance_observer.c **** /*	matrix_float_set_zero(KalmanHandler.F_continous_time);
+  15:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F_continous_time, 1, 4, 1);
+  16:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F_continous_time, 2, 5, 1);
+  17:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F_continous_time, 3, 6, 1);
+  18:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F_continous_time, 4, 4, -Ax);
+  19:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F_continous_time, 5, 5, -Ay);
+  20:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F_continous_time, 6, 6, -Az);
+  21:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F_continous_time, 4, 13, 1);
+  22:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F_continous_time, 5, 14, 1);
+  23:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F_continous_time, 6, 15, 1);
+  24:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F_continous_time, 7, 10, 1);
+  25:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F_continous_time, 8, 11, 1);
+  26:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F_continous_time, 9, 12, 1);
+  27:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F_continous_time, 10, 7, -roll_omega_ * roll_omega_);
+  28:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F_continous_time, 11, 8, -pitch_omega_ * pitch_omega_);
+  29:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F_continous_time, 12, 9, -yaw_omega_ * yaw_omega_);
+  30:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F_continous_time, 10, 10, -2.0*roll_omega_ * roll_damping_);
+  31:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F_continous_time, 11, 11, -2.0*pitch_omega_ * pitch_damping_);
+  32:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F_continous_time, 12, 12, -2.0*yaw_omega_ * yaw_damping_);
+  33:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F_continous_time, 10, 16, 1);
+  34:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F_continous_time, 11, 17, 1);
+  35:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F_continous_time, 12, 18, 1);	*/
+  36:firefly_KF_disturbance_observer.c **** 
+  37:firefly_KF_disturbance_observer.c **** 	/* discrete system matrix F */
+  38:firefly_KF_disturbance_observer.c **** 	// sampling_time not determined yet ??
+  39:firefly_KF_disturbance_observer.c **** 	KalmanHandler.F->height = KalmanHandler.kStateSize;
+  40:firefly_KF_disturbance_observer.c **** 	KalmanHandler.F->width = KalmanHandler.kStateSize;
+  41:firefly_KF_disturbance_observer.c **** 	matrix_float_set_all(KalmanHandler.F, 1);
+  42:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F, 1, 4, 1.0101);
+  43:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F, 2, 5, 1.0101);
+  44:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F, 3, 6, 1.0101);
+  45:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F, 7, 10, 1.0101);
+  46:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F, 8, 11, 1.0101);
+  47:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F, 9, 12, 1.0101);
+  48:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F, 4, 13, 1.0101);
+  49:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F, 5, 14, 1.0101);
+  50:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F, 6, 15, 1.0101);
+  51:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F, 10, 16, 1.0101);
+  52:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F, 11, 17, 1.0101);
+  53:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F, 12, 18, 1.0101);
+  54:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F, 4, 4, 0.9999);
+  55:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F, 5, 5, 0.9999);
+  56:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F, 10, 7, 0.6066);
+  57:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F, 11, 8, 0.6066);
+  58:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F, 12, 9, 0.7788);
+  59:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F, 10, 10, 0.9032);
+  60:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F, 11, 11, 0.8981);
+  61:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.F, 12, 12, 0.9094);
+  62:firefly_KF_disturbance_observer.c **** 
+  63:firefly_KF_disturbance_observer.c **** 	/* measurement matrix H */
+  64:firefly_KF_disturbance_observer.c **** 	KalmanHandler.H->height = KalmanHandler.kMeasurementSize;
+  65:firefly_KF_disturbance_observer.c **** 	KalmanHandler.H->width = KalmanHandler.kStateSize;
+  66:firefly_KF_disturbance_observer.c **** 	matrix_float_set_zero(KalmanHandler.H);
+  67:firefly_KF_disturbance_observer.c **** 	for(int i = 1; i < 10; i++){
+  68:firefly_KF_disturbance_observer.c **** 		matrix_float_set(KalmanHandler.H, i, i, 1);
+  69:firefly_KF_disturbance_observer.c **** 	}
+  70:firefly_KF_disturbance_observer.c **** 
+  71:firefly_KF_disturbance_observer.c **** 
+  72:firefly_KF_disturbance_observer.c **** 	/* state covariance P */
+  73:firefly_KF_disturbance_observer.c **** 	KalmanHandler.P->height = KalmanHandler.kStateSize;
+  74:firefly_KF_disturbance_observer.c **** 	KalmanHandler.P->width = KalmanHandler.kStateSize;
+  75:firefly_KF_disturbance_observer.c **** 	matrix_float_set_zero(KalmanHandler.P);
+  76:firefly_KF_disturbance_observer.c **** 	for(int i = 1; i < 4; i++){
+  77:firefly_KF_disturbance_observer.c **** 		matrix_float_set(KalmanHandler.P, i, i, P0_position);
+  78:firefly_KF_disturbance_observer.c **** 		matrix_float_set(KalmanHandler.P, i+3, i+3, P0_velocity);
+  79:firefly_KF_disturbance_observer.c **** 		matrix_float_set(KalmanHandler.P, i+6, i+6, P0_attitude);
+  80:firefly_KF_disturbance_observer.c **** 		matrix_float_set(KalmanHandler.P, i+9, i+9, P0_angular_velocity);
+  81:firefly_KF_disturbance_observer.c **** 		matrix_float_set(KalmanHandler.P, i+12, i+12, P0_force);
+  82:firefly_KF_disturbance_observer.c **** 		matrix_float_set(KalmanHandler.P, i+15, i+15, P0_torque);
+  83:firefly_KF_disturbance_observer.c **** 	}
+  84:firefly_KF_disturbance_observer.c **** 
+  85:firefly_KF_disturbance_observer.c **** 	/* process noise covariance Q */
+  86:firefly_KF_disturbance_observer.c **** 	KalmanHandler.Q->height = KalmanHandler.kStateSize;
+  87:firefly_KF_disturbance_observer.c **** 	KalmanHandler.Q->width = KalmanHandler.kStateSize;
+  88:firefly_KF_disturbance_observer.c **** 	matrix_float_set_zero(KalmanHandler.Q);
+  89:firefly_KF_disturbance_observer.c **** 	for(int i = 1; i < 4; i++){
+  90:firefly_KF_disturbance_observer.c **** 		matrix_float_set(KalmanHandler.Q, i, i, q_position);
+  91:firefly_KF_disturbance_observer.c **** 		matrix_float_set(KalmanHandler.Q, i+3, i+3, q_velocity);
+  92:firefly_KF_disturbance_observer.c **** 		matrix_float_set(KalmanHandler.Q, i+6, i+6, q_attitude);
+  93:firefly_KF_disturbance_observer.c **** 		matrix_float_set(KalmanHandler.Q, i+9, i+9, q_angular_velocity);
+  94:firefly_KF_disturbance_observer.c **** 		matrix_float_set(KalmanHandler.Q, i+12, i+12, q_force);
+  95:firefly_KF_disturbance_observer.c **** 		matrix_float_set(KalmanHandler.Q, i+15, i+15, q_torque);
+  96:firefly_KF_disturbance_observer.c **** 	}
+  97:firefly_KF_disturbance_observer.c **** 
+  98:firefly_KF_disturbance_observer.c **** 	/* measurement noise covariance R */
+  99:firefly_KF_disturbance_observer.c **** 	KalmanHandler.R->height = KalmanHandler.kMeasurementSize;
+ 100:firefly_KF_disturbance_observer.c **** 	KalmanHandler.R->width = KalmanHandler.kMeasurementSize;
+ 101:firefly_KF_disturbance_observer.c **** 	matrix_float_set_zero(KalmanHandler.R);
+ 102:firefly_KF_disturbance_observer.c **** 	for(int i = 1; i < 4; i++){
+ 103:firefly_KF_disturbance_observer.c **** 		matrix_float_set(KalmanHandler.R, i, i, r_position);
+ 104:firefly_KF_disturbance_observer.c **** 		matrix_float_set(KalmanHandler.R, i+3, i+3, r_velocity);
+ 105:firefly_KF_disturbance_observer.c **** 		matrix_float_set(KalmanHandler.R, i+6, i+6, r_attitude);
+ 106:firefly_KF_disturbance_observer.c **** 	}
+ 107:firefly_KF_disturbance_observer.c **** 
+ 108:firefly_KF_disturbance_observer.c **** 	/* drag_coefficients_matrix */
+ 109:firefly_KF_disturbance_observer.c **** 	KalmanHandler.drag_coefficients_matrix->height = 3;
+ 110:firefly_KF_disturbance_observer.c **** 	KalmanHandler.drag_coefficients_matrix->width = 3;
+ 111:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.drag_coefficients_matrix, 1, 1, Ax);
+ 112:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.drag_coefficients_matrix, 2, 2, Ay);
+ 113:firefly_KF_disturbance_observer.c **** 	matrix_float_set(KalmanHandler.drag_coefficients_matrix, 3, 3, Az);
+ 114:firefly_KF_disturbance_observer.c **** 
+ 115:firefly_KF_disturbance_observer.c **** 	/* set command_roll_pitch_yaw_thrust to zero */
+ 116:firefly_KF_disturbance_observer.c **** 	KalmanHandler.command_roll_pitch_yaw_thrust->length = 4;
+ 117:firefly_KF_disturbance_observer.c **** 	KalmanHandler.command_roll_pitch_yaw_thrust->orientation = 0;
+ 118:firefly_KF_disturbance_observer.c **** 	vector_float_set_zero(KalmanHandler.command_roll_pitch_yaw_thrust);
+ 119:firefly_KF_disturbance_observer.c **** 
+ 120:firefly_KF_disturbance_observer.c **** 	/* set initial state to zero */
+ 121:firefly_KF_disturbance_observer.c **** 	KalmanHandler.state->length = KalmanHandler.kStateSize;
+ 122:firefly_KF_disturbance_observer.c **** 	KalmanHandler.state->orientation = 0;		// set orientation to vertical
+ 123:firefly_KF_disturbance_observer.c **** 	vector_float_set_zero(KalmanHandler.state);
+ 124:firefly_KF_disturbance_observer.c **** 
+ 125:firefly_KF_disturbance_observer.c **** 	/* set initial position to zero */
+ 126:firefly_KF_disturbance_observer.c **** 	KalmanHandler.position->length = 3;
+ 127:firefly_KF_disturbance_observer.c **** 	KalmanHandler.position->orientation = 0;		// set orientation to vertical
+ 128:firefly_KF_disturbance_observer.c **** 	vector_float_set_zero(KalmanHandler.position);
+ 129:firefly_KF_disturbance_observer.c **** 
+ 130:firefly_KF_disturbance_observer.c **** 	/* set initial velocity to zero */
+ 131:firefly_KF_disturbance_observer.c **** 	KalmanHandler.velocity->length = 3;
+ 132:firefly_KF_disturbance_observer.c **** 	KalmanHandler.velocity->orientation = 0;		// set orientation to vertical
+ 133:firefly_KF_disturbance_observer.c **** 	vector_float_set_zero(KalmanHandler.velocity);
+ 134:firefly_KF_disturbance_observer.c **** 
+ 135:firefly_KF_disturbance_observer.c **** 	/* set initial attitude to zero */
+ 136:firefly_KF_disturbance_observer.c **** 	KalmanHandler.attitude->length = 3;
+ 137:firefly_KF_disturbance_observer.c **** 	KalmanHandler.attitude->orientation = 0;		// set orientation to vertical
+ 138:firefly_KF_disturbance_observer.c **** 	vector_float_set_zero(KalmanHandler.attitude);
+ 139:firefly_KF_disturbance_observer.c **** 
+ 140:firefly_KF_disturbance_observer.c **** 	/* set initial angular_velocity to zero */
+ 141:firefly_KF_disturbance_observer.c **** 	KalmanHandler.angular_velocity->length = 3;
+ 142:firefly_KF_disturbance_observer.c **** 	KalmanHandler.angular_velocity->orientation = 0;		// set orientation to vertical
+ 143:firefly_KF_disturbance_observer.c **** 	vector_float_set_zero(KalmanHandler.angular_velocity);
+ 144:firefly_KF_disturbance_observer.c **** 
+ 145:firefly_KF_disturbance_observer.c **** 	/* set initial external_forces to zero */
+ 146:firefly_KF_disturbance_observer.c **** 	KalmanHandler.external_forces->length = 3;
+ 147:firefly_KF_disturbance_observer.c **** 	KalmanHandler.external_forces->orientation = 0;		// set orientation to vertical
+ 148:firefly_KF_disturbance_observer.c **** 	vector_float_set_zero(KalmanHandler.external_forces);
+ 149:firefly_KF_disturbance_observer.c **** 
+ 150:firefly_KF_disturbance_observer.c **** 	/* set initial external_moments to zero */
+ 151:firefly_KF_disturbance_observer.c **** 	KalmanHandler.external_moments->length = 3;
+ 152:firefly_KF_disturbance_observer.c **** 	KalmanHandler.external_moments->orientation = 0;		// set orientation to vertical
+ 153:firefly_KF_disturbance_observer.c **** 	vector_float_set_zero(KalmanHandler.external_moments);
+ 154:firefly_KF_disturbance_observer.c **** }
+ 155:firefly_KF_disturbance_observer.c **** 
+ 156:firefly_KF_disturbance_observer.c **** void updateEstimator(void){
+ 157:firefly_KF_disturbance_observer.c **** 	/* P = F*P*F' + Q */
+ 158:firefly_KF_disturbance_observer.c **** 	matrix_float * temp1;
+ 159:firefly_KF_disturbance_observer.c **** 	temp1->height = KalmanHandler.F->height;
+ 160:firefly_KF_disturbance_observer.c **** 	temp1->width = KalmanHandler.P->width;
+ 161:firefly_KF_disturbance_observer.c **** 	matrix_float_mul(KalmanHandler.F, KalmanHandler.P, temp1);	// temp1 = F*P
+ 162:firefly_KF_disturbance_observer.c **** 	matrix_float_mul_trans(temp1, KalmanHandler.F, KalmanHandler.P);		// P = temp1*F' = F*P*F'
+ 163:firefly_KF_disturbance_observer.c **** 	matrix_float_add(KalmanHandler.P, KalmanHandler.Q);		// P = P + Q = F*P*F' + Q
+ 164:firefly_KF_disturbance_observer.c **** 
+ 165:firefly_KF_disturbance_observer.c **** 	/* predict state */
+ 166:firefly_KF_disturbance_observer.c **** 	systemDynamics(0.01);	//??? dt need to be set
+ 167:firefly_KF_disturbance_observer.c **** 
+ 168:firefly_KF_disturbance_observer.c **** 	/* S = H*P*H' + R */
+ 169:firefly_KF_disturbance_observer.c **** 	matrix_float * S;
+ 170:firefly_KF_disturbance_observer.c **** 	S->height = KalmanHandler.R->height;
+ 171:firefly_KF_disturbance_observer.c **** 	S->width = KalmanHandler.R->width;
+ 172:firefly_KF_disturbance_observer.c **** 	matrix_float * temp2;
+ 173:firefly_KF_disturbance_observer.c **** 	temp2->height = KalmanHandler.H->height;
+ 174:firefly_KF_disturbance_observer.c **** 	temp2->width = KalmanHandler.P->width;
+ 175:firefly_KF_disturbance_observer.c **** 	matrix_float_mul(KalmanHandler.H, KalmanHandler.P, temp2);	// temp2 = H*P
+ 176:firefly_KF_disturbance_observer.c **** 	matrix_float_mul_trans(temp2, KalmanHandler.H, S);		// S = temp2*H' = H*P*H'
+ 177:firefly_KF_disturbance_observer.c **** 	matrix_float_add(S, KalmanHandler.R);		// S = S + R = H*P*H' + R
+ 178:firefly_KF_disturbance_observer.c **** 
+ 179:firefly_KF_disturbance_observer.c **** 	/* K = P*H'*inv(S) */
+ 180:firefly_KF_disturbance_observer.c **** 	matrix_float * K;
+ 181:firefly_KF_disturbance_observer.c **** 	K->height = KalmanHandler.P->height;
+ 182:firefly_KF_disturbance_observer.c **** 	K->width = S->width;
+ 183:firefly_KF_disturbance_observer.c **** 	matrix_float * temp3;
+ 184:firefly_KF_disturbance_observer.c **** 	temp3->height = KalmanHandler.P->height;
+ 185:firefly_KF_disturbance_observer.c **** 	temp3->width = KalmanHandler.H->height;
+ 186:firefly_KF_disturbance_observer.c **** 	matrix_float_mul_trans(KalmanHandler.P, KalmanHandler.H, temp3); // temp3 = P*H'
+ 187:firefly_KF_disturbance_observer.c **** 	matrix_float_inverse(S);	// inv(S)
+ 188:firefly_KF_disturbance_observer.c **** 	matrix_float_mul(temp3, S, K);		// K = temp3*inv(S) = P*H'*inv(S)
+ 189:firefly_KF_disturbance_observer.c **** 
+ 190:firefly_KF_disturbance_observer.c **** 	/* update states with measurements:  x = x + K*(z - H*x) */
+ 191:firefly_KF_disturbance_observer.c **** 	vector_float * temp4;
+ 192:firefly_KF_disturbance_observer.c **** 	temp4->length = KalmanHandler.measurement->length;
+ 193:firefly_KF_disturbance_observer.c **** 	temp4->orientation = 0;
+ 194:firefly_KF_disturbance_observer.c **** 	matrix_float_mul_vec_right(KalmanHandler.H, KalmanHandler.state, temp4);		// temp4 = H*x
+ 195:firefly_KF_disturbance_observer.c **** 	vector_float * temp5;
+ 196:firefly_KF_disturbance_observer.c **** 	temp5->length = KalmanHandler.measurement->length;
+ 197:firefly_KF_disturbance_observer.c **** 	vector_float_copy(temp5, KalmanHandler.measurement);		// temp5 = z
+ 198:firefly_KF_disturbance_observer.c **** 	vector_float_subtract(temp5, temp4);	// temp5 = temp5 - temp4 = z - H*x
+ 199:firefly_KF_disturbance_observer.c **** 	vector_float * temp6;
+ 200:firefly_KF_disturbance_observer.c **** 	temp6->length = KalmanHandler.state->length;
+ 201:firefly_KF_disturbance_observer.c **** 	temp6->orientation = 0;
+ 202:firefly_KF_disturbance_observer.c **** 	matrix_float_mul_vec_right(K, temp5, temp6);	// temp6 = K*temp5 = K*(z - H*x)
+ 203:firefly_KF_disturbance_observer.c **** 	vector_float_add(KalmanHandler.state, temp6);	// x = x + temp6 = x + K*(z - H*x)
+ 204:firefly_KF_disturbance_observer.c **** 
+ 205:firefly_KF_disturbance_observer.c **** 	/* update state covariance P = (I - K*H)*P */
+ 206:firefly_KF_disturbance_observer.c **** 	matrix_float * I;
+ 207:firefly_KF_disturbance_observer.c **** 	I->height = K->height;
+ 208:firefly_KF_disturbance_observer.c **** 	I->width = KalmanHandler.H->width;
+ 209:firefly_KF_disturbance_observer.c **** 	matrix_float_set_identity(I);
+ 210:firefly_KF_disturbance_observer.c **** 	matrix_float * temp7;
+ 211:firefly_KF_disturbance_observer.c **** 	temp7->height = K->height;
+ 212:firefly_KF_disturbance_observer.c **** 	temp7->width = KalmanHandler.H->width;
+ 213:firefly_KF_disturbance_observer.c **** 	matrix_float_mul(K, KalmanHandler.H, temp7);		// temp7 = K*H
+ 214:firefly_KF_disturbance_observer.c **** 	matrix_float_sub(I, temp7);		// I = I - temp7 = I - K*H
+ 215:firefly_KF_disturbance_observer.c **** 	matrix_float * temp8;
+ 216:firefly_KF_disturbance_observer.c **** 	temp8->height = KalmanHandler.P->height;
+ 217:firefly_KF_disturbance_observer.c **** 	temp8->width = KalmanHandler.P->width;
+ 218:firefly_KF_disturbance_observer.c **** 	matrix_float_copy(temp8, KalmanHandler.P);		// temp8 = P
+ 219:firefly_KF_disturbance_observer.c **** 	matrix_float_mul(I, temp8, KalmanHandler.P);		// P = I*temp8 = (I - K*H)*P
+ 220:firefly_KF_disturbance_observer.c **** 
+ 221:firefly_KF_disturbance_observer.c **** 
+ 222:firefly_KF_disturbance_observer.c **** 	/* limits */
+ 223:firefly_KF_disturbance_observer.c **** 	// omega_limit_x
+ 224:firefly_KF_disturbance_observer.c **** 	if(vector_float_get(KalmanHandler.state, 10) < -omega_limit_x){
+ 225:firefly_KF_disturbance_observer.c **** 		vector_float_set(KalmanHandler.state, 10, -omega_limit_x);
+ 226:firefly_KF_disturbance_observer.c **** 	}
+ 227:firefly_KF_disturbance_observer.c **** 	else if(vector_float_get(KalmanHandler.state, 10) > omega_limit_x){
+ 228:firefly_KF_disturbance_observer.c **** 		vector_float_set(KalmanHandler.state, 10, omega_limit_x);
+ 229:firefly_KF_disturbance_observer.c **** 	}
+ 230:firefly_KF_disturbance_observer.c **** 	// omega_limit_y
+ 231:firefly_KF_disturbance_observer.c **** 	if(vector_float_get(KalmanHandler.state, 11) < -omega_limit_y){
+ 232:firefly_KF_disturbance_observer.c **** 		vector_float_set(KalmanHandler.state, 11, -omega_limit_y);
+ 233:firefly_KF_disturbance_observer.c **** 	}
+ 234:firefly_KF_disturbance_observer.c **** 	else if(vector_float_get(KalmanHandler.state, 11) > omega_limit_y){
+ 235:firefly_KF_disturbance_observer.c **** 		vector_float_set(KalmanHandler.state, 11, omega_limit_y);
+ 236:firefly_KF_disturbance_observer.c **** 	}
+ 237:firefly_KF_disturbance_observer.c **** 	// omega_limit_z
+ 238:firefly_KF_disturbance_observer.c **** 	if(vector_float_get(KalmanHandler.state, 12) < -omega_limit_z){
+ 239:firefly_KF_disturbance_observer.c **** 		vector_float_set(KalmanHandler.state, 12, -omega_limit_z);
+ 240:firefly_KF_disturbance_observer.c **** 	}
+ 241:firefly_KF_disturbance_observer.c **** 	else if(vector_float_get(KalmanHandler.state, 12) > omega_limit_z){
+ 242:firefly_KF_disturbance_observer.c **** 		vector_float_set(KalmanHandler.state, 12, omega_limit_z);
+ 243:firefly_KF_disturbance_observer.c **** 	}
+ 244:firefly_KF_disturbance_observer.c **** 
+ 245:firefly_KF_disturbance_observer.c **** 	// external_forces_limit_x
+ 246:firefly_KF_disturbance_observer.c **** 	if(vector_float_get(KalmanHandler.state, 13) < -external_forces_limit_x){
+ 247:firefly_KF_disturbance_observer.c **** 		vector_float_set(KalmanHandler.state, 13, -external_forces_limit_x);
+ 248:firefly_KF_disturbance_observer.c **** 	}
+ 249:firefly_KF_disturbance_observer.c **** 	else if(vector_float_get(KalmanHandler.state, 13) > external_forces_limit_x){
+ 250:firefly_KF_disturbance_observer.c **** 		vector_float_set(KalmanHandler.state, 13, external_forces_limit_x);
+ 251:firefly_KF_disturbance_observer.c **** 	}
+ 252:firefly_KF_disturbance_observer.c **** 	// external_forces_limit_y
+ 253:firefly_KF_disturbance_observer.c **** 	if(vector_float_get(KalmanHandler.state, 14) < -external_forces_limit_y){
+ 254:firefly_KF_disturbance_observer.c **** 		vector_float_set(KalmanHandler.state, 14, -external_forces_limit_y);
+ 255:firefly_KF_disturbance_observer.c **** 	}
+ 256:firefly_KF_disturbance_observer.c **** 	else if(vector_float_get(KalmanHandler.state, 14) > external_forces_limit_y){
+ 257:firefly_KF_disturbance_observer.c **** 		vector_float_set(KalmanHandler.state, 14, external_forces_limit_y);
+ 258:firefly_KF_disturbance_observer.c **** 	}
+ 259:firefly_KF_disturbance_observer.c **** 	// external_forces_limit_z
+ 260:firefly_KF_disturbance_observer.c **** 	if(vector_float_get(KalmanHandler.state, 15) < -external_forces_limit_z){
+ 261:firefly_KF_disturbance_observer.c **** 		vector_float_set(KalmanHandler.state, 15, -external_forces_limit_z);
+ 262:firefly_KF_disturbance_observer.c **** 	}
+ 263:firefly_KF_disturbance_observer.c **** 	else if(vector_float_get(KalmanHandler.state, 15) > external_forces_limit_z){
+ 264:firefly_KF_disturbance_observer.c **** 		vector_float_set(KalmanHandler.state, 15, external_forces_limit_z);
+ 265:firefly_KF_disturbance_observer.c **** 	}
+ 266:firefly_KF_disturbance_observer.c **** 
+ 267:firefly_KF_disturbance_observer.c **** 	// external_moments_limit_x
+ 268:firefly_KF_disturbance_observer.c **** 	if(vector_float_get(KalmanHandler.state, 16) < -external_moments_limit_x){
+ 269:firefly_KF_disturbance_observer.c **** 		vector_float_set(KalmanHandler.state, 16, -external_moments_limit_x);
+ 270:firefly_KF_disturbance_observer.c **** 	}
+ 271:firefly_KF_disturbance_observer.c **** 	else if(vector_float_get(KalmanHandler.state, 16) > external_moments_limit_x){
+ 272:firefly_KF_disturbance_observer.c **** 		vector_float_set(KalmanHandler.state, 16, external_moments_limit_x);
+ 273:firefly_KF_disturbance_observer.c **** 	}
+ 274:firefly_KF_disturbance_observer.c **** 	// external_moments_limit_y
+ 275:firefly_KF_disturbance_observer.c **** 	if(vector_float_get(KalmanHandler.state, 17) < -external_moments_limit_y){
+ 276:firefly_KF_disturbance_observer.c **** 		vector_float_set(KalmanHandler.state, 17, -external_moments_limit_y);
+ 277:firefly_KF_disturbance_observer.c **** 	}
+ 278:firefly_KF_disturbance_observer.c **** 	else if(vector_float_get(KalmanHandler.state, 17) > external_moments_limit_y){
+ 279:firefly_KF_disturbance_observer.c **** 		vector_float_set(KalmanHandler.state, 17, external_moments_limit_y);
+ 280:firefly_KF_disturbance_observer.c **** 	}
+ 281:firefly_KF_disturbance_observer.c **** 	// external_moments_limit_z
+ 282:firefly_KF_disturbance_observer.c **** 	if(vector_float_get(KalmanHandler.state, 18) < -external_moments_limit_z){
+ 283:firefly_KF_disturbance_observer.c **** 		vector_float_set(KalmanHandler.state, 18, -external_moments_limit_z);
+ 284:firefly_KF_disturbance_observer.c **** 	}
+ 285:firefly_KF_disturbance_observer.c **** 	else if(vector_float_get(KalmanHandler.state, 18) > external_moments_limit_z){
+ 286:firefly_KF_disturbance_observer.c **** 		vector_float_set(KalmanHandler.state, 18, external_moments_limit_z);
+ 287:firefly_KF_disturbance_observer.c **** 	}
+ 288:firefly_KF_disturbance_observer.c **** 
+ 289:firefly_KF_disturbance_observer.c **** 
+ 290:firefly_KF_disturbance_observer.c **** 	/* update */
+ 291:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.position, 1, vector_float_get(KalmanHandler.state, 1));
+ 292:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.position, 2, vector_float_get(KalmanHandler.state, 2));
+ 293:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.position, 3, vector_float_get(KalmanHandler.state, 3));
+ 294:firefly_KF_disturbance_observer.c **** 
+ 295:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.velocity, 1, vector_float_get(KalmanHandler.state, 4));
+ 296:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.velocity, 2, vector_float_get(KalmanHandler.state, 5));
+ 297:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.velocity, 3, vector_float_get(KalmanHandler.state, 6));
+ 298:firefly_KF_disturbance_observer.c **** 
+ 299:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.attitude, 1, vector_float_get(KalmanHandler.state, 7));
+ 300:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.attitude, 2, vector_float_get(KalmanHandler.state, 8));
+ 301:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.attitude, 3, vector_float_get(KalmanHandler.state, 9));
+ 302:firefly_KF_disturbance_observer.c **** 
+ 303:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.angular_velocity, 1, vector_float_get(KalmanHandler.state, 10));
+ 304:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.angular_velocity, 2, vector_float_get(KalmanHandler.state, 11));
+ 305:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.angular_velocity, 3, vector_float_get(KalmanHandler.state, 12));
+ 306:firefly_KF_disturbance_observer.c **** 
+ 307:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.external_forces, 1, vector_float_get(KalmanHandler.state, 13));
+ 308:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.external_forces, 2, vector_float_get(KalmanHandler.state, 14));
+ 309:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.external_forces, 3, vector_float_get(KalmanHandler.state, 15));
+ 310:firefly_KF_disturbance_observer.c **** 
+ 311:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.external_moments, 1, vector_float_get(KalmanHandler.state, 16));
+ 312:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.external_moments, 2, vector_float_get(KalmanHandler.state, 17));
+ 313:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.external_moments, 3, vector_float_get(KalmanHandler.state, 18));
+ 314:firefly_KF_disturbance_observer.c **** }
+ 315:firefly_KF_disturbance_observer.c **** 
+ 316:firefly_KF_disturbance_observer.c **** void systemDynamics(float dt){
+  21              	ction supports interworking.
+  22              		@ args = 0, pretend = 0, frame = 40
+  23              		@ frame_needed = 0, uses_anonymous_args = 0
+  24              	.LVL0:
+  25              		stmfd	sp!, {r4, r5, r6, r7, r9, sl, fp, lr}
+  26 0000 F04E2DE9 	.LCFI0:
+  27              		.loc 1 323 0
+ 317:firefly_KF_disturbance_observer.c **** /* acceleration = rotation_matrix * (0, 0, T)' + (0, 0, -g)' - drag_coefficients_matrix * old_veloc
+ 318:firefly_KF_disturbance_observer.c **** 	// thrust = (0, 0, T)'
+ 319:firefly_KF_disturbance_observer.c **** 	vector_float * thrust;
+ 320:firefly_KF_disturbance_observer.c **** 	thrust->length = 3;
+ 321:firefly_KF_disturbance_observer.c **** 	thrust->orientation = 0;
+ 322:firefly_KF_disturbance_observer.c **** 	vector_float_set_zero(thrust);
+ 323:firefly_KF_disturbance_observer.c **** 	float thrust_value = vector_float_get(KalmanHandler.command_roll_pitch_yaw_thrust, 4);
+  28              	, .L3+40
+  29 0004 10669FE5 		.loc 1 316 0
+  30              		sub	sp, sp, #40
+  31 0008 28D04DE2 	.LCFI1:
+  32              		.loc 1 321 0
+  33              		mov	r4, #0
+  34 000c 0040A0E3 		.loc 1 320 0
+  35              		mov	r7, #3
+  36 0010 0370A0E3 		.loc 1 316 0
+  37              		str	r0, [sp, #4]	@ float
+  38 0014 04008DE5 	.LVL1:
+  39              		.loc 1 320 0
+  40              		strh	r7, [r4, #0]	@ movhi
+  41 0018 B070C4E1 		.loc 1 322 0
+  42              		mov	r0, r4
+  43 001c 0400A0E1 	.LVL2:
+  44              	.LVL3:
+  45              		.loc 1 321 0
+  46              		strb	r4, [r4, #2]
+  47 0020 0240C4E5 		.loc 1 322 0
+  48              		bl	vector_float_set_zero
+  49 0024 FEFFFFEB 	.LVL4:
+  50              		.loc 1 323 0
+  51              		ldr	r0, [r6, #60]
+  52 0028 3C0096E5 		mov	r1, #4
+  53 002c 0410A0E3 		bl	vector_float_get
+  54 0030 FEFFFFEB 		.loc 1 324 0
+ 324:firefly_KF_disturbance_observer.c **** 	vector_float_set(thrust, 3, thrust_value);
+  55              	mov	r2, r0
+  56 0034 0710A0E1 	.LVL5:
+  57              	.LVL6:
+  58 0038 0020A0E1 		.loc 1 324 0
+  59              		mov	r0, r4
+  60              		bl	vector_float_set
+  61              	.LVL7:
+  62 003c 0400A0E1 	.LVL8:
+  63 0040 FEFFFFEB 		.loc 1 328 0
+  64              		strb	r4, [r4, #2]
+  65              	.LVL9:
+ 325:firefly_KF_disturbance_observer.c **** 
+ 326:firefly_KF_disturbance_observer.c **** 	vector_float * acceleration;
+ 327:firefly_KF_disturbance_observer.c **** 	acceleration->length = 3;
+ 328:firefly_KF_disturbance_observer.c **** 	acceleration->orientation = 0;
+  66              	 0
+  67 0044 0240C4E5 		mov	r1, r4
+  68              	.LVL10:
+ 329:firefly_KF_disturbance_observer.c **** 
+ 330:firefly_KF_disturbance_observer.c **** 	// acceleration = rotation_matrix * (0, 0, T)'
+ 331:firefly_KF_disturbance_observer.c **** 	matrix_float_mul_vec_right(KalmanHandler.rotation_matrix, thrust, acceleration);
+  69              	v	r2, r4
+  70 0048 0410A0E1 		.loc 1 327 0
+  71              		strh	r7, [r4, #0]	@ movhi
+  72 004c 0420A0E1 		.loc 1 331 0
+  73              		ldr	r0, [r6, #68]
+  74 0050 B070C4E1 		bl	matrix_float_mul_vec_right
+  75              	.LVL11:
+  76 0054 440096E5 	.LVL12:
+  77 0058 FEFFFFEB 		.loc 1 335 0
+  78              		strh	r7, [r4, #0]	@ movhi
+  79              		.loc 1 337 0
+ 332:firefly_KF_disturbance_observer.c **** 
+ 333:firefly_KF_disturbance_observer.c **** 	// gravity = (0, 0, -g)'
+ 334:firefly_KF_disturbance_observer.c **** 	vector_float * gravity;
+ 335:firefly_KF_disturbance_observer.c **** 	gravity->length = 3;
+  80              	
+  81 005c B070C4E1 	.LVL13:
+ 336:firefly_KF_disturbance_observer.c **** 	gravity->orientation = 0;
+ 337:firefly_KF_disturbance_observer.c **** 	vector_float_set_zero(gravity);
+  82              	.loc 1 336 0
+  83 0060 0400A0E1 		strb	r4, [r4, #2]
+  84              		.loc 1 337 0
+  85              		bl	vector_float_set_zero
+  86 0064 0240C4E5 	.LVL14:
+  87              	.LVL15:
+  88 0068 FEFFFFEB 		.loc 1 338 0
+  89              		mov	r0, r4
+  90              		mov	r1, r7
+ 338:firefly_KF_disturbance_observer.c **** 	vector_float_set(gravity, 3, -kGravity);
+  91              	.L3+44
+  92 006c 0400A0E1 		bl	vector_float_set
+  93 0070 0710A0E1 	.LVL16:
+  94 0074 A4259FE5 		.loc 1 341 0
+  95 0078 FEFFFFEB 		mov	r0, r4
+  96              	.LVL17:
+ 339:firefly_KF_disturbance_observer.c **** 
+ 340:firefly_KF_disturbance_observer.c **** 	// acceleration = acceleration + (0, 0, -g)'
+ 341:firefly_KF_disturbance_observer.c **** 	vector_float_add(acceleration, gravity);
+  97              	1, r4
+  98 007c 0400A0E1 		bl	vector_float_add
+  99              	.LVL18:
+ 100 0080 0410A0E1 	.LVL19:
+ 101 0084 FEFFFFEB 		.loc 1 346 0
+ 102              		strb	r4, [r4, #2]
+ 103              	.LVL20:
+ 342:firefly_KF_disturbance_observer.c **** 
+ 343:firefly_KF_disturbance_observer.c **** 	// temp1 = drag_coefficients_matrix * old_velocity
+ 344:firefly_KF_disturbance_observer.c **** 	vector_float * temp1;
+ 345:firefly_KF_disturbance_observer.c **** 	temp1->length = 3;
+ 346:firefly_KF_disturbance_observer.c **** 	temp1->orientation = 0;
+ 104              	 347 0
+ 105 0088 0240C4E5 		mov	r2, r4
+ 106              		.loc 1 345 0
+ 347:firefly_KF_disturbance_observer.c **** 	matrix_float_mul_vec_right(KalmanHandler.drag_coefficients_matrix, KalmanHandler.velocity, temp1);
+ 107              	rh	r7, [r4, #0]	@ movhi
+ 108 008c 0420A0E1 		.loc 1 347 0
+ 109              		ldr	r0, [r6, #28]
+ 110 0090 B070C4E1 		ldr	r1, [r6, #40]
+ 111              		bl	matrix_float_mul_vec_right
+ 112 0094 1C0096E5 	.LVL21:
+ 113 0098 281096E5 		.loc 1 350 0
+ 114 009c FEFFFFEB 		mov	r0, r4
+ 115              	.LVL22:
+ 348:firefly_KF_disturbance_observer.c **** 
+ 349:firefly_KF_disturbance_observer.c **** 	// acceleration = acceleration - drag_coefficients_matrix * old_velocity
+ 350:firefly_KF_disturbance_observer.c **** 	vector_float_subtract(acceleration, temp1);		// ?? I think subtract, not add
+ 116              	r4
+ 117 00a0 0400A0E1 		bl	vector_float_subtract
+ 118              	.LVL23:
+ 119 00a4 0410A0E1 	.LVL24:
+ 120 00a8 FEFFFFEB 		.loc 1 353 0
+ 121              		mov	r0, r4
+ 122              		ldr	r1, [r6, #52]
+ 351:firefly_KF_disturbance_observer.c **** 
+ 352:firefly_KF_disturbance_observer.c **** 	// acceleration = acceleration + old_external_forces
+ 353:firefly_KF_disturbance_observer.c **** 	vector_float_add(acceleration, KalmanHandler.external_forces);
+ 123              	tor_float_add
+ 124 00ac 0400A0E1 	.LVL25:
+ 125 00b0 341096E5 		.loc 1 358 0
+ 126 00b4 FEFFFFEB 		strh	r7, [r4, #0]	@ movhi
+ 127              	.LVL26:
+ 354:firefly_KF_disturbance_observer.c **** 
+ 355:firefly_KF_disturbance_observer.c **** /* update velocity and position */
+ 356:firefly_KF_disturbance_observer.c **** 	// temp2 = acceleration * dt
+ 357:firefly_KF_disturbance_observer.c **** 	vector_float * temp2;
+ 358:firefly_KF_disturbance_observer.c **** 	temp2->length = 3;
+ 128              	 1 359 0
+ 129 00b8 B070C4E1 		mov	r1, r4
+ 130              	.LVL27:
+ 359:firefly_KF_disturbance_observer.c **** 	vector_float_copy(temp2, acceleration);
+ 131              	v	r0, r4
+ 132 00bc 0410A0E1 		bl	vector_float_copy
+ 133              	.LVL28:
+ 134 00c0 0400A0E1 		.loc 1 360 0
+ 135 00c4 FEFFFFEB 		mov	r0, r4
+ 136              		ldr	r1, [sp, #4]	@ float
+ 360:firefly_KF_disturbance_observer.c **** 	vector_float_times(temp2, dt);
+ 137              	ctor_float_times
+ 138 00c8 0400A0E1 	.LVL29:
+ 139 00cc 04109DE5 		.loc 1 364 0
+ 140 00d0 FEFFFFEB 		strh	r7, [r4, #0]	@ movhi
+ 141              		.loc 1 365 0
+ 361:firefly_KF_disturbance_observer.c **** 
+ 362:firefly_KF_disturbance_observer.c **** 	// temp3 = old_velocity (save for calculating new position later)
+ 363:firefly_KF_disturbance_observer.c **** 	vector_float * temp3;
+ 364:firefly_KF_disturbance_observer.c **** 	temp3->length = 3;
+ 142              	r0, r4
+ 143 00d4 B070C4E1 		ldr	r1, [r6, #40]
+ 365:firefly_KF_disturbance_observer.c **** 	vector_float_copy(temp3, KalmanHandler.velocity);
+ 144              	l	vector_float_copy
+ 145 00d8 0400A0E1 		.loc 1 368 0
+ 146 00dc 281096E5 		ldr	r0, [r6, #40]
+ 147 00e0 FEFFFFEB 	.LVL30:
+ 366:firefly_KF_disturbance_observer.c **** 
+ 367:firefly_KF_disturbance_observer.c **** 	// new_velocity = velocity + acceleration * dt
+ 368:firefly_KF_disturbance_observer.c **** 	vector_float_add(KalmanHandler.velocity, temp2);
+ 148              		r1, r4
+ 149 00e4 280096E5 		bl	vector_float_add
+ 150              	.LVL31:
+ 151 00e8 0410A0E1 		.loc 1 371 0
+ 152 00ec FEFFFFEB 		mov	r0, r4
+ 153              		ldr	r1, [sp, #4]	@ float
+ 369:firefly_KF_disturbance_observer.c **** 
+ 370:firefly_KF_disturbance_observer.c **** 	// temp3 = old_velocity * dt
+ 371:firefly_KF_disturbance_observer.c **** 	vector_float_times(temp3, dt);
+ 154              	ctor_float_times
+ 155 00f0 0400A0E1 		.loc 1 374 0
+ 156 00f4 04109DE5 		ldr	r0, [sp, #4]	@ float
+ 157 00f8 FEFFFFEB 		mov	r1, #1056964608
+ 372:firefly_KF_disturbance_observer.c **** 
+ 373:firefly_KF_disturbance_observer.c **** 	// temp2 = 0.5 * acceleration * dt * dt
+ 374:firefly_KF_disturbance_observer.c **** 	vector_float_times(temp2, 0.5 * dt);
+ 158              	__mulsf3
+ 159 00fc 04009DE5 		str	r0, [sp, #0]	@ float
+ 160 0100 3F14A0E3 		ldr	r1, [sp, #0]	@ float
+ 161 0104 FEFFFFEB 	.LVL32:
+ 162 0108 00008DE5 		mov	r0, r4
+ 163 010c 00109DE5 		bl	vector_float_times
+ 164              	.LVL33:
+ 165 0110 0400A0E1 		.loc 1 377 0
+ 166 0114 FEFFFFEB 		mov	r1, r4
+ 167              		ldr	r0, [r6, #36]
+ 375:firefly_KF_disturbance_observer.c **** 
+ 376:firefly_KF_disturbance_observer.c **** 	// new_position = position + velocity * dt + 0.5 * acceleration * dt * dt
+ 377:firefly_KF_disturbance_observer.c **** 	vector_float_add(KalmanHandler.position, temp3);
+ 168              	_float_add
+ 169 0118 0410A0E1 	.LVL34:
+ 170 011c 240096E5 		.loc 1 378 0
+ 171 0120 FEFFFFEB 		mov	r1, r4
+ 172              		ldr	r0, [r6, #36]
+ 378:firefly_KF_disturbance_observer.c **** 	vector_float_add(KalmanHandler.position, temp2);
+ 173              	ector_float_add
+ 174 0124 0410A0E1 	.LVL35:
+ 175 0128 240096E5 		.loc 1 384 0
+ 176 012c FEFFFFEB 		strb	r4, [r4, #2]
+ 177              	.LVL36:
+ 379:firefly_KF_disturbance_observer.c **** 
+ 380:firefly_KF_disturbance_observer.c **** 
+ 381:firefly_KF_disturbance_observer.c **** /* calculate angular_acceleration */
+ 382:firefly_KF_disturbance_observer.c **** 	vector_float * angular_acceleration;
+ 383:firefly_KF_disturbance_observer.c **** 	angular_acceleration->length = 3;
+ 384:firefly_KF_disturbance_observer.c **** 	angular_acceleration->orientation = 0;
+ 178              	 1 383 0
+ 179 0130 0240C4E5 		strh	r7, [r4, #0]	@ movhi
+ 180              		.loc 1 387 0
+ 181              		mov	r1, #1
+ 182 0134 B070C4E1 		ldr	r0, [r6, #48]
+ 385:firefly_KF_disturbance_observer.c **** 
+ 386:firefly_KF_disturbance_observer.c **** 	// get old angular velocity, attitude, attitude command, external_moments
+ 387:firefly_KF_disturbance_observer.c **** 	float p = vector_float_get(KalmanHandler.angular_velocity, 1);
+ 183              	ector_float_get
+ 184 0138 0110A0E3 		.loc 1 388 0
+ 185 013c 300096E5 		mov	r1, #2
+ 186 0140 FEFFFFEB 		.loc 1 387 0
+ 388:firefly_KF_disturbance_observer.c **** 	float q = vector_float_get(KalmanHandler.angular_velocity, 2);
+ 187              		r4, r0
+ 188 0144 0210A0E3 	.LVL37:
+ 189              		.loc 1 388 0
+ 190 0148 0040A0E1 		ldr	r0, [r6, #48]
+ 191              		bl	vector_float_get
+ 192              		.loc 1 389 0
+ 193 014c 300096E5 		mov	r1, r7
+ 194 0150 FEFFFFEB 		.loc 1 388 0
+ 389:firefly_KF_disturbance_observer.c **** 	float r = vector_float_get(KalmanHandler.angular_velocity, 3);
+ 195              	 [sp, #8]	@ float
+ 196 0154 0710A0E1 	.LVL38:
+ 197              		.loc 1 389 0
+ 198 0158 08008DE5 		ldr	r0, [r6, #48]
+ 199              		bl	vector_float_get
+ 200              		.loc 1 391 0
+ 201 015c 300096E5 		mov	r1, #1
+ 202 0160 FEFFFFEB 		.loc 1 389 0
+ 390:firefly_KF_disturbance_observer.c **** 
+ 391:firefly_KF_disturbance_observer.c **** 	float roll = vector_float_get(KalmanHandler.attitude, 1);
+ 203              	 [sp, #12]	@ float
+ 204 0164 0110A0E3 	.LVL39:
+ 205              		.loc 1 391 0
+ 206 0168 0C008DE5 		ldr	r0, [r6, #44]
+ 207              		bl	vector_float_get
+ 208              		.loc 1 392 0
+ 209 016c 2C0096E5 		mov	r1, #2
+ 210 0170 FEFFFFEB 		.loc 1 391 0
+ 392:firefly_KF_disturbance_observer.c **** 	float pitch = vector_float_get(KalmanHandler.attitude, 2);
+ 211              	 r0
+ 212 0174 0210A0E3 	.LVL40:
+ 213              		.loc 1 392 0
+ 214 0178 0090A0E1 		ldr	r0, [r6, #44]
+ 215              		bl	vector_float_get
+ 216              		.loc 1 393 0
+ 217 017c 2C0096E5 		mov	r1, r7
+ 218 0180 FEFFFFEB 		.loc 1 392 0
+ 393:firefly_KF_disturbance_observer.c **** 	float yaw = vector_float_get(KalmanHandler.attitude, 3);
+ 219              	 [sp, #16]	@ float
+ 220 0184 0710A0E1 	.LVL41:
+ 221              		.loc 1 393 0
+ 222 0188 10008DE5 		ldr	r0, [r6, #44]
+ 223              		bl	vector_float_get
+ 224              		.loc 1 395 0
+ 225 018c 2C0096E5 		mov	r1, #1
+ 226 0190 FEFFFFEB 		.loc 1 393 0
+ 394:firefly_KF_disturbance_observer.c **** 
+ 395:firefly_KF_disturbance_observer.c **** 	float roll_cmd = vector_float_get(KalmanHandler.command_roll_pitch_yaw_thrust, 1);
+ 227              	 [sp, #20]	@ float
+ 228 0194 0110A0E3 	.LVL42:
+ 229              		.loc 1 395 0
+ 230 0198 14008DE5 		ldr	r0, [r6, #60]
+ 231              		bl	vector_float_get
+ 232              		.loc 1 396 0
+ 233 019c 3C0096E5 		mov	r1, #2
+ 234 01a0 FEFFFFEB 		.loc 1 395 0
+ 396:firefly_KF_disturbance_observer.c **** 	float pitch_cmd = vector_float_get(KalmanHandler.command_roll_pitch_yaw_thrust, 2);
+ 235              	 r0
+ 236 01a4 0210A0E3 	.LVL43:
+ 237              		.loc 1 396 0
+ 238 01a8 00B0A0E1 		ldr	r0, [r6, #60]
+ 239              		bl	vector_float_get
+ 240              		.loc 1 397 0
+ 241 01ac 3C0096E5 		mov	r1, r7
+ 242 01b0 FEFFFFEB 		.loc 1 396 0
+ 397:firefly_KF_disturbance_observer.c **** 	float yaw_cmd = vector_float_get(KalmanHandler.command_roll_pitch_yaw_thrust, 3);
+ 243              	 [sp, #24]	@ float
+ 244 01b4 0710A0E1 	.LVL44:
+ 245              		.loc 1 397 0
+ 246 01b8 18008DE5 		ldr	r0, [r6, #60]
+ 247              		bl	vector_float_get
+ 248              		.loc 1 399 0
+ 249 01bc 3C0096E5 		mov	r1, #1
+ 250 01c0 FEFFFFEB 		.loc 1 397 0
+ 398:firefly_KF_disturbance_observer.c **** 
+ 399:firefly_KF_disturbance_observer.c **** 	float dm1 = vector_float_get(KalmanHandler.external_moments, 1);
+ 251              	 [sp, #28]	@ float
+ 252 01c4 0110A0E3 	.LVL45:
+ 253              		.loc 1 399 0
+ 254 01c8 1C008DE5 		ldr	r0, [r6, #56]
+ 255              		bl	vector_float_get
+ 256              		.loc 1 400 0
+ 257 01cc 380096E5 		mov	r1, #2
+ 258 01d0 FEFFFFEB 		.loc 1 399 0
+ 400:firefly_KF_disturbance_observer.c **** 	float dm2 = vector_float_get(KalmanHandler.external_moments, 2);
+ 259              	 r0
+ 260 01d4 0210A0E3 	.LVL46:
+ 261              		.loc 1 400 0
+ 262 01d8 00A0A0E1 		ldr	r0, [r6, #56]
+ 263              		bl	vector_float_get
+ 264              		.loc 1 401 0
+ 265 01dc 380096E5 		mov	r1, r7
+ 266 01e0 FEFFFFEB 		.loc 1 400 0
+ 401:firefly_KF_disturbance_observer.c **** 	float dm3 = vector_float_get(KalmanHandler.external_moments, 3);
+ 267              	 [sp, #32]	@ float
+ 268 01e4 0710A0E1 	.LVL47:
+ 269              		.loc 1 401 0
+ 270 01e8 20008DE5 		ldr	r0, [r6, #56]
+ 271              		bl	vector_float_get
+ 272              		str	r0, [sp, #36]	@ float
+ 273 01ec 380096E5 	.LVL48:
+ 274 01f0 FEFFFFEB 		.loc 1 407 0
+ 275 01f4 24008DE5 		mov	r0, r4
+ 276              		bl	__extendsfdf2
+ 402:firefly_KF_disturbance_observer.c **** 
+ 403:firefly_KF_disturbance_observer.c **** 	float acc_roll = -2.0 * roll_damping_ * roll_omega_ * p - roll_omega_ * roll_omega_ * roll + roll_
+ 404:firefly_KF_disturbance_observer.c **** 	float acc_pitch = -2.0 * pitch_damping_ * pitch_omega_ * q - pitch_omega_ * pitch_omega_ * pitch +
+ 405:firefly_KF_disturbance_observer.c **** 	float acc_yaw = -2.0 * yaw_damping_ * yaw_omega_ * r - yaw_omega_ * yaw_omega_ * yaw + yaw_gain_ *
+ 406:firefly_KF_disturbance_observer.c **** 
+ 407:firefly_KF_disturbance_observer.c **** 	vector_float_set(angular_acceleration, 1, acc_roll);
+ 277              	L3
+ 278 01f8 0400A0E1 		ldmia	r2, {r2-r3}
+ 279 01fc FEFFFFEB 		bl	__muldf3
+ 280 0200 FB2F8FE2 		mov	r4, r0
+ 281 0204 0C0092E8 	.LVL49:
+ 282 0208 FEFFFFEB 		mov	r0, r9
+ 283 020c 0040A0E1 		mov	r5, r1
+ 284              		bl	__extendsfdf2
+ 285 0210 0900A0E1 		adr	r2, .L3+8
+ 286 0214 0150A0E1 		ldmia	r2, {r2-r3}
+ 287 0218 FEFFFFEB 		bl	__muldf3
+ 288 021c F62F8FE2 		mov	r2, r0
+ 289 0220 0C0092E8 		mov	r3, r1
+ 290 0224 FEFFFFEB 		mov	r0, r4
+ 291 0228 0020A0E1 		mov	r1, r5
+ 292 022c 0130A0E1 		bl	__adddf3
+ 293 0230 0400A0E1 		mov	r4, r0
+ 294 0234 0510A0E1 		mov	r0, fp
+ 295 0238 FEFFFFEB 		mov	r5, r1
+ 296 023c 0040A0E1 		bl	__extendsfdf2
+ 297 0240 0B00A0E1 		adr	r2, .L3+16
+ 298 0244 0150A0E1 		ldmia	r2, {r2-r3}
+ 299 0248 FEFFFFEB 		bl	__muldf3
+ 300 024c 3B2E8FE2 		mov	r2, r0
+ 301 0250 0C0092E8 		mov	r3, r1
+ 302 0254 FEFFFFEB 		mov	r0, r4
+ 303 0258 0020A0E1 		mov	r1, r5
+ 304 025c 0130A0E1 		bl	__adddf3
+ 305 0260 0400A0E1 		mov	r4, r0
+ 306 0264 0510A0E1 		mov	r0, sl
+ 307 0268 FEFFFFEB 		mov	r5, r1
+ 308 026c 0040A0E1 		bl	__extendsfdf2
+ 309 0270 0A00A0E1 		mov	r3, r1
+ 310 0274 0150A0E1 		mov	r2, r0
+ 311 0278 FEFFFFEB 		mov	r1, r5
+ 312 027c 0130A0E1 		mov	r0, r4
+ 313 0280 0020A0E1 		bl	__adddf3
+ 314 0284 0510A0E1 		bl	__truncdfsf2
+ 315 0288 0400A0E1 		mov	r1, #1
+ 316 028c FEFFFFEB 		mov	r2, r0
+ 317 0290 FEFFFFEB 	.LVL50:
+ 318 0294 0110A0E3 		mov	r0, r4
+ 319 0298 0020A0E1 		bl	vector_float_set
+ 320              		.loc 1 408 0
+ 321 029c 0400A0E1 		ldr	r0, [sp, #8]	@ float
+ 322 02a0 FEFFFFEB 		bl	__extendsfdf2
+ 408:firefly_KF_disturbance_observer.c **** 	vector_float_set(angular_acceleration, 2, acc_pitch);
+ 323              	3
+ 324 02a4 08009DE5 		mov	r4, r0
+ 325 02a8 FEFFFFEB 	.LVL51:
+ 326 02ac D62F8FE2 		ldr	r0, [sp, #16]	@ float
+ 327 02b0 0C0092E8 		mov	r5, r1
+ 328 02b4 FEFFFFEB 		bl	__extendsfdf2
+ 329 02b8 0040A0E1 		adr	r2, .L3+8
+ 330              		ldmia	r2, {r2-r3}
+ 331 02bc 10009DE5 		bl	__muldf3
+ 332 02c0 0150A0E1 		mov	r2, r0
+ 333 02c4 FEFFFFEB 		mov	r3, r1
+ 334 02c8 CB2F8FE2 		mov	r0, r4
+ 335 02cc 0C0092E8 		mov	r1, r5
+ 336 02d0 FEFFFFEB 		bl	__adddf3
+ 337 02d4 0020A0E1 		mov	r4, r0
+ 338 02d8 0130A0E1 		ldr	r0, [sp, #24]	@ float
+ 339 02dc 0400A0E1 		mov	r5, r1
+ 340 02e0 0510A0E1 		bl	__extendsfdf2
+ 341 02e4 FEFFFFEB 		adr	r2, .L3+32
+ 342 02e8 0040A0E1 		ldmia	r2, {r2-r3}
+ 343 02ec 18009DE5 		bl	__muldf3
+ 344 02f0 0150A0E1 		mov	r2, r0
+ 345 02f4 FEFFFFEB 		mov	r3, r1
+ 346 02f8 C52F8FE2 		mov	r0, r4
+ 347 02fc 0C0092E8 		mov	r1, r5
+ 348 0300 FEFFFFEB 		bl	__adddf3
+ 349 0304 0020A0E1 		mov	r4, r0
+ 350 0308 0130A0E1 		ldr	r0, [sp, #32]	@ float
+ 351 030c 0400A0E1 		mov	r5, r1
+ 352 0310 0510A0E1 		bl	__extendsfdf2
+ 353 0314 FEFFFFEB 		mov	r3, r1
+ 354 0318 0040A0E1 		mov	r2, r0
+ 355 031c 20009DE5 		mov	r1, r5
+ 356 0320 0150A0E1 		mov	r0, r4
+ 357 0324 FEFFFFEB 		bl	__adddf3
+ 358 0328 0130A0E1 		bl	__truncdfsf2
+ 359 032c 0020A0E1 		mov	r1, #2
+ 360 0330 0510A0E1 		mov	r2, r0
+ 361 0334 0400A0E1 	.LVL52:
+ 362 0338 FEFFFFEB 		mov	r0, r4
+ 363 033c FEFFFFEB 		bl	vector_float_set
+ 364 0340 0210A0E3 		.loc 1 409 0
+ 365 0344 0020A0E1 		ldr	r0, [sp, #12]	@ float
+ 366              		bl	__extendsfdf2
+ 367 0348 0400A0E1 		mov	r2, #-1073741824
+ 368 034c FEFFFFEB 		add	r2, r2, #2293760
+ 409:firefly_KF_disturbance_observer.c **** 	vector_float_set(angular_acceleration, 3, acc_yaw);
+ 369              	ldr	r0, [sp, #20]	@ float
+ 370 0350 0C009DE5 		mov	r5, r1
+ 371 0354 FEFFFFEB 		bl	__extendsfdf2
+ 372 0358 0321A0E3 		mov	r2, #-1073741824
+ 373 035c 232882E2 		add	r2, r2, #3735552
+ 374 0360 0030A0E3 		mov	r3, #0
+ 375 0364 FEFFFFEB 		bl	__muldf3
+ 376 0368 0040A0E1 		mov	r2, r0
+ 377              		mov	r3, r1
+ 378 036c 14009DE5 		mov	r0, r4
+ 379 0370 0150A0E1 		mov	r1, r5
+ 380 0374 FEFFFFEB 		bl	__adddf3
+ 381 0378 0321A0E3 		mov	r4, r0
+ 382 037c 392882E2 		ldr	r0, [sp, #28]	@ float
+ 383 0380 0030A0E3 		mov	r5, r1
+ 384 0384 FEFFFFEB 		bl	__extendsfdf2
+ 385 0388 0020A0E1 		mov	r2, #1073741824
+ 386 038c 0130A0E1 		add	r2, r2, #3735552
+ 387 0390 0400A0E1 		mov	r3, #0
+ 388 0394 0510A0E1 		bl	__muldf3
+ 389 0398 FEFFFFEB 		mov	r2, r0
+ 390 039c 0040A0E1 		mov	r3, r1
+ 391 03a0 1C009DE5 		mov	r0, r4
+ 392 03a4 0150A0E1 		mov	r1, r5
+ 393 03a8 FEFFFFEB 		bl	__adddf3
+ 394 03ac 0121A0E3 		mov	r4, r0
+ 395 03b0 392882E2 		ldr	r0, [sp, #36]	@ float
+ 396 03b4 0030A0E3 		mov	r5, r1
+ 397 03b8 FEFFFFEB 		bl	__extendsfdf2
+ 398 03bc 0020A0E1 		mov	r3, r1
+ 399 03c0 0130A0E1 		mov	r2, r0
+ 400 03c4 0400A0E1 		mov	r1, r5
+ 401 03c8 0510A0E1 		mov	r0, r4
+ 402 03cc FEFFFFEB 		bl	__adddf3
+ 403 03d0 0040A0E1 		bl	__truncdfsf2
+ 404 03d4 24009DE5 		mov	r1, r7
+ 405 03d8 0150A0E1 		mov	r2, r0
+ 406 03dc FEFFFFEB 	.LVL54:
+ 407 03e0 0130A0E1 		mov	r0, r4
+ 408 03e4 0020A0E1 		bl	vector_float_set
+ 409 03e8 0510A0E1 	.LVL55:
+ 410 03ec 0400A0E1 		.loc 1 414 0
+ 411 03f0 FEFFFFEB 		strh	r7, [r4, #0]	@ movhi
+ 412 03f4 FEFFFFEB 	.LVL56:
+ 413 03f8 0710A0E1 		.loc 1 415 0
+ 414 03fc 0020A0E1 		mov	r1, r4
+ 415              	.LVL57:
+ 416 0400 0400A0E1 		mov	r0, r4
+ 417 0404 FEFFFFEB 		bl	vector_float_copy
+ 418              	.LVL58:
+ 410:firefly_KF_disturbance_observer.c **** 
+ 411:firefly_KF_disturbance_observer.c **** /* update angular velocity and attitude */
+ 412:firefly_KF_disturbance_observer.c **** 	// temp4 = angular_acceleration * dt
+ 413:firefly_KF_disturbance_observer.c **** 	vector_float * temp4;
+ 414:firefly_KF_disturbance_observer.c **** 	temp4->length = 3;
+ 419              	t
+ 420 0408 B070C4E1 		bl	vector_float_times
+ 421              	.LVL59:
+ 415:firefly_KF_disturbance_observer.c **** 	vector_float_copy(temp4, angular_acceleration);
+ 422              	oc 1 420 0
+ 423 040c 0410A0E1 		strh	r7, [r4, #0]	@ movhi
+ 424              		.loc 1 421 0
+ 425 0410 0400A0E1 		mov	r0, r4
+ 426 0414 FEFFFFEB 		ldr	r1, [r6, #48]
+ 427              		bl	vector_float_copy
+ 416:firefly_KF_disturbance_observer.c **** 	vector_float_times(temp4, dt);
+ 428              	1 424 0
+ 429 0418 0400A0E1 		ldr	r0, [r6, #48]
+ 430 041c 04109DE5 	.LVL60:
+ 431 0420 FEFFFFEB 		mov	r1, r4
+ 432              		bl	vector_float_add
+ 417:firefly_KF_disturbance_observer.c **** 
+ 418:firefly_KF_disturbance_observer.c **** 	// temp5 = old_angular_velocity (save for calculating new attitude later)
+ 419:firefly_KF_disturbance_observer.c **** 	vector_float * temp5;
+ 420:firefly_KF_disturbance_observer.c **** 	temp5->length = 3;
+ 433              	1:
+ 434 0424 B070C4E1 		.loc 1 427 0
+ 421:firefly_KF_disturbance_observer.c **** 	vector_float_copy(temp5, KalmanHandler.angular_velocity);
+ 435              	ov	r0, r4
+ 436 0428 0400A0E1 		ldr	r1, [sp, #4]	@ float
+ 437 042c 301096E5 		bl	vector_float_times
+ 438 0430 FEFFFFEB 	.LVL62:
+ 422:firefly_KF_disturbance_observer.c **** 
+ 423:firefly_KF_disturbance_observer.c **** 	// new_angular_velocity = angular_velocity + angular_acceleration * dt
+ 424:firefly_KF_disturbance_observer.c **** 	vector_float_add(KalmanHandler.angular_velocity, temp4);
+ 439              	c 1 430 0
+ 440 0434 300096E5 		mov	r0, r4
+ 441              		ldr	r1, [sp, #0]	@ float
+ 442 0438 0410A0E1 		bl	vector_float_times
+ 443 043c FEFFFFEB 	.LVL63:
+ 444              		.loc 1 433 0
+ 425:firefly_KF_disturbance_observer.c **** 
+ 426:firefly_KF_disturbance_observer.c **** 	// temp5 = old_angular_velocity * dt
+ 427:firefly_KF_disturbance_observer.c **** 	vector_float_times(temp5, dt);
+ 445              	1, r4
+ 446 0440 0400A0E1 		ldr	r0, [r6, #44]
+ 447 0444 04109DE5 		bl	vector_float_add
+ 448 0448 FEFFFFEB 	.LVL64:
+ 449              		.loc 1 434 0
+ 428:firefly_KF_disturbance_observer.c **** 
+ 429:firefly_KF_disturbance_observer.c **** 	// temp4 = 0.5 * angular_acceleration * dt * dt
+ 430:firefly_KF_disturbance_observer.c **** 	vector_float_times(temp4, 0.5 * dt);
+ 450              	r1, r4
+ 451 044c 0400A0E1 		ldr	r0, [r6, #44]
+ 452 0450 00109DE5 		bl	vector_float_add
+ 453 0454 FEFFFFEB 		.loc 1 438 0
+ 454              		mov	r1, #1
+ 431:firefly_KF_disturbance_observer.c **** 
+ 432:firefly_KF_disturbance_observer.c **** 	// new_attitude = attitude + angular_velocity * dt + 0.5 * angular_acceleration * dt * dt
+ 433:firefly_KF_disturbance_observer.c **** 	vector_float_add(KalmanHandler.attitude, temp5);
+ 455              	r0, [r6, #36]
+ 456 0458 0410A0E1 		ldr	r4, [r6, #32]
+ 457 045c 2C0096E5 	.LVL65:
+ 458 0460 FEFFFFEB 		bl	vector_float_get
+ 459              		mov	r1, #1
+ 434:firefly_KF_disturbance_observer.c **** 	vector_float_add(KalmanHandler.attitude, temp4);
+ 460              	r2, r0
+ 461 0464 0410A0E1 		mov	r0, r4
+ 462 0468 2C0096E5 		bl	vector_float_set
+ 463 046c FEFFFFEB 		.loc 1 439 0
+ 435:firefly_KF_disturbance_observer.c **** 
+ 436:firefly_KF_disturbance_observer.c **** 
+ 437:firefly_KF_disturbance_observer.c **** /* update the state vector */
+ 438:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.state, 1, vector_float_get(KalmanHandler.position, 1));
+ 464              		r1, #2
+ 465 0470 0110A0E3 		ldr	r0, [r6, #36]
+ 466 0474 240096E5 		ldr	r4, [r6, #32]
+ 467 0478 204096E5 		bl	vector_float_get
+ 468              		mov	r1, #2
+ 469 047c FEFFFFEB 		mov	r2, r0
+ 470 0480 0110A0E3 		mov	r0, r4
+ 471 0484 0020A0E1 		bl	vector_float_set
+ 472 0488 0400A0E1 		.loc 1 440 0
+ 473 048c FEFFFFEB 		mov	r1, r7
+ 439:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.state, 2, vector_float_get(KalmanHandler.position, 2));
+ 474              	r6, #36]
+ 475 0490 0210A0E3 		ldr	r4, [r6, #32]
+ 476 0494 240096E5 		bl	vector_float_get
+ 477 0498 204096E5 		mov	r1, r7
+ 478 049c FEFFFFEB 		mov	r2, r0
+ 479 04a0 0210A0E3 		mov	r0, r4
+ 480 04a4 0020A0E1 		bl	vector_float_set
+ 481 04a8 0400A0E1 		.loc 1 442 0
+ 482 04ac FEFFFFEB 		mov	r1, #1
+ 440:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.state, 3, vector_float_get(KalmanHandler.position, 3));
+ 483              	[r6, #40]
+ 484 04b0 0710A0E1 		ldr	r4, [r6, #32]
+ 485 04b4 240096E5 		bl	vector_float_get
+ 486 04b8 204096E5 		mov	r1, #4
+ 487 04bc FEFFFFEB 		mov	r2, r0
+ 488 04c0 0710A0E1 		mov	r0, r4
+ 489 04c4 0020A0E1 		bl	vector_float_set
+ 490 04c8 0400A0E1 		.loc 1 443 0
+ 491 04cc FEFFFFEB 		mov	r1, #2
+ 441:firefly_KF_disturbance_observer.c **** 
+ 442:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.state, 4, vector_float_get(KalmanHandler.velocity, 1));
+ 492              	[r6, #40]
+ 493 04d0 0110A0E3 		ldr	r4, [r6, #32]
+ 494 04d4 280096E5 		bl	vector_float_get
+ 495 04d8 204096E5 		mov	r1, #5
+ 496 04dc FEFFFFEB 		mov	r2, r0
+ 497 04e0 0410A0E3 		mov	r0, r4
+ 498 04e4 0020A0E1 		bl	vector_float_set
+ 499 04e8 0400A0E1 		.loc 1 444 0
+ 500 04ec FEFFFFEB 		mov	r1, r7
+ 443:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.state, 5, vector_float_get(KalmanHandler.velocity, 2));
+ 501              	[r6, #40]
+ 502 04f0 0210A0E3 		ldr	r4, [r6, #32]
+ 503 04f4 280096E5 		bl	vector_float_get
+ 504 04f8 204096E5 		mov	r1, #6
+ 505 04fc FEFFFFEB 		mov	r2, r0
+ 506 0500 0510A0E3 		mov	r0, r4
+ 507 0504 0020A0E1 		bl	vector_float_set
+ 508 0508 0400A0E1 		.loc 1 446 0
+ 509 050c FEFFFFEB 		mov	r1, #1
+ 444:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.state, 6, vector_float_get(KalmanHandler.velocity, 3));
+ 510              	[r6, #44]
+ 511 0510 0710A0E1 		ldr	r4, [r6, #32]
+ 512 0514 280096E5 		bl	vector_float_get
+ 513 0518 204096E5 		mov	r1, #7
+ 514 051c FEFFFFEB 		mov	r2, r0
+ 515 0520 0610A0E3 		mov	r0, r4
+ 516 0524 0020A0E1 		bl	vector_float_set
+ 517 0528 0400A0E1 		.loc 1 447 0
+ 518 052c FEFFFFEB 		mov	r1, #2
+ 445:firefly_KF_disturbance_observer.c **** 
+ 446:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.state, 7, vector_float_get(KalmanHandler.attitude, 1));
+ 519              	[r6, #44]
+ 520 0530 0110A0E3 		ldr	r4, [r6, #32]
+ 521 0534 2C0096E5 		bl	vector_float_get
+ 522 0538 204096E5 		mov	r1, #8
+ 523 053c FEFFFFEB 		mov	r2, r0
+ 524 0540 0710A0E3 		mov	r0, r4
+ 525 0544 0020A0E1 		bl	vector_float_set
+ 526 0548 0400A0E1 		.loc 1 448 0
+ 527 054c FEFFFFEB 		mov	r1, r7
+ 447:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.state, 8, vector_float_get(KalmanHandler.attitude, 2));
+ 528              	[r6, #44]
+ 529 0550 0210A0E3 		ldr	r4, [r6, #32]
+ 530 0554 2C0096E5 		bl	vector_float_get
+ 531 0558 204096E5 		mov	r1, #9
+ 532 055c FEFFFFEB 		mov	r2, r0
+ 533 0560 0810A0E3 		mov	r0, r4
+ 534 0564 0020A0E1 		bl	vector_float_set
+ 535 0568 0400A0E1 		.loc 1 450 0
+ 536 056c FEFFFFEB 		mov	r1, #1
+ 448:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.state, 9, vector_float_get(KalmanHandler.attitude, 3));
+ 537              	[r6, #48]
+ 538 0570 0710A0E1 		ldr	r4, [r6, #32]
+ 539 0574 2C0096E5 		bl	vector_float_get
+ 540 0578 204096E5 		mov	r1, #10
+ 541 057c FEFFFFEB 		mov	r2, r0
+ 542 0580 0910A0E3 		mov	r0, r4
+ 543 0584 0020A0E1 		bl	vector_float_set
+ 544 0588 0400A0E1 		.loc 1 451 0
+ 545 058c FEFFFFEB 		mov	r1, #2
+ 449:firefly_KF_disturbance_observer.c **** 
+ 450:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.state, 10, vector_float_get(KalmanHandler.angular_velocity, 1));
+ 546              	[r6, #48]
+ 547 0590 0110A0E3 		ldr	r4, [r6, #32]
+ 548 0594 300096E5 		bl	vector_float_get
+ 549 0598 204096E5 		mov	r1, #11
+ 550 059c FEFFFFEB 		mov	r2, r0
+ 551 05a0 0A10A0E3 		mov	r0, r4
+ 552 05a4 0020A0E1 		bl	vector_float_set
+ 553 05a8 0400A0E1 		.loc 1 452 0
+ 554 05ac FEFFFFEB 		mov	r1, r7
+ 451:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.state, 11, vector_float_get(KalmanHandler.angular_velocity, 2));
+ 555              	[r6, #48]
+ 556 05b0 0210A0E3 		ldr	r4, [r6, #32]
+ 557 05b4 300096E5 		bl	vector_float_get
+ 558 05b8 204096E5 		mov	r1, #12
+ 559 05bc FEFFFFEB 		mov	r2, r0
+ 560 05c0 0B10A0E3 		mov	r0, r4
+ 561 05c4 0020A0E1 		bl	vector_float_set
+ 562 05c8 0400A0E1 		b	.L4
+ 563 05cc FEFFFFEB 	.L5:
+ 452:firefly_KF_disturbance_observer.c **** 	vector_float_set(KalmanHandler.state, 12, vector_float_get(KalmanHandler.angular_velocity, 3));
+ 564              	
+ 565 05d0 0710A0E1 	.L3:
+ 566 05d4 300096E5 		.word	-1071358831
+ 567 05d8 204096E5 		.word	-783402035
+ 568 05dc FEFFFFEB 		.word	-1068958191
+ 569 05e0 0C10A0E3 		.word	872737355
+ 570 05e4 0020A0E1 		.word	1078197876
+ 571 05e8 0400A0E1 		.word	698189884
+ 572 05ec FEFFFFEB 		.word	-1071284696
+ 573 05f0 0B0000EA 		.word	604731396
+ 574              		.word	1078263392
+ 575              		.word	1592092837
+ 576              		.word	KalmanHandler
+ 577 05f4 915C24C0 		.word	-1055070251
+ 578 05f8 CD3B4ED1 	.L4:
+ 579 05fc 11FE48C0 		.loc 1 453 0
+ 580 0600 4BEA0434 		add	sp, sp, #40
+ 581 0604 74FE4340 		ldmfd	sp!, {r4, r5, r6, r7, r9, sl, fp, lr}
+ 582 0608 3C889D29 		bx	lr
+ 583 060c 287E25C0 	.LFE4:
+ 585 0614 60FE4440 		.global	__ltsf2
+ 586 0618 A568E55E 		.global	__gtsf2
+ 587 061c 00000000 		.align	2
+ 588 0620 D5E71CC1 		.global	updateEstimator
+ 453:firefly_KF_disturbance_observer.c **** }
+ 590              	.loc 1 156 0
+ 591 0624 28D08DE2 		@ Function supports interworking.
+ 592 0628 F04EBDE8 		@ args = 0, pretend = 0, frame = 0
+ 593 062c 1EFF2FE1 		@ frame_needed = 0, uses_anonymous_args = 0
+ 594              		stmfd	sp!, {r4, r5, lr}
+ 595              	.LCFI2:
+ 596              		.loc 1 159 0
+ 597              		ldr	r5, .L63
+ 598              		ldr	r0, [r5, #4]
+ 599              		.loc 1 160 0
+ 600              		ldr	r3, [r5, #0]
+ 601              		.loc 1 159 0
+ 602              		ldrh	r1, [r0, #2]
+ 603              	.LVL66:
+ 604              		strh	r1, [r4, #2]	@ movhi
+ 605              		.loc 1 161 0
+ 606              		mov	r1, r3
+ 607 0630 30402DE9 		.loc 1 160 0
+ 608              		ldrh	r3, [r3, #0]
+ 609              		.loc 1 161 0
+ 610 0634 E4579FE5 		mov	r2, r4
+ 611 0638 040095E5 		.loc 1 160 0
+ 612              		strh	r3, [r4, #0]	@ movhi
+ 613 063c 003095E5 		.loc 1 161 0
+ 614              		bl	matrix_float_mul
+ 615 0640 B210D0E1 		.loc 1 162 0
+ 616              		ldr	r2, [r5, #0]
+ 617 0644 B210C4E1 		mov	r0, r4
+ 618              		ldr	r1, [r5, #4]
+ 619 0648 0310A0E1 		bl	matrix_float_mul_trans
+ 620              		.loc 1 163 0
+ 621 064c B030D3E1 		ldr	r1, [r5, #8]
+ 622              		ldr	r0, [r5, #0]
+ 623 0650 0420A0E1 		bl	matrix_float_add
+ 624              		.loc 1 166 0
+ 625 0654 B030C4E1 		ldr	r0, .L63+4
+ 626              		bl	systemDynamics
+ 627 0658 FEFFFFEB 		.loc 1 170 0
+ 628              		ldr	r3, [r5, #16]
+ 629 065c 002095E5 		.loc 1 171 0
+ 630 0660 0400A0E1 		ldrh	r1, [r3, #0]
+ 631 0664 041095E5 		.loc 1 170 0
+ 632 0668 FEFFFFEB 		ldrh	r3, [r3, #2]
+ 633              	.LVL67:
+ 634 066c 081095E5 		.loc 1 171 0
+ 635 0670 000095E5 		strh	r1, [r4, #0]	@ movhi
+ 636 0674 FEFFFFEB 		.loc 1 170 0
+ 637              		strh	r3, [r4, #2]	@ movhi
+ 638 0678 A4079FE5 		.loc 1 173 0
+ 639 067c FEFFFFEB 		ldr	r0, [r5, #12]
+ 640              		.loc 1 174 0
+ 641 0680 103095E5 		ldr	r2, [r5, #0]
+ 642              		.loc 1 173 0
+ 643 0684 B010D3E1 		ldrh	r3, [r0, #2]
+ 644              		.loc 1 175 0
+ 645 0688 B230D3E1 		mov	r1, r2
+ 646              		.loc 1 174 0
+ 647              		ldrh	r2, [r2, #0]
+ 648 068c B010C4E1 	.LVL68:
+ 649              		.loc 1 173 0
+ 650 0690 B230C4E1 		strh	r3, [r4, #2]	@ movhi
+ 651              		.loc 1 174 0
+ 652 0694 0C0095E5 		strh	r2, [r4, #0]	@ movhi
+ 653              		.loc 1 175 0
+ 654 0698 002095E5 		mov	r2, r4
+ 655              		bl	matrix_float_mul
+ 656 069c B230D0E1 	.LVL69:
+ 657              		.loc 1 176 0
+ 658 06a0 0210A0E1 		mov	r2, r4
+ 659              	.LVL70:
+ 660 06a4 B020D2E1 		mov	r0, r4
+ 661              		ldr	r1, [r5, #12]
+ 662              		bl	matrix_float_mul_trans
+ 663 06a8 B230C4E1 	.LVL71:
+ 664              	.LVL72:
+ 665 06ac B020C4E1 		.loc 1 177 0
+ 666              		mov	r0, r4
+ 667 06b0 0420A0E1 		ldr	r1, [r5, #16]
+ 668 06b4 FEFFFFEB 		bl	matrix_float_add
+ 669              		.loc 1 181 0
+ 670              		ldr	r0, [r5, #0]
+ 671 06b8 0420A0E1 		ldrh	r1, [r0, #2]
+ 672              	.LVL73:
+ 673 06bc 0400A0E1 		strh	r1, [r4, #2]	@ movhi
+ 674 06c0 0C1095E5 		.loc 1 184 0
+ 675 06c4 FEFFFFEB 		ldrh	r2, [r0, #2]
+ 676              		.loc 1 185 0
+ 677              		ldr	r3, [r5, #12]
+ 678              	.LVL74:
+ 679 06c8 0400A0E1 		.loc 1 184 0
+ 680 06cc 101095E5 		strh	r2, [r4, #2]	@ movhi
+ 681 06d0 FEFFFFEB 		.loc 1 186 0
+ 682              		mov	r1, r3
+ 683 06d4 000095E5 		.loc 1 185 0
+ 684 06d8 B210D0E1 		ldrh	r3, [r3, #2]
+ 685              		.loc 1 186 0
+ 686 06dc B210C4E1 		mov	r2, r4
+ 687              		.loc 1 185 0
+ 688 06e0 B220D0E1 		strh	r3, [r4, #0]	@ movhi
+ 689              		.loc 1 186 0
+ 690 06e4 0C3095E5 		bl	matrix_float_mul_trans
+ 691              	.LVL75:
+ 692              		.loc 1 187 0
+ 693 06e8 B220C4E1 		mov	r0, r4
+ 694              		bl	matrix_float_inverse
+ 695 06ec 0310A0E1 	.LVL76:
+ 696              		.loc 1 188 0
+ 697 06f0 B230D3E1 		mov	r0, r4
+ 698              	.LVL77:
+ 699 06f4 0420A0E1 		mov	r1, r4
+ 700              	.LVL78:
+ 701 06f8 B030C4E1 		mov	r2, r4
+ 702              		bl	matrix_float_mul
+ 703 06fc FEFFFFEB 	.LVL79:
+ 704              		.loc 1 192 0
+ 705              		ldr	r3, [r5, #64]
+ 706 0700 0400A0E1 		.loc 1 193 0
+ 707 0704 FEFFFFEB 		mov	r4, #0
+ 708              	.LVL80:
+ 709              		.loc 1 192 0
+ 710 0708 0400A0E1 		ldrh	r3, [r3, #0]
+ 711              	.LVL81:
+ 712 070c 0410A0E1 		.loc 1 193 0
+ 713              		strb	r4, [r4, #2]
+ 714 0710 0420A0E1 	.LVL82:
+ 715 0714 FEFFFFEB 		.loc 1 192 0
+ 716              		strh	r3, [r4, #0]	@ movhi
+ 717              		.loc 1 194 0
+ 718 0718 403095E5 		mov	r2, r4
+ 719              		ldr	r0, [r5, #12]
+ 720 071c 0040A0E3 		ldr	r1, [r5, #32]
+ 721              		bl	matrix_float_mul_vec_right
+ 722              		.loc 1 196 0
+ 723 0720 B030D3E1 		ldr	r1, [r5, #64]
+ 724              		ldrh	r2, [r1, #0]
+ 725              	.LVL83:
+ 726 0724 0240C4E5 		.loc 1 197 0
+ 727              		mov	r0, r4
+ 728              		.loc 1 196 0
+ 729 0728 B030C4E1 		strh	r2, [r4, #0]	@ movhi
+ 730              		.loc 1 197 0
+ 731 072c 0420A0E1 		bl	vector_float_copy
+ 732 0730 0C0095E5 		.loc 1 198 0
+ 733 0734 201095E5 		mov	r0, r4
+ 734 0738 FEFFFFEB 	.LVL84:
+ 735              		mov	r1, r4
+ 736 073c 401095E5 		bl	vector_float_subtract
+ 737 0740 B020D1E1 	.LVL85:
+ 738              		.loc 1 200 0
+ 739              		ldr	r3, [r5, #32]
+ 740 0744 0400A0E1 		ldrh	r3, [r3, #0]
+ 741              	.LVL86:
+ 742 0748 B020C4E1 		.loc 1 202 0
+ 743              		mov	r2, r4
+ 744 074c FEFFFFEB 		.loc 1 200 0
+ 745              		strh	r3, [r4, #0]	@ movhi
+ 746 0750 0400A0E1 	.LVL87:
+ 747              		.loc 1 202 0
+ 748 0754 0410A0E1 		mov	r1, r4
+ 749 0758 FEFFFFEB 	.LVL88:
+ 750              		mov	r0, r4
+ 751              	.LVL89:
+ 752 075c 203095E5 		.loc 1 201 0
+ 753 0760 B030D3E1 		strb	r4, [r4, #2]
+ 754              		.loc 1 202 0
+ 755              		bl	matrix_float_mul_vec_right
+ 756 0764 0420A0E1 	.LVL90:
+ 757              	.LVL91:
+ 758 0768 B030C4E1 		.loc 1 203 0
+ 759              		mov	r1, r4
+ 760              		ldr	r0, [r5, #32]
+ 761 076c 0410A0E1 		bl	vector_float_add
+ 762              		.loc 1 208 0
+ 763 0770 0400A0E1 		ldr	r3, [r5, #12]
+ 764              		ldrh	r3, [r3, #0]
+ 765              	.LVL92:
+ 766 0774 0240C4E5 		strh	r3, [r4, #0]	@ movhi
+ 767              	.LVL93:
+ 768 0778 FEFFFFEB 		.loc 1 207 0
+ 769              		ldrh	r3, [r4, #2]
+ 770              	.LVL94:
+ 771              		.loc 1 209 0
+ 772 077c 0410A0E1 		mov	r0, r4
+ 773 0780 200095E5 		.loc 1 207 0
+ 774 0784 FEFFFFEB 		strh	r3, [r4, #2]	@ movhi
+ 775              		.loc 1 209 0
+ 776 0788 0C3095E5 		bl	matrix_float_set_identity
+ 777 078c B030D3E1 		.loc 1 212 0
+ 778              		ldr	r1, [r5, #12]
+ 779 0790 B030C4E1 	.LVL95:
+ 780              		.loc 1 211 0
+ 781              		ldrh	r2, [r4, #2]
+ 782 0794 B230D4E1 		.loc 1 212 0
+ 783              		ldrh	r3, [r1, #0]
+ 784              	.LVL96:
+ 785 0798 0400A0E1 		.loc 1 211 0
+ 786              		strh	r2, [r4, #2]	@ movhi
+ 787 079c B230C4E1 		.loc 1 212 0
+ 788              		strh	r3, [r4, #0]	@ movhi
+ 789 07a0 FEFFFFEB 		.loc 1 213 0
+ 790              		mov	r2, r4
+ 791 07a4 0C1095E5 	.LVL97:
+ 792              		mov	r0, r4
+ 793              		bl	matrix_float_mul
+ 794 07a8 B220D4E1 	.LVL98:
+ 795              	.LVL99:
+ 796 07ac B030D1E1 		.loc 1 214 0
+ 797              		mov	r0, r4
+ 798              	.LVL100:
+ 799 07b0 B220C4E1 		mov	r1, r4
+ 800              		bl	matrix_float_sub
+ 801 07b4 B030C4E1 	.LVL101:
+ 802              		.loc 1 216 0
+ 803 07b8 0420A0E1 		ldr	r1, [r5, #0]
+ 804              		.loc 1 217 0
+ 805 07bc 0400A0E1 		ldrh	r3, [r1, #0]
+ 806 07c0 FEFFFFEB 		.loc 1 216 0
+ 807              		ldrh	r2, [r1, #2]
+ 808              	.LVL102:
+ 809              		.loc 1 217 0
+ 810 07c4 0400A0E1 		strh	r3, [r4, #0]	@ movhi
+ 811              		.loc 1 216 0
+ 812 07c8 0410A0E1 		strh	r2, [r4, #2]	@ movhi
+ 813 07cc FEFFFFEB 		.loc 1 218 0
+ 814              		mov	r0, r4
+ 815              		bl	matrix_float_copy
+ 816 07d0 001095E5 		.loc 1 219 0
+ 817              		ldr	r2, [r5, #0]
+ 818 07d4 B030D1E1 	.LVL103:
+ 819              		mov	r0, r4
+ 820 07d8 B220D1E1 	.LVL104:
+ 821              		mov	r1, r4
+ 822              		bl	matrix_float_mul
+ 823 07dc B030C4E1 	.LVL105:
+ 824              		.loc 1 224 0
+ 825 07e0 B220C4E1 		mov	r1, #10
+ 826              		ldr	r0, [r5, #32]
+ 827 07e4 0400A0E1 		bl	vector_float_get
+ 828 07e8 FEFFFFEB 		mov	r1, #-1073741824
+ 829              		add	r1, r1, #4194304
+ 830 07ec 002095E5 		bl	__ltsf2
+ 831              	.LVL106:
+ 832 07f0 0400A0E1 		cmp	r0, r4
+ 833              		bge	.L7
+ 834 07f4 0410A0E1 		.loc 1 225 0
+ 835 07f8 FEFFFFEB 		mov	r2, #-1073741824
+ 836              		ldr	r0, [r5, #32]
+ 837              		mov	r1, #10
+ 838 07fc 0A10A0E3 		add	r2, r2, #4194304
+ 839 0800 200095E5 		bl	vector_float_set
+ 840 0804 FEFFFFEB 	.L10:
+ 841 0808 0311A0E3 		.loc 1 231 0
+ 842 080c 011581E2 		mov	r1, #11
+ 843 0810 FEFFFFEB 		ldr	r0, [r5, #32]
+ 844              		bl	vector_float_get
+ 845 0814 040050E1 		mov	r1, #-1073741824
+ 846 0818 040100AA 		add	r1, r1, #4194304
+ 847              		bl	__ltsf2
+ 848 081c 0321A0E3 		cmp	r0, #0
+ 849 0820 200095E5 		ldr	r4, .L63
+ 850 0824 0A10A0E3 		bge	.L13
+ 851 0828 012582E2 		.loc 1 232 0
+ 852 082c FEFFFFEB 		mov	r2, #-1073741824
+ 853              		ldr	r0, [r4, #32]
+ 854              		mov	r1, #11
+ 855 0830 0B10A0E3 		add	r2, r2, #4194304
+ 856 0834 200095E5 		bl	vector_float_set
+ 857 0838 FEFFFFEB 	.L16:
+ 858 083c 0311A0E3 		.loc 1 238 0
+ 859 0840 011581E2 		mov	r1, #12
+ 860 0844 FEFFFFEB 		ldr	r0, [r5, #32]
+ 861 0848 000050E3 		bl	vector_float_get
+ 862 084c CC459FE5 		mov	r1, #-1073741824
+ 863 0850 640100AA 		bl	__ltsf2
+ 864              		cmp	r0, #0
+ 865 0854 0321A0E3 		ldr	r4, .L63
+ 866 0858 200094E5 		bge	.L19
+ 867 085c 0B10A0E3 		.loc 1 239 0
+ 868 0860 012582E2 		ldr	r0, [r4, #32]
+ 869 0864 FEFFFFEB 		mov	r1, #12
+ 870              		mov	r2, #-1073741824
+ 871              		bl	vector_float_set
+ 872 0868 0C10A0E3 	.L22:
+ 873 086c 200095E5 		.loc 1 246 0
+ 874 0870 FEFFFFEB 		mov	r1, #13
+ 875 0874 0311A0E3 		ldr	r0, [r5, #32]
+ 876 0878 FEFFFFEB 		bl	vector_float_get
+ 877 087c 000050E3 		mov	r1, #-1073741824
+ 878 0880 98459FE5 		add	r1, r1, #10485760
+ 879 0884 4B0100AA 		bl	__ltsf2
+ 880              		cmp	r0, #0
+ 881 0888 200094E5 		ldr	r4, .L63
+ 882 088c 0C10A0E3 		bge	.L25
+ 883 0890 0321A0E3 		.loc 1 247 0
+ 884 0894 FEFFFFEB 		mov	r2, #-1073741824
+ 885              		ldr	r0, [r4, #32]
+ 886              		mov	r1, #13
+ 887 0898 0D10A0E3 		add	r2, r2, #10485760
+ 888 089c 200095E5 		bl	vector_float_set
+ 889 08a0 FEFFFFEB 	.L28:
+ 890 08a4 0311A0E3 		.loc 1 253 0
+ 891 08a8 0A1681E2 		mov	r1, #14
+ 892 08ac FEFFFFEB 		ldr	r0, [r5, #32]
+ 893 08b0 000050E3 		bl	vector_float_get
+ 894 08b4 64459FE5 		mov	r1, #-1073741824
+ 895 08b8 300100AA 		add	r1, r1, #10485760
+ 896              		bl	__ltsf2
+ 897 08bc 0321A0E3 		cmp	r0, #0
+ 898 08c0 200094E5 		ldr	r4, .L63
+ 899 08c4 0D10A0E3 		bge	.L31
+ 900 08c8 0A2682E2 		.loc 1 254 0
+ 901 08cc FEFFFFEB 		mov	r2, #-1073741824
+ 902              		ldr	r0, [r4, #32]
+ 903              		mov	r1, #14
+ 904 08d0 0E10A0E3 		add	r2, r2, #10485760
+ 905 08d4 200095E5 		bl	vector_float_set
+ 906 08d8 FEFFFFEB 	.L34:
+ 907 08dc 0311A0E3 		.loc 1 260 0
+ 908 08e0 0A1681E2 		mov	r1, #15
+ 909 08e4 FEFFFFEB 		ldr	r0, [r5, #32]
+ 910 08e8 000050E3 		bl	vector_float_get
+ 911 08ec 2C459FE5 		mov	r1, #-1073741824
+ 912 08f0 140100AA 		add	r1, r1, #4194304
+ 913              		bl	__ltsf2
+ 914 08f4 0321A0E3 		cmp	r0, #0
+ 915 08f8 200094E5 		ldr	r4, .L63
+ 916 08fc 0E10A0E3 		bge	.L37
+ 917 0900 0A2682E2 		.loc 1 261 0
+ 918 0904 FEFFFFEB 		mov	r2, #-1073741824
+ 919              		ldr	r0, [r4, #32]
+ 920              		mov	r1, #15
+ 921 0908 0F10A0E3 		add	r2, r2, #4194304
+ 922 090c 200095E5 		bl	vector_float_set
+ 923 0910 FEFFFFEB 	.L40:
+ 924 0914 0311A0E3 		.loc 1 268 0
+ 925 0918 011581E2 		mov	r1, #16
+ 926 091c FEFFFFEB 		ldr	r0, [r5, #32]
+ 927 0920 000050E3 		bl	vector_float_get
+ 928 0924 F4449FE5 		mov	r1, #-1056964608
+ 929 0928 F80000AA 		add	r1, r1, #10485760
+ 930              		bl	__ltsf2
+ 931 092c 0321A0E3 		cmp	r0, #0
+ 932 0930 200094E5 		ldr	r4, .L63
+ 933 0934 0F10A0E3 		bge	.L43
+ 934 0938 012582E2 		.loc 1 269 0
+ 935 093c FEFFFFEB 		mov	r2, #-1056964608
+ 936              		ldr	r0, [r4, #32]
+ 937              		mov	r1, #16
+ 938 0940 1010A0E3 		add	r2, r2, #10485760
+ 939 0944 200095E5 		bl	vector_float_set
+ 940 0948 FEFFFFEB 	.L46:
+ 941 094c C114A0E3 		.loc 1 275 0
+ 942 0950 0A1681E2 		mov	r1, #17
+ 943 0954 FEFFFFEB 		ldr	r0, [r5, #32]
+ 944 0958 000050E3 		bl	vector_float_get
+ 945 095c BC449FE5 		mov	r1, #-1056964608
+ 946 0960 DC0000AA 		add	r1, r1, #10485760
+ 947              		bl	__ltsf2
+ 948 0964 C124A0E3 		cmp	r0, #0
+ 949 0968 200094E5 		ldr	r4, .L63
+ 950 096c 1010A0E3 		bge	.L49
+ 951 0970 0A2682E2 		.loc 1 276 0
+ 952 0974 FEFFFFEB 		mov	r2, #-1056964608
+ 953              		ldr	r0, [r4, #32]
+ 954              		mov	r1, #17
+ 955 0978 1110A0E3 		add	r2, r2, #10485760
+ 956 097c 200095E5 		bl	vector_float_set
+ 957 0980 FEFFFFEB 	.L52:
+ 958 0984 C114A0E3 		.loc 1 282 0
+ 959 0988 0A1681E2 		mov	r1, #18
+ 960 098c FEFFFFEB 		ldr	r0, [r5, #32]
+ 961 0990 000050E3 		bl	vector_float_get
+ 962 0994 84449FE5 		mov	r1, #-1056964608
+ 963 0998 C00000AA 		add	r1, r1, #10485760
+ 964              		bl	__ltsf2
+ 965 099c C124A0E3 		cmp	r0, #0
+ 966 09a0 200094E5 		ldr	r4, .L63
+ 967 09a4 1110A0E3 		bge	.L55
+ 968 09a8 0A2682E2 		.loc 1 283 0
+ 969 09ac FEFFFFEB 		mov	r2, #-1056964608
+ 970              		ldr	r0, [r4, #32]
+ 971              		mov	r1, #18
+ 972 09b0 1210A0E3 		add	r2, r2, #10485760
+ 973 09b4 200095E5 		bl	vector_float_set
+ 974 09b8 FEFFFFEB 	.L58:
+ 975 09bc C114A0E3 		.loc 1 291 0
+ 976 09c0 0A1681E2 		mov	r1, #1
+ 977 09c4 FEFFFFEB 		add	r0, r5, #32
+ 978 09c8 000050E3 		ldmia	r0, {r0, r4}	@ phole ldm
+ 979 09cc 4C449FE5 		bl	vector_float_get
+ 980 09d0 A40000AA 		mov	r1, #1
+ 981              		mov	r2, r0
+ 982 09d4 C124A0E3 		mov	r0, r4
+ 983 09d8 200094E5 		bl	vector_float_set
+ 984 09dc 1210A0E3 		.loc 1 292 0
+ 985 09e0 0A2682E2 		mov	r1, #2
+ 986 09e4 FEFFFFEB 		add	r0, r5, #32
+ 987              		ldmia	r0, {r0, r4}	@ phole ldm
+ 988              		bl	vector_float_get
+ 989 09e8 0110A0E3 		mov	r1, #2
+ 990 09ec 200085E2 		mov	r2, r0
+ 991 09f0 110090E8 		mov	r0, r4
+ 992 09f4 FEFFFFEB 		bl	vector_float_set
+ 993 09f8 0110A0E3 		.loc 1 293 0
+ 994 09fc 0020A0E1 		mov	r1, #3
+ 995 0a00 0400A0E1 		add	r0, r5, #32
+ 996 0a04 FEFFFFEB 		ldmia	r0, {r0, r4}	@ phole ldm
+ 997              		bl	vector_float_get
+ 998 0a08 0210A0E3 		mov	r1, #3
+ 999 0a0c 200085E2 		mov	r2, r0
+ 1000 0a10 110090E8 		mov	r0, r4
+ 1001 0a14 FEFFFFEB 		bl	vector_float_set
+ 1002 0a18 0210A0E3 		.loc 1 295 0
+ 1003 0a1c 0020A0E1 		mov	r1, #4
+ 1004 0a20 0400A0E1 		ldr	r0, [r5, #32]
+ 1005 0a24 FEFFFFEB 		ldr	r4, [r5, #40]
+ 1006              		bl	vector_float_get
+ 1007 0a28 0310A0E3 		mov	r1, #1
+ 1008 0a2c 200085E2 		mov	r2, r0
+ 1009 0a30 110090E8 		mov	r0, r4
+ 1010 0a34 FEFFFFEB 		bl	vector_float_set
+ 1011 0a38 0310A0E3 		.loc 1 296 0
+ 1012 0a3c 0020A0E1 		mov	r1, #5
+ 1013 0a40 0400A0E1 		ldr	r0, [r5, #32]
+ 1014 0a44 FEFFFFEB 		ldr	r4, [r5, #40]
+ 1015              		bl	vector_float_get
+ 1016 0a48 0410A0E3 		mov	r1, #2
+ 1017 0a4c 200095E5 		mov	r2, r0
+ 1018 0a50 284095E5 		mov	r0, r4
+ 1019 0a54 FEFFFFEB 		bl	vector_float_set
+ 1020 0a58 0110A0E3 		.loc 1 297 0
+ 1021 0a5c 0020A0E1 		mov	r1, #6
+ 1022 0a60 0400A0E1 		ldr	r0, [r5, #32]
+ 1023 0a64 FEFFFFEB 		ldr	r4, [r5, #40]
+ 1024              		bl	vector_float_get
+ 1025 0a68 0510A0E3 		mov	r1, #3
+ 1026 0a6c 200095E5 		mov	r2, r0
+ 1027 0a70 284095E5 		mov	r0, r4
+ 1028 0a74 FEFFFFEB 		bl	vector_float_set
+ 1029 0a78 0210A0E3 		.loc 1 299 0
+ 1030 0a7c 0020A0E1 		mov	r1, #7
+ 1031 0a80 0400A0E1 		ldr	r0, [r5, #32]
+ 1032 0a84 FEFFFFEB 		ldr	r4, [r5, #44]
+ 1033              		bl	vector_float_get
+ 1034 0a88 0610A0E3 		mov	r1, #1
+ 1035 0a8c 200095E5 		mov	r2, r0
+ 1036 0a90 284095E5 		mov	r0, r4
+ 1037 0a94 FEFFFFEB 		bl	vector_float_set
+ 1038 0a98 0310A0E3 		.loc 1 300 0
+ 1039 0a9c 0020A0E1 		mov	r1, #8
+ 1040 0aa0 0400A0E1 		ldr	r0, [r5, #32]
+ 1041 0aa4 FEFFFFEB 		ldr	r4, [r5, #44]
+ 1042              		bl	vector_float_get
+ 1043 0aa8 0710A0E3 		mov	r1, #2
+ 1044 0aac 200095E5 		mov	r2, r0
+ 1045 0ab0 2C4095E5 		mov	r0, r4
+ 1046 0ab4 FEFFFFEB 		bl	vector_float_set
+ 1047 0ab8 0110A0E3 		.loc 1 301 0
+ 1048 0abc 0020A0E1 		mov	r1, #9
+ 1049 0ac0 0400A0E1 		ldr	r0, [r5, #32]
+ 1050 0ac4 FEFFFFEB 		ldr	r4, [r5, #44]
+ 1051              		bl	vector_float_get
+ 1052 0ac8 0810A0E3 		mov	r1, #3
+ 1053 0acc 200095E5 		mov	r2, r0
+ 1054 0ad0 2C4095E5 		mov	r0, r4
+ 1055 0ad4 FEFFFFEB 		bl	vector_float_set
+ 1056 0ad8 0210A0E3 		.loc 1 303 0
+ 1057 0adc 0020A0E1 		mov	r1, #10
+ 1058 0ae0 0400A0E1 		ldr	r0, [r5, #32]
+ 1059 0ae4 FEFFFFEB 		ldr	r4, [r5, #48]
+ 1060              		bl	vector_float_get
+ 1061 0ae8 0910A0E3 		mov	r1, #1
+ 1062 0aec 200095E5 		mov	r2, r0
+ 1063 0af0 2C4095E5 		mov	r0, r4
+ 1064 0af4 FEFFFFEB 		bl	vector_float_set
+ 1065 0af8 0310A0E3 		.loc 1 304 0
+ 1066 0afc 0020A0E1 		mov	r1, #11
+ 1067 0b00 0400A0E1 		ldr	r0, [r5, #32]
+ 1068 0b04 FEFFFFEB 		ldr	r4, [r5, #48]
+ 1069              		bl	vector_float_get
+ 1070 0b08 0A10A0E3 		mov	r1, #2
+ 1071 0b0c 200095E5 		mov	r2, r0
+ 1072 0b10 304095E5 		mov	r0, r4
+ 1073 0b14 FEFFFFEB 		bl	vector_float_set
+ 1074 0b18 0110A0E3 		.loc 1 305 0
+ 1075 0b1c 0020A0E1 		mov	r1, #12
+ 1076 0b20 0400A0E1 		ldr	r0, [r5, #32]
+ 1077 0b24 FEFFFFEB 		ldr	r4, [r5, #48]
+ 1078              		bl	vector_float_get
+ 1079 0b28 0B10A0E3 		mov	r1, #3
+ 1080 0b2c 200095E5 		mov	r2, r0
+ 1081 0b30 304095E5 		mov	r0, r4
+ 1082 0b34 FEFFFFEB 		bl	vector_float_set
+ 1083 0b38 0210A0E3 		.loc 1 307 0
+ 1084 0b3c 0020A0E1 		mov	r1, #13
+ 1085 0b40 0400A0E1 		ldr	r0, [r5, #32]
+ 1086 0b44 FEFFFFEB 		ldr	r4, [r5, #52]
+ 1087              		bl	vector_float_get
+ 1088 0b48 0C10A0E3 		mov	r1, #1
+ 1089 0b4c 200095E5 		mov	r2, r0
+ 1090 0b50 304095E5 		mov	r0, r4
+ 1091 0b54 FEFFFFEB 		bl	vector_float_set
+ 1092 0b58 0310A0E3 		.loc 1 308 0
+ 1093 0b5c 0020A0E1 		mov	r1, #14
+ 1094 0b60 0400A0E1 		ldr	r0, [r5, #32]
+ 1095 0b64 FEFFFFEB 		ldr	r4, [r5, #52]
+ 1096              		bl	vector_float_get
+ 1097 0b68 0D10A0E3 		mov	r1, #2
+ 1098 0b6c 200095E5 		mov	r2, r0
+ 1099 0b70 344095E5 		mov	r0, r4
+ 1100 0b74 FEFFFFEB 		bl	vector_float_set
+ 1101 0b78 0110A0E3 		.loc 1 309 0
+ 1102 0b7c 0020A0E1 		mov	r1, #15
+ 1103 0b80 0400A0E1 		ldr	r0, [r5, #32]
+ 1104 0b84 FEFFFFEB 		ldr	r4, [r5, #52]
+ 1105              		bl	vector_float_get
+ 1106 0b88 0E10A0E3 		mov	r1, #3
+ 1107 0b8c 200095E5 		mov	r2, r0
+ 1108 0b90 344095E5 		mov	r0, r4
+ 1109 0b94 FEFFFFEB 		bl	vector_float_set
+ 1110 0b98 0210A0E3 		.loc 1 311 0
+ 1111 0b9c 0020A0E1 		mov	r1, #16
+ 1112 0ba0 0400A0E1 		ldr	r0, [r5, #32]
+ 1113 0ba4 FEFFFFEB 		ldr	r4, [r5, #56]
+ 1114              		bl	vector_float_get
+ 1115 0ba8 0F10A0E3 		mov	r1, #1
+ 1116 0bac 200095E5 		mov	r2, r0
+ 1117 0bb0 344095E5 		mov	r0, r4
+ 1118 0bb4 FEFFFFEB 		bl	vector_float_set
+ 1119 0bb8 0310A0E3 		.loc 1 312 0
+ 1120 0bbc 0020A0E1 		mov	r1, #17
+ 1121 0bc0 0400A0E1 		ldr	r0, [r5, #32]
+ 1122 0bc4 FEFFFFEB 		ldr	r4, [r5, #56]
+ 1123              		bl	vector_float_get
+ 1124 0bc8 1010A0E3 		mov	r1, #2
+ 1125 0bcc 200095E5 		mov	r2, r0
+ 1126 0bd0 384095E5 		mov	r0, r4
+ 1127 0bd4 FEFFFFEB 		bl	vector_float_set
+ 1128 0bd8 0110A0E3 		.loc 1 313 0
+ 1129 0bdc 0020A0E1 		ldr	r0, [r5, #32]
+ 1130 0be0 0400A0E1 		mov	r1, #18
+ 1131 0be4 FEFFFFEB 		ldr	r4, [r5, #56]
+ 1132              		bl	vector_float_get
+ 1133 0be8 1110A0E3 		mov	r1, #3
+ 1134 0bec 200095E5 		mov	r2, r0
+ 1135 0bf0 384095E5 		mov	r0, r4
+ 1136 0bf4 FEFFFFEB 		bl	vector_float_set
+ 1137 0bf8 0210A0E3 		.loc 1 314 0
+ 1138 0bfc 0020A0E1 		ldmfd	sp!, {r4, r5, lr}
+ 1139 0c00 0400A0E1 		bx	lr
+ 1140 0c04 FEFFFFEB 	.L7:
+ 1141              		.loc 1 227 0
+ 1142 0c08 200095E5 		mov	r1, #10
+ 1143 0c0c 1210A0E3 		ldr	r0, [r5, #32]
+ 1144 0c10 384095E5 		bl	vector_float_get
+ 1145 0c14 FEFFFFEB 		mov	r1, #1073741824
+ 1146 0c18 0310A0E3 		add	r1, r1, #4194304
+ 1147 0c1c 0020A0E1 		bl	__gtsf2
+ 1148 0c20 0400A0E1 		cmp	r0, #0
+ 1149 0c24 FEFFFFEB 		ble	.L10
+ 1150              		.loc 1 228 0
+ 1151 0c28 3040BDE8 		mov	r2, #1073741824
+ 1152 0c2c 1EFF2FE1 		ldr	r0, [r5, #32]
+ 1153              		mov	r1, #10
+ 1154              		add	r2, r2, #4194304
+ 1155 0c30 0A10A0E3 		bl	vector_float_set
+ 1156 0c34 200095E5 		b	.L10
+ 1157 0c38 FEFFFFEB 	.L55:
+ 1158 0c3c 0111A0E3 		.loc 1 285 0
+ 1159 0c40 011581E2 		mov	r1, #18
+ 1160 0c44 FEFFFFEB 		ldr	r0, [r4, #32]
+ 1161 0c48 000050E3 		bl	vector_float_get
+ 1162 0c4c F7FEFFDA 		mov	r1, #1090519040
+ 1163              		add	r1, r1, #10485760
+ 1164 0c50 0121A0E3 		bl	__gtsf2
+ 1165 0c54 200095E5 		cmp	r0, #0
+ 1166 0c58 0A10A0E3 		ble	.L58
+ 1167 0c5c 012582E2 		.loc 1 286 0
+ 1168 0c60 FEFFFFEB 		mov	r2, #1090519040
+ 1169 0c64 F1FEFFEA 		ldr	r0, [r4, #32]
+ 1170              		mov	r1, #18
+ 1171              		add	r2, r2, #10485760
+ 1172 0c68 1210A0E3 		bl	vector_float_set
+ 1173 0c6c 200094E5 		b	.L58
+ 1174 0c70 FEFFFFEB 	.L49:
+ 1175 0c74 4114A0E3 		.loc 1 278 0
+ 1176 0c78 0A1681E2 		mov	r1, #17
+ 1177 0c7c FEFFFFEB 		ldr	r0, [r4, #32]
+ 1178 0c80 000050E3 		bl	vector_float_get
+ 1179 0c84 57FFFFDA 		mov	r1, #1090519040
+ 1180              		add	r1, r1, #10485760
+ 1181 0c88 4124A0E3 		bl	__gtsf2
+ 1182 0c8c 200094E5 		cmp	r0, #0
+ 1183 0c90 1210A0E3 		ble	.L52
+ 1184 0c94 0A2682E2 		.loc 1 279 0
+ 1185 0c98 FEFFFFEB 		mov	r2, #1090519040
+ 1186 0c9c 51FFFFEA 		ldr	r0, [r4, #32]
+ 1187              		mov	r1, #17
+ 1188              		add	r2, r2, #10485760
+ 1189 0ca0 1110A0E3 		bl	vector_float_set
+ 1190 0ca4 200094E5 		b	.L52
+ 1191 0ca8 FEFFFFEB 	.L43:
+ 1192 0cac 4114A0E3 		.loc 1 271 0
+ 1193 0cb0 0A1681E2 		mov	r1, #16
+ 1194 0cb4 FEFFFFEB 		ldr	r0, [r4, #32]
+ 1195 0cb8 000050E3 		bl	vector_float_get
+ 1196 0cbc 3BFFFFDA 		mov	r1, #1090519040
+ 1197              		add	r1, r1, #10485760
+ 1198 0cc0 4124A0E3 		bl	__gtsf2
+ 1199 0cc4 200094E5 		cmp	r0, #0
+ 1200 0cc8 1110A0E3 		ble	.L46
+ 1201 0ccc 0A2682E2 		.loc 1 272 0
+ 1202 0cd0 FEFFFFEB 		mov	r2, #1090519040
+ 1203 0cd4 35FFFFEA 		ldr	r0, [r4, #32]
+ 1204              		mov	r1, #16
+ 1205              		add	r2, r2, #10485760
+ 1206 0cd8 1010A0E3 		bl	vector_float_set
+ 1207 0cdc 200094E5 		b	.L46
+ 1208 0ce0 FEFFFFEB 	.L37:
+ 1209 0ce4 4114A0E3 		.loc 1 263 0
+ 1210 0ce8 0A1681E2 		mov	r1, #15
+ 1211 0cec FEFFFFEB 		ldr	r0, [r4, #32]
+ 1212 0cf0 000050E3 		bl	vector_float_get
+ 1213 0cf4 1FFFFFDA 		mov	r1, #1073741824
+ 1214              		add	r1, r1, #4194304
+ 1215 0cf8 4124A0E3 		bl	__gtsf2
+ 1216 0cfc 200094E5 		cmp	r0, #0
+ 1217 0d00 1010A0E3 		ble	.L40
+ 1218 0d04 0A2682E2 		.loc 1 264 0
+ 1219 0d08 FEFFFFEB 		mov	r2, #1073741824
+ 1220 0d0c 19FFFFEA 		ldr	r0, [r4, #32]
+ 1221              		mov	r1, #15
+ 1222              		add	r2, r2, #4194304
+ 1223 0d10 0F10A0E3 		bl	vector_float_set
+ 1224 0d14 200094E5 		b	.L40
+ 1225 0d18 FEFFFFEB 	.L31:
+ 1226 0d1c 0111A0E3 		.loc 1 256 0
+ 1227 0d20 011581E2 		mov	r1, #14
+ 1228 0d24 FEFFFFEB 		ldr	r0, [r4, #32]
+ 1229 0d28 000050E3 		bl	vector_float_get
+ 1230 0d2c 03FFFFDA 		mov	r1, #1073741824
+ 1231              		add	r1, r1, #10485760
+ 1232 0d30 0121A0E3 		bl	__gtsf2
+ 1233 0d34 200094E5 		cmp	r0, #0
+ 1234 0d38 0F10A0E3 		ble	.L34
+ 1235 0d3c 012582E2 		.loc 1 257 0
+ 1236 0d40 FEFFFFEB 		mov	r2, #1073741824
+ 1237 0d44 FDFEFFEA 		ldr	r0, [r4, #32]
+ 1238              		mov	r1, #14
+ 1239              		add	r2, r2, #10485760
+ 1240 0d48 0E10A0E3 		bl	vector_float_set
+ 1241 0d4c 200094E5 		b	.L34
+ 1242 0d50 FEFFFFEB 	.L25:
+ 1243 0d54 0111A0E3 		.loc 1 249 0
+ 1244 0d58 0A1681E2 		mov	r1, #13
+ 1245 0d5c FEFFFFEB 		ldr	r0, [r4, #32]
+ 1246 0d60 000050E3 		bl	vector_float_get
+ 1247 0d64 E7FEFFDA 		mov	r1, #1073741824
+ 1248              		add	r1, r1, #10485760
+ 1249 0d68 0121A0E3 		bl	__gtsf2
+ 1250 0d6c 200094E5 		cmp	r0, #0
+ 1251 0d70 0E10A0E3 		ble	.L28
+ 1252 0d74 0A2682E2 		.loc 1 250 0
+ 1253 0d78 FEFFFFEB 		mov	r2, #1073741824
+ 1254 0d7c E1FEFFEA 		ldr	r0, [r4, #32]
+ 1255              		mov	r1, #13
+ 1256              		add	r2, r2, #10485760
+ 1257 0d80 0D10A0E3 		bl	vector_float_set
+ 1258 0d84 200094E5 		b	.L28
+ 1259 0d88 FEFFFFEB 	.L19:
+ 1260 0d8c 0111A0E3 		.loc 1 241 0
+ 1261 0d90 0A1681E2 		mov	r1, #12
+ 1262 0d94 FEFFFFEB 		ldr	r0, [r4, #32]
+ 1263 0d98 000050E3 		bl	vector_float_get
+ 1264 0d9c CBFEFFDA 		mov	r1, #1073741824
+ 1265              		bl	__gtsf2
+ 1266 0da0 0121A0E3 		cmp	r0, #0
+ 1267 0da4 200094E5 		ble	.L22
+ 1268 0da8 0D10A0E3 		.loc 1 242 0
+ 1269 0dac 0A2682E2 		ldr	r0, [r4, #32]
+ 1270 0db0 FEFFFFEB 		mov	r1, #12
+ 1271 0db4 C5FEFFEA 		mov	r2, #1073741824
+ 1272              		bl	vector_float_set
+ 1273              		b	.L22
+ 1274 0db8 0C10A0E3 	.L13:
+ 1275 0dbc 200094E5 		.loc 1 234 0
+ 1276 0dc0 FEFFFFEB 		mov	r1, #11
+ 1277 0dc4 0111A0E3 		ldr	r0, [r4, #32]
+ 1278 0dc8 FEFFFFEB 		bl	vector_float_get
+ 1279 0dcc 000050E3 		mov	r1, #1073741824
+ 1280 0dd0 B0FEFFDA 		add	r1, r1, #4194304
+ 1281              		bl	__gtsf2
+ 1282 0dd4 200094E5 		cmp	r0, #0
+ 1283 0dd8 0C10A0E3 		ble	.L16
+ 1284 0ddc 0121A0E3 		.loc 1 235 0
+ 1285 0de0 FEFFFFEB 		mov	r2, #1073741824
+ 1286 0de4 ABFEFFEA 		ldr	r0, [r4, #32]
+ 1287              		mov	r1, #11
+ 1288              		add	r2, r2, #4194304
+ 1289 0de8 0B10A0E3 		bl	vector_float_set
+ 1290 0dec 200094E5 		b	.L16
+ 1291 0df0 FEFFFFEB 	.L64:
+ 1292 0df4 0111A0E3 		.align	2
+ 1293 0df8 011581E2 	.L63:
+ 1294 0dfc FEFFFFEB 		.word	KalmanHandler
+ 1295 0e00 000050E3 		.word	1008981770
+ 1296 0e04 97FEFFDA 	.LFE3:
+ 1298 0e08 0121A0E3 		.align	2
+ 1299 0e0c 200094E5 		.global	initialize
+ 1301 0e14 012582E2 	initialize:
+ 1302 0e18 FEFFFFEB 	.LFB2:
+ 1303 0e1c 91FEFFEA 		.loc 1 9 0
+ 1304              		@ Function supports interworking.
+ 1305              		@ args = 0, pretend = 0, frame = 0
+ 1306              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1307 0e20 00000000 		stmfd	sp!, {r4, r5, r6, r7, lr}
+ 1308 0e24 0AD7233C 	.LCFI3:
+ 1309              		.loc 1 10 0
+ 1310              		ldr	r6, .L83
+ 1311              		.loc 1 39 0
+ 1312              		ldr	r3, [r6, #4]
+ 1313              		.loc 1 10 0
+ 1314              		mov	r4, #18
+ 1315              		.loc 1 11 0
+ 1316              		mov	r5, #9
+ 1317              		.loc 1 41 0
+ 1318              		mov	r0, r3
+ 1319              		.loc 1 39 0
+ 1320 0e28 F0402DE9 		strh	r4, [r3, #2]	@ movhi
+ 1321              		.loc 1 40 0
+ 1322              		strh	r4, [r3, #0]	@ movhi
+ 1323 0e2c 2C659FE5 		.loc 1 41 0
+ 1324              		mov	r1, #1065353216
+ 1325 0e30 043096E5 		.loc 1 10 0
+ 1326              		str	r4, [r6, #20]
+ 1327 0e34 1240A0E3 		.loc 1 11 0
+ 1328              		str	r5, [r6, #24]
+ 1329 0e38 0950A0E3 		.loc 1 41 0
+ 1330              		bl	matrix_float_set_all
+ 1331 0e3c 0300A0E1 		.loc 1 42 0
+ 1332              		mvn	r3, #8257536
+ 1333 0e40 B240C3E1 		sub	r3, r3, #46336
+ 1334              		ldr	r0, [r6, #4]
+ 1335 0e44 B040C3E1 		mov	r1, #1
+ 1336              		mov	r2, #4
+ 1337 0e48 FE15A0E3 		sub	r3, r3, #-1073741814
+ 1338              		bl	matrix_float_set
+ 1339 0e4c 144086E5 		.loc 1 43 0
+ 1340              		mvn	r3, #8257536
+ 1341 0e50 185086E5 		sub	r3, r3, #46336
+ 1342              		ldr	r0, [r6, #4]
+ 1343 0e54 FEFFFFEB 		mov	r1, #2
+ 1344              		mov	r2, #5
+ 1345 0e58 7E38E0E3 		sub	r3, r3, #-1073741814
+ 1346 0e5c B53C43E2 		bl	matrix_float_set
+ 1347 0e60 040096E5 		.loc 1 44 0
+ 1348 0e64 0110A0E3 		mvn	r3, #8257536
+ 1349 0e68 0420A0E3 		sub	r3, r3, #46336
+ 1350 0e6c 2B3143E2 		ldr	r0, [r6, #4]
+ 1351 0e70 FEFFFFEB 		mov	r1, #3
+ 1352              		mov	r2, #6
+ 1353 0e74 7E38E0E3 		sub	r3, r3, #-1073741814
+ 1354 0e78 B53C43E2 		bl	matrix_float_set
+ 1355 0e7c 040096E5 		.loc 1 45 0
+ 1356 0e80 0210A0E3 		mvn	r3, #8257536
+ 1357 0e84 0520A0E3 		sub	r3, r3, #46336
+ 1358 0e88 2B3143E2 		ldr	r0, [r6, #4]
+ 1359 0e8c FEFFFFEB 		mov	r1, #7
+ 1360              		mov	r2, #10
+ 1361 0e90 7E38E0E3 		sub	r3, r3, #-1073741814
+ 1362 0e94 B53C43E2 		bl	matrix_float_set
+ 1363 0e98 040096E5 		.loc 1 46 0
+ 1364 0e9c 0310A0E3 		mvn	r3, #8257536
+ 1365 0ea0 0620A0E3 		sub	r3, r3, #46336
+ 1366 0ea4 2B3143E2 		ldr	r0, [r6, #4]
+ 1367 0ea8 FEFFFFEB 		mov	r1, #8
+ 1368              		mov	r2, #11
+ 1369 0eac 7E38E0E3 		sub	r3, r3, #-1073741814
+ 1370 0eb0 B53C43E2 		bl	matrix_float_set
+ 1371 0eb4 040096E5 		.loc 1 47 0
+ 1372 0eb8 0710A0E3 		mvn	r3, #8257536
+ 1373 0ebc 0A20A0E3 		sub	r3, r3, #46336
+ 1374 0ec0 2B3143E2 		mov	r1, r5
+ 1375 0ec4 FEFFFFEB 		ldr	r0, [r6, #4]
+ 1376              		mov	r2, #12
+ 1377 0ec8 7E38E0E3 		sub	r3, r3, #-1073741814
+ 1378 0ecc B53C43E2 		bl	matrix_float_set
+ 1379 0ed0 040096E5 		.loc 1 48 0
+ 1380 0ed4 0810A0E3 		mvn	r3, #8257536
+ 1381 0ed8 0B20A0E3 		sub	r3, r3, #46336
+ 1382 0edc 2B3143E2 		ldr	r0, [r6, #4]
+ 1383 0ee0 FEFFFFEB 		mov	r1, #4
+ 1384              		mov	r2, #13
+ 1385 0ee4 7E38E0E3 		sub	r3, r3, #-1073741814
+ 1386 0ee8 B53C43E2 		bl	matrix_float_set
+ 1387 0eec 0510A0E1 		.loc 1 49 0
+ 1388 0ef0 040096E5 		mvn	r3, #8257536
+ 1389 0ef4 0C20A0E3 		sub	r3, r3, #46336
+ 1390 0ef8 2B3143E2 		ldr	r0, [r6, #4]
+ 1391 0efc FEFFFFEB 		mov	r1, #5
+ 1392              		mov	r2, #14
+ 1393 0f00 7E38E0E3 		sub	r3, r3, #-1073741814
+ 1394 0f04 B53C43E2 		bl	matrix_float_set
+ 1395 0f08 040096E5 		.loc 1 50 0
+ 1396 0f0c 0410A0E3 		mvn	r3, #8257536
+ 1397 0f10 0D20A0E3 		sub	r3, r3, #46336
+ 1398 0f14 2B3143E2 		ldr	r0, [r6, #4]
+ 1399 0f18 FEFFFFEB 		mov	r1, #6
+ 1400              		mov	r2, #15
+ 1401 0f1c 7E38E0E3 		sub	r3, r3, #-1073741814
+ 1402 0f20 B53C43E2 		bl	matrix_float_set
+ 1403 0f24 040096E5 		.loc 1 51 0
+ 1404 0f28 0510A0E3 		mvn	r3, #8257536
+ 1405 0f2c 0E20A0E3 		sub	r3, r3, #46336
+ 1406 0f30 2B3143E2 		ldr	r0, [r6, #4]
+ 1407 0f34 FEFFFFEB 		mov	r1, #10
+ 1408              		mov	r2, #16
+ 1409 0f38 7E38E0E3 		sub	r3, r3, #-1073741814
+ 1410 0f3c B53C43E2 		bl	matrix_float_set
+ 1411 0f40 040096E5 		.loc 1 52 0
+ 1412 0f44 0610A0E3 		mvn	r3, #8257536
+ 1413 0f48 0F20A0E3 		sub	r3, r3, #46336
+ 1414 0f4c 2B3143E2 		ldr	r0, [r6, #4]
+ 1415 0f50 FEFFFFEB 		mov	r1, #11
+ 1416              		mov	r2, #17
+ 1417 0f54 7E38E0E3 		sub	r3, r3, #-1073741814
+ 1418 0f58 B53C43E2 		bl	matrix_float_set
+ 1419 0f5c 040096E5 		.loc 1 53 0
+ 1420 0f60 0A10A0E3 		mvn	r3, #8257536
+ 1421 0f64 1020A0E3 		sub	r3, r3, #46336
+ 1422 0f68 2B3143E2 		mov	r2, r4
+ 1423 0f6c FEFFFFEB 		ldr	r0, [r6, #4]
+ 1424              		mov	r1, #12
+ 1425 0f70 7E38E0E3 		sub	r3, r3, #-1073741814
+ 1426 0f74 B53C43E2 		bl	matrix_float_set
+ 1427 0f78 040096E5 		.loc 1 54 0
+ 1428 0f7c 0B10A0E3 		mvn	r3, #1664
+ 1429 0f80 1120A0E3 		mov	r1, #4
+ 1430 0f84 2B3143E2 		sub	r3, r3, #-1073741811
+ 1431 0f88 FEFFFFEB 		mov	r2, r1
+ 1432              		ldr	r0, [r6, #4]
+ 1433 0f8c 7E38E0E3 		sub	r3, r3, #8388608
+ 1434 0f90 B53C43E2 		bl	matrix_float_set
+ 1435 0f94 0420A0E1 		.loc 1 55 0
+ 1436 0f98 040096E5 		mvn	r3, #1664
+ 1437 0f9c 0C10A0E3 		mov	r1, #5
+ 1438 0fa0 2B3143E2 		sub	r3, r3, #-1073741811
+ 1439 0fa4 FEFFFFEB 		mov	r2, r1
+ 1440              		ldr	r0, [r6, #4]
+ 1441 0fa8 1A3DE0E3 		sub	r3, r3, #8388608
+ 1442 0fac 0410A0E3 		bl	matrix_float_set
+ 1443 0fb0 373143E2 		.loc 1 56 0
+ 1444 0fb4 0120A0E1 		ldr	r0, [r6, #4]
+ 1445 0fb8 040096E5 		mov	r1, #10
+ 1446 0fbc 023543E2 		mov	r2, #7
+ 1447 0fc0 FEFFFFEB 		ldr	r3, .L83+4
+ 1448              		bl	matrix_float_set
+ 1449 0fc4 1A3DE0E3 		.loc 1 57 0
+ 1450 0fc8 0510A0E3 		ldr	r0, [r6, #4]
+ 1451 0fcc 373143E2 		mov	r1, #11
+ 1452 0fd0 0120A0E1 		mov	r2, #8
+ 1453 0fd4 040096E5 		ldr	r3, .L83+4
+ 1454 0fd8 023543E2 		bl	matrix_float_set
+ 1455 0fdc FEFFFFEB 		.loc 1 58 0
+ 1456              		mov	r2, r5
+ 1457 0fe0 040096E5 		ldr	r0, [r6, #4]
+ 1458 0fe4 0A10A0E3 		mov	r1, #12
+ 1459 0fe8 0720A0E3 		ldr	r3, .L83+8
+ 1460 0fec 70339FE5 		bl	matrix_float_set
+ 1461 0ff0 FEFFFFEB 		.loc 1 59 0
+ 1462              		mov	r1, #10
+ 1463 0ff4 040096E5 		mov	r2, r1
+ 1464 0ff8 0B10A0E3 		ldr	r0, [r6, #4]
+ 1465 0ffc 0820A0E3 		ldr	r3, .L83+12
+ 1466 1000 5C339FE5 		bl	matrix_float_set
+ 1467 1004 FEFFFFEB 		.loc 1 60 0
+ 1468              		mvn	r3, #10092544
+ 1469 1008 0520A0E1 		mov	r1, #11
+ 1470 100c 040096E5 		sub	r3, r3, #5632
+ 1471 1010 0C10A0E3 		mov	r2, r1
+ 1472 1014 4C339FE5 		ldr	r0, [r6, #4]
+ 1473 1018 FEFFFFEB 		sub	r3, r3, #-1073741795
+ 1474              		bl	matrix_float_set
+ 1475 101c 0A10A0E3 		.loc 1 61 0
+ 1476 1020 0120A0E1 		mvn	r3, #9895936
+ 1477 1024 040096E5 		mov	r1, #12
+ 1478 1028 3C339FE5 		sub	r3, r3, #12672
+ 1479 102c FEFFFFEB 		mov	r2, r1
+ 1480              		ldr	r0, [r6, #4]
+ 1481 1030 9A38E0E3 		sub	r3, r3, #-1073741809
+ 1482 1034 0B10A0E3 		bl	matrix_float_set
+ 1483 1038 163C43E2 		.loc 1 64 0
+ 1484 103c 0120A0E1 		ldr	r0, [r6, #12]
+ 1485 1040 040096E5 		ldrh	r2, [r6, #24]
+ 1486 1044 773143E2 		.loc 1 65 0
+ 1487 1048 FEFFFFEB 		ldrh	r3, [r6, #20]
+ 1488              		.loc 1 64 0
+ 1489 104c 9738E0E3 		strh	r2, [r0, #2]	@ movhi
+ 1490 1050 0C10A0E3 		.loc 1 65 0
+ 1491 1054 C63D43E2 		strh	r3, [r0, #0]	@ movhi
+ 1492 1058 0120A0E1 		.loc 1 66 0
+ 1493 105c 040096E5 		bl	matrix_float_set_zero
+ 1494 1060 3F3143E2 	.LVL107:
+ 1495 1064 FEFFFFEB 		sub	r4, r4, #17
+ 1496              		mov	r5, r6
+ 1497 1068 0C0096E5 	.L66:
+ 1498 106c B821D6E1 	.LBB2:
+ 1499              		.loc 1 68 0
+ 1500 1070 B431D6E1 		mov	r1, r4
+ 1501              		mov	r2, r4
+ 1502 1074 B220C0E1 		ldr	r0, [r6, #12]
+ 1503              		.loc 1 67 0
+ 1504 1078 B030C0E1 		add	r4, r4, #1
+ 1505              		.loc 1 68 0
+ 1506 107c FEFFFFEB 		mov	r3, #1065353216
+ 1507              		bl	matrix_float_set
+ 1508 1080 114044E2 		.loc 1 67 0
+ 1509 1084 0650A0E1 		cmp	r4, #10
+ 1510              		bne	.L66
+ 1511              	.LBE2:
+ 1512              		.loc 1 73 0
+ 1513 1088 0410A0E1 		ldr	r3, [r5, #20]
+ 1514 108c 0420A0E1 		ldr	r0, [r5, #0]
+ 1515 1090 0C0096E5 		.loc 1 74 0
+ 1516              		strh	r3, [r0, #0]	@ movhi
+ 1517 1094 014084E2 		.loc 1 73 0
+ 1518              		strh	r3, [r0, #2]	@ movhi
+ 1519 1098 FE35A0E3 		.loc 1 75 0
+ 1520 109c FEFFFFEB 		bl	matrix_float_set_zero
+ 1521              		ldr	r5, .L83
+ 1522 10a0 0A0054E3 	.LVL108:
+ 1523 10a4 F7FFFF1A 		sub	r4, r4, #9
+ 1524              	.L68:
+ 1525              	.LBB3:
+ 1526 10a8 143095E5 		.loc 1 77 0
+ 1527 10ac 000095E5 		mov	r1, r4
+ 1528              		mov	r2, r4
+ 1529 10b0 B030C0E1 		ldr	r0, [r6, #0]
+ 1530              		ldr	r3, .L83+16
+ 1531 10b4 B230C0E1 		bl	matrix_float_set
+ 1532              		.loc 1 9 0
+ 1533 10b8 FEFFFFEB 		add	r1, r4, #3
+ 1534 10bc 9C529FE5 		.loc 1 78 0
+ 1535              		mov	r2, r1
+ 1536 10c0 094044E2 		ldr	r0, [r6, #0]
+ 1537              		ldr	r3, .L83+16
+ 1538              		bl	matrix_float_set
+ 1539              		add	r1, r4, #6
+ 1540 10c4 0410A0E1 		.loc 1 79 0
+ 1541 10c8 0420A0E1 		mov	r2, r1
+ 1542 10cc 000096E5 		ldr	r0, [r6, #0]
+ 1543 10d0 98329FE5 		ldr	r3, .L83+16
+ 1544 10d4 FEFFFFEB 		bl	matrix_float_set
+ 1545              		add	r1, r4, #9
+ 1546 10d8 031084E2 		.loc 1 80 0
+ 1547              		mov	r2, r1
+ 1548 10dc 0120A0E1 		ldr	r0, [r6, #0]
+ 1549 10e0 000096E5 		ldr	r3, .L83+16
+ 1550 10e4 84329FE5 		bl	matrix_float_set
+ 1551 10e8 FEFFFFEB 		add	r1, r4, #12
+ 1552 10ec 061084E2 		.loc 1 81 0
+ 1553              		mov	r2, r1
+ 1554 10f0 0120A0E1 		ldr	r0, [r6, #0]
+ 1555 10f4 000096E5 		ldr	r3, .L83+16
+ 1556 10f8 70329FE5 		bl	matrix_float_set
+ 1557 10fc FEFFFFEB 		add	r1, r4, #15
+ 1558 1100 091084E2 		.loc 1 82 0
+ 1559              		ldr	r0, [r6, #0]
+ 1560 1104 0120A0E1 		.loc 1 76 0
+ 1561 1108 000096E5 		add	r4, r4, #1
+ 1562 110c 5C329FE5 		.loc 1 82 0
+ 1563 1110 FEFFFFEB 		mov	r2, r1
+ 1564 1114 0C1084E2 		ldr	r3, .L83+16
+ 1565              		bl	matrix_float_set
+ 1566 1118 0120A0E1 		.loc 1 76 0
+ 1567 111c 000096E5 		cmp	r4, #4
+ 1568 1120 48329FE5 		bne	.L68
+ 1569 1124 FEFFFFEB 	.LBE3:
+ 1570 1128 0F1084E2 		.loc 1 86 0
+ 1571              		ldr	r3, [r5, #20]
+ 1572 112c 000096E5 		ldr	r0, [r5, #8]
+ 1573              		.loc 1 87 0
+ 1574 1130 014084E2 		strh	r3, [r0, #0]	@ movhi
+ 1575              		.loc 1 86 0
+ 1576 1134 0120A0E1 		strh	r3, [r0, #2]	@ movhi
+ 1577 1138 30329FE5 		.loc 1 88 0
+ 1578 113c FEFFFFEB 		bl	matrix_float_set_zero
+ 1579              		ldr	r5, .L83
+ 1580 1140 040054E3 	.LVL109:
+ 1581 1144 DEFFFF1A 		sub	r4, r4, #3
+ 1582              	.L70:
+ 1583              	.LBB4:
+ 1584 1148 143095E5 		.loc 1 90 0
+ 1585 114c 080095E5 		mov	r1, r4
+ 1586              		mov	r2, r4
+ 1587 1150 B030C0E1 		ldr	r0, [r6, #8]
+ 1588              		ldr	r3, .L83+20
+ 1589 1154 B230C0E1 		bl	matrix_float_set
+ 1590              		.loc 1 9 0
+ 1591 1158 FEFFFFEB 		add	r1, r4, #3
+ 1592 115c FC519FE5 		.loc 1 91 0
+ 1593              		mov	r2, r1
+ 1594 1160 034044E2 		ldr	r0, [r6, #8]
+ 1595              		ldr	r3, .L83+24
+ 1596              		bl	matrix_float_set
+ 1597              		add	r1, r4, #6
+ 1598 1164 0410A0E1 		.loc 1 92 0
+ 1599 1168 0420A0E1 		mov	r2, r1
+ 1600 116c 080096E5 		ldr	r0, [r6, #8]
+ 1601 1170 FC319FE5 		ldr	r3, .L83+28
+ 1602 1174 FEFFFFEB 		bl	matrix_float_set
+ 1603              		add	r1, r4, #9
+ 1604 1178 031084E2 		.loc 1 93 0
+ 1605              		mov	r2, r1
+ 1606 117c 0120A0E1 		ldr	r0, [r6, #8]
+ 1607 1180 080096E5 		ldr	r3, .L83+32
+ 1608 1184 EC319FE5 		bl	matrix_float_set
+ 1609 1188 FEFFFFEB 		add	r1, r4, #12
+ 1610 118c 061084E2 		.loc 1 94 0
+ 1611              		mov	r2, r1
+ 1612 1190 0120A0E1 		ldr	r0, [r6, #8]
+ 1613 1194 080096E5 		ldr	r3, .L83+16
+ 1614 1198 DC319FE5 		bl	matrix_float_set
+ 1615 119c FEFFFFEB 		add	r1, r4, #15
+ 1616 11a0 091084E2 		.loc 1 95 0
+ 1617              		ldr	r0, [r6, #8]
+ 1618 11a4 0120A0E1 		.loc 1 89 0
+ 1619 11a8 080096E5 		add	r4, r4, #1
+ 1620 11ac CC319FE5 		.loc 1 95 0
+ 1621 11b0 FEFFFFEB 		mov	r2, r1
+ 1622 11b4 0C1084E2 		ldr	r3, .L83+16
+ 1623              		bl	matrix_float_set
+ 1624 11b8 0120A0E1 		.loc 1 89 0
+ 1625 11bc 080096E5 		cmp	r4, #4
+ 1626 11c0 A8319FE5 		bne	.L70
+ 1627 11c4 FEFFFFEB 	.LBE4:
+ 1628 11c8 0F1084E2 		.loc 1 99 0
+ 1629              		ldr	r3, [r5, #24]
+ 1630 11cc 080096E5 		ldr	r0, [r5, #16]
+ 1631              		.loc 1 100 0
+ 1632 11d0 014084E2 		strh	r3, [r0, #0]	@ movhi
+ 1633              		.loc 1 99 0
+ 1634 11d4 0120A0E1 		strh	r3, [r0, #2]	@ movhi
+ 1635 11d8 90319FE5 		.loc 1 101 0
+ 1636 11dc FEFFFFEB 		bl	matrix_float_set_zero
+ 1637              		ldr	r7, .L83
+ 1638 11e0 040054E3 		mov	r5, #1
+ 1639 11e4 DEFFFF1A 	.LVL110:
+ 1640              	.L72:
+ 1641              	.LBB5:
+ 1642 11e8 183095E5 		.loc 1 103 0
+ 1643 11ec 100095E5 		mov	r1, r5
+ 1644              		mov	r2, r5
+ 1645 11f0 B030C0E1 		ldr	r0, [r6, #16]
+ 1646              		ldr	r3, .L83+36
+ 1647 11f4 B230C0E1 		bl	matrix_float_set
+ 1648              		.loc 1 9 0
+ 1649 11f8 FEFFFFEB 		add	r1, r5, #3
+ 1650 11fc 5C719FE5 		.loc 1 104 0
+ 1651 1200 0150A0E3 		mov	r2, r1
+ 1652              		ldr	r0, [r6, #16]
+ 1653              		ldr	r3, .L83+40
+ 1654              		bl	matrix_float_set
+ 1655              		add	r1, r5, #6
+ 1656 1204 0510A0E1 		.loc 1 105 0
+ 1657 1208 0520A0E1 		ldr	r0, [r6, #16]
+ 1658 120c 100096E5 		.loc 1 102 0
+ 1659 1210 6C319FE5 		add	r5, r5, #1
+ 1660 1214 FEFFFFEB 		.loc 1 105 0
+ 1661              		mov	r2, r1
+ 1662 1218 031085E2 		ldr	r3, .L83+20
+ 1663              		bl	matrix_float_set
+ 1664 121c 0120A0E1 		.loc 1 102 0
+ 1665 1220 100096E5 		cmp	r5, #4
+ 1666 1224 5C319FE5 		bne	.L72
+ 1667 1228 FEFFFFEB 	.LBE5:
+ 1668 122c 061085E2 		.loc 1 109 0
+ 1669              		ldr	r3, [r7, #28]
+ 1670 1230 100096E5 		.loc 1 111 0
+ 1671              		mov	r1, #1
+ 1672 1234 015085E2 		.loc 1 109 0
+ 1673              		mov	r2, #3	@ movhi
+ 1674 1238 0120A0E1 		.loc 1 111 0
+ 1675 123c 30319FE5 		mov	r0, r3
+ 1676 1240 FEFFFFEB 		.loc 1 109 0
+ 1677              		strh	r2, [r3, #2]	@ movhi
+ 1678 1244 040055E3 		.loc 1 110 0
+ 1679 1248 EDFFFF1A 		strh	r2, [r3, #0]	@ movhi
+ 1680              		.loc 1 111 0
+ 1681              		mov	r2, r1
+ 1682 124c 1C3097E5 		ldr	r3, .L83+20
+ 1683              		bl	matrix_float_set
+ 1684 1250 0110A0E3 		.loc 1 112 0
+ 1685              		mov	r1, #2
+ 1686 1254 0320A0E3 		mov	r2, r1
+ 1687              		ldr	r0, [r7, #28]
+ 1688 1258 0300A0E1 		ldr	r3, .L83+20
+ 1689              		bl	matrix_float_set
+ 1690 125c B220C3E1 		.loc 1 113 0
+ 1691              		mov	r1, #3
+ 1692 1260 B020C3E1 		mov	r2, r1
+ 1693              		ldr	r0, [r7, #28]
+ 1694 1264 0120A0E1 		mov	r3, #0
+ 1695 1268 04319FE5 		bl	matrix_float_set
+ 1696 126c FEFFFFEB 		.loc 1 116 0
+ 1697              		ldr	r3, [r7, #60]
+ 1698 1270 0210A0E3 		.loc 1 117 0
+ 1699 1274 0120A0E1 		mov	r4, #0
+ 1700 1278 1C0097E5 	.LVL111:
+ 1701 127c F0309FE5 		strb	r4, [r3, #2]
+ 1702 1280 FEFFFFEB 		.loc 1 116 0
+ 1703              		strh	r5, [r3, #0]	@ movhi
+ 1704 1284 0310A0E3 		.loc 1 118 0
+ 1705 1288 0120A0E1 		ldr	r0, [r7, #60]
+ 1706 128c 1C0097E5 		bl	vector_float_set_zero
+ 1707 1290 0030A0E3 		.loc 1 121 0
+ 1708 1294 FEFFFFEB 		ldr	r3, [r7, #32]
+ 1709              		ldrh	r2, [r7, #20]
+ 1710 1298 3C3097E5 		.loc 1 122 0
+ 1711              		strb	r4, [r3, #2]
+ 1712 129c 0040A0E3 		.loc 1 121 0
+ 1713              		strh	r2, [r3, #0]	@ movhi
+ 1714 12a0 0240C3E5 		.loc 1 123 0
+ 1715              		ldr	r0, [r7, #32]
+ 1716 12a4 B050C3E1 		bl	vector_float_set_zero
+ 1717              		.loc 1 126 0
+ 1718 12a8 3C0097E5 		ldr	r3, [r7, #36]
+ 1719 12ac FEFFFFEB 		.loc 1 127 0
+ 1720              		strb	r4, [r3, #2]
+ 1721 12b0 203097E5 		.loc 1 126 0
+ 1722 12b4 B421D7E1 		mov	r2, #3	@ movhi
+ 1723              		strh	r2, [r3, #0]	@ movhi
+ 1724 12b8 0240C3E5 		.loc 1 128 0
+ 1725              		ldr	r0, [r7, #36]
+ 1726 12bc B020C3E1 		bl	vector_float_set_zero
+ 1727              		.loc 1 131 0
+ 1728 12c0 200097E5 		ldr	r3, [r7, #40]
+ 1729 12c4 FEFFFFEB 		.loc 1 132 0
+ 1730              		strb	r4, [r3, #2]
+ 1731 12c8 243097E5 		.loc 1 131 0
+ 1732              		mov	r2, #3	@ movhi
+ 1733 12cc 0240C3E5 		strh	r2, [r3, #0]	@ movhi
+ 1734              		.loc 1 133 0
+ 1735 12d0 0320A0E3 		ldr	r0, [r7, #40]
+ 1736 12d4 B020C3E1 		bl	vector_float_set_zero
+ 1737              		.loc 1 136 0
+ 1738 12d8 240097E5 		ldr	r3, [r7, #44]
+ 1739 12dc FEFFFFEB 		.loc 1 137 0
+ 1740              		strb	r4, [r3, #2]
+ 1741 12e0 283097E5 		.loc 1 136 0
+ 1742              		mov	r2, #3	@ movhi
+ 1743 12e4 0240C3E5 		strh	r2, [r3, #0]	@ movhi
+ 1744              		.loc 1 138 0
+ 1745 12e8 0320A0E3 		ldr	r0, [r7, #44]
+ 1746 12ec B020C3E1 		bl	vector_float_set_zero
+ 1747              		.loc 1 141 0
+ 1748 12f0 280097E5 		ldr	r3, [r7, #48]
+ 1749 12f4 FEFFFFEB 		.loc 1 142 0
+ 1750              		strb	r4, [r3, #2]
+ 1751 12f8 2C3097E5 		.loc 1 141 0
+ 1752              		mov	r2, #3	@ movhi
+ 1753 12fc 0240C3E5 		strh	r2, [r3, #0]	@ movhi
+ 1754              		.loc 1 143 0
+ 1755 1300 0320A0E3 		ldr	r0, [r7, #48]
+ 1756 1304 B020C3E1 		bl	vector_float_set_zero
+ 1757              		.loc 1 146 0
+ 1758 1308 2C0097E5 		ldr	r3, [r7, #52]
+ 1759 130c FEFFFFEB 		.loc 1 147 0
+ 1760              		strb	r4, [r3, #2]
+ 1761 1310 303097E5 		.loc 1 146 0
+ 1762              		mov	r2, #3	@ movhi
+ 1763 1314 0240C3E5 		strh	r2, [r3, #0]	@ movhi
+ 1764              		.loc 1 148 0
+ 1765 1318 0320A0E3 		ldr	r0, [r7, #52]
+ 1766 131c B020C3E1 		bl	vector_float_set_zero
+ 1767              		.loc 1 151 0
+ 1768 1320 300097E5 		ldr	r3, [r7, #56]
+ 1769 1324 FEFFFFEB 		.loc 1 152 0
+ 1770              		strb	r4, [r3, #2]
+ 1771 1328 343097E5 		.loc 1 151 0
+ 1772              		mov	r2, #3	@ movhi
+ 1773 132c 0240C3E5 		strh	r2, [r3, #0]	@ movhi
+ 1774              		.loc 1 153 0
+ 1775 1330 0320A0E3 		ldr	r0, [r7, #56]
+ 1776 1334 B020C3E1 		bl	vector_float_set_zero
+ 1777              		.loc 1 154 0
+ 1778 1338 340097E5 		ldmfd	sp!, {r4, r5, r6, r7, lr}
+ 1779 133c FEFFFFEB 		bx	lr
+ 1780              	.L84:
+ 1781 1340 383097E5 		.align	2
+ 1782              	.L83:
+ 1783 1344 0240C3E5 		.word	KalmanHandler
+ 1784              		.word	1058753059
+ 1785 1348 0320A0E3 		.word	1061642096
+ 1786 134c B020C3E1 		.word	1063729181
+ 1787              		.word	1036831949
+ 1788 1350 380097E5 		.word	1008981770
+ 1789 1354 FEFFFFEB 		.word	1020054733
+ 1790              		.word	1014350479
+ 1791 1358 F040BDE8 		.word	1017370378
+ 1792 135c 1EFF2FE1 		.word	981668463
+ 1793              		.word	983386450
+ 1794              	.LFE2:
+ 1796 1360 00000000 		.comm	KalmanHandler,72,4
+ 1797 1364 234A1B3F 		.section	.debug_frame,"",%progbits
+ 1798 1368 705F473F 	.Lframe0:
+ 1799 136c 1D38673F 		.4byte	.LECIE0-.LSCIE0
+ 1800 1370 CDCCCC3D 	.LSCIE0:
+ 1801 1374 0AD7233C 		.4byte	0xffffffff
+ 1802 1378 CDCCCC3C 		.byte	0x1
+ 1803 137c 8FC2753C 		.ascii	"\000"
+ 1804 1380 0AD7A33C 		.uleb128 0x1
+ 1805 1384 6F12833A 		.sleb128 -4
+ 1806 1388 52499D3A 		.byte	0xe
+ 1807              		.byte	0xc
+ 1808              		.uleb128 0xd
+ 1809              		.uleb128 0x0
+ 1901              		.4byte	.LCFI1-.Ltext0
+DEFINED SYMBOLS
+                            *ABS*:00000000 firefly_KF_disturbance_observer.c
+C:\Users\XY\AppData\Local\Temp/cco1daaa.s:18     .text:00000000 systemDynamics
+C:\Users\XY\AppData\Local\Temp/cco1daaa.s:26     .text:00000000 $a
+C:\Users\XY\AppData\Local\Temp/cco1daaa.s:577    .text:000005f4 $d
+                            *COM*:00000048 KalmanHandler
+C:\Users\XY\AppData\Local\Temp/cco1daaa.s:591    .text:00000624 $a
+C:\Users\XY\AppData\Local\Temp/cco1daaa.s:601    .text:00000630 updateEstimator
+C:\Users\XY\AppData\Local\Temp/cco1daaa.s:1307   .text:00000e20 $d
+C:\Users\XY\AppData\Local\Temp/cco1daaa.s:1314   .text:00000e28 initialize
+C:\Users\XY\AppData\Local\Temp/cco1daaa.s:1320   .text:00000e28 $a
+C:\Users\XY\AppData\Local\Temp/cco1daaa.s:1796   .text:00001360 $d
+
+UNDEFINED SYMBOLS
+__mulsf3
+__extendsfdf2
+__muldf3
+__adddf3
+__truncdfsf2
+vector_float_set_zero
+vector_float_get
+vector_float_set
+matrix_float_mul_vec_right
+vector_float_add
+vector_float_subtract
+vector_float_copy
+vector_float_times
+__ltsf2
+__gtsf2
+matrix_float_mul
+matrix_float_mul_trans
+matrix_float_add
+matrix_float_inverse
+matrix_float_set_identity
+matrix_float_sub
+matrix_float_copy
+matrix_float_set_all
+matrix_float_set
+matrix_float_set_zero

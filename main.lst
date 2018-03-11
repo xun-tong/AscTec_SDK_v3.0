@@ -1,0 +1,2135 @@
+   1              		.file	"main.c"
+   9              	.Ltext0:
+  10              		.global	int_cnt
+  11              		.bss
+  12              		.align	2
+  15              	int_cnt:
+  16 0000 00000000 		.space	4
+  17              		.global	cnt
+  18              		.align	2
+  21              	cnt:
+  22 0004 00000000 		.space	4
+  23              		.global	mainloop_cnt
+  24              		.align	2
+  27              	mainloop_cnt:
+  28 0008 00000000 		.space	4
+  29              		.global	mainloop_trigger
+  32              	mainloop_trigger:
+  33 000c 00       		.space	1
+  34              		.global	GPS_timeout
+  35 000d 000000   		.align	2
+  38              	GPS_timeout:
+  39 0010 00000000 		.space	4
+  40              		.global	trigger_cnt
+  41              		.align	2
+  44              	trigger_cnt:
+  45 0014 00000000 		.space	4
+  46              		.global	SYSTEM_initialized
+  49              	SYSTEM_initialized:
+  50 0018 00       		.space	1
+  51              		.global	DataOutputsPerSecond
+  52              		.data
+  55              	DataOutputsPerSecond:
+  56 0000 0A       		.byte	10
+  57              		.global	fireflyLedEnabled
+  58              		.bss
+  61              	fireflyLedEnabled:
+  62 0019 00       		.space	1
+  63              		.global	PTU_cam_option_4_version
+  64              		.data
+  67              	PTU_cam_option_4_version:
+  68 0001 02       		.byte	2
+  69              		.global	mainloop_overflows
+  70              		.bss
+  71              		.align	1
+  74              	mainloop_overflows:
+  75 001a 0000     		.space	2
+  76              		.text
+  77              		.align	2
+  78              		.global	timer0ISR
+  80              	timer0ISR:
+  81              	.LFB2:
+  82              		.file 1 "main.c"
+   1:main.c        **** /*
+   2:main.c        **** 
+   3:main.c        **** AscTec SDK 3.0
+   4:main.c        **** 
+   5:main.c        **** Copyright (c) 2011, Ascending Technologies GmbH
+   6:main.c        **** All rights reserved.
+   7:main.c        **** 
+   8:main.c        **** Redistribution and use in source and binary forms, with or without
+   9:main.c        **** modification, are permitted provided that the following conditions are met:
+  10:main.c        **** 
+  11:main.c        ****  * Redistributions of source code must retain the above copyright notice,
+  12:main.c        ****    this list of conditions and the following disclaimer.
+  13:main.c        ****  * Redistributions in binary form must reproduce the above copyright
+  14:main.c        ****    notice, this list of conditions and the following disclaimer in the
+  15:main.c        ****    documentation and/or other materials provided with the distribution.
+  16:main.c        **** 
+  17:main.c        **** THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND ANY
+  18:main.c        **** EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+  19:main.c        **** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  20:main.c        **** DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE FOR ANY
+  21:main.c        **** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+  22:main.c        **** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  23:main.c        **** SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+  24:main.c        **** CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+  25:main.c        **** LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+  26:main.c        **** OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+  27:main.c        **** DAMAGE.
+  28:main.c        **** 
+  29:main.c        ****  */
+  30:main.c        **** 
+  31:main.c        **** /**********************************************************
+  32:main.c        ****                   Header files
+  33:main.c        ****  **********************************************************/
+  34:main.c        **** #include "LPC214x.h"
+  35:main.c        **** #include "main.h"
+  36:main.c        **** #include "system.h"
+  37:main.c        **** #include "uart.h"
+  38:main.c        **** #include "mymath.h"
+  39:main.c        **** #include "hardware.h"
+  40:main.c        **** #include "irq.h"
+  41:main.c        **** #include "i2c.h"
+  42:main.c        **** #include "i2c1.h"
+  43:main.c        **** #include "gpsmath.h"
+  44:main.c        **** #include "adc.h"
+  45:main.c        **** #include "uart.h"
+  46:main.c        **** #include "ssp.h"
+  47:main.c        **** #include "LL_HL_comm.h"
+  48:main.c        **** #include "sdk.h"
+  49:main.c        **** #include "buzzer.h"
+  50:main.c        **** #include "ublox.h"
+  51:main.c        **** #include "pelican_ptu.h"
+  52:main.c        **** #include "declination.h"
+  53:main.c        **** #include "asctecCommIntfOnboard.h"
+  54:main.c        **** #include "lpc_aci_eeprom.h"
+  55:main.c        **** 
+  56:main.c        **** #ifdef MATLAB
+  57:main.c        **** #include "..\custom_mdl\onboard_matlab_ert_rtw\onboard_matlab.h"
+  58:main.c        **** #endif
+  59:main.c        **** 
+  60:main.c        **** /* *********************************************************
+  61:main.c        ****                Function declarations
+  62:main.c        ****   ********************************************************* */
+  63:main.c        **** 
+  64:main.c        **** void Initialize(void);
+  65:main.c        **** void feed(void);
+  66:main.c        **** void beeper(unsigned char);
+  67:main.c        **** void ACISDK(void);
+  68:main.c        **** 
+  69:main.c        **** /**********************************************************
+  70:main.c        ****                   Global Variables
+  71:main.c        ****  **********************************************************/
+  72:main.c        **** struct HL_STATUS HL_Status;
+  73:main.c        **** struct IMU_CALCDATA IMU_CalcData, IMU_CalcData_tmp;
+  74:main.c        **** struct GPS_TIME GPS_Time;
+  75:main.c        **** 
+  76:main.c        **** volatile unsigned int int_cnt=0, cnt=0, mainloop_cnt=0;
+  77:main.c        **** volatile unsigned char mainloop_trigger=0;
+  78:main.c        **** volatile unsigned int GPS_timeout=0;
+  79:main.c        **** volatile unsigned int trigger_cnt=0;
+  80:main.c        **** volatile char SYSTEM_initialized=0;
+  81:main.c        **** 
+  82:main.c        **** unsigned int uart_cnt;
+  83:main.c        **** unsigned char DataOutputsPerSecond=10;
+  84:main.c        **** unsigned char fireflyLedEnabled=0;
+  85:main.c        **** unsigned char PTU_cam_option_4_version=2;
+  86:main.c        **** unsigned short mainloop_overflows=0;
+  87:main.c        **** 
+  88:main.c        **** extern short laser_distance;
+  89:main.c        **** 
+  90:main.c        **** void timer0ISR(void) __irq
+  91:main.c        **** {
+  83              	0
+  84              		@ frame_needed = 1, uses_anonymous_args = 0
+  85              		mov	ip, sp
+  86              	.LCFI0:
+  87 0000 0DC0A0E1 		stmfd	sp!, {fp, ip, lr, pc}
+  88              	.LCFI1:
+  89 0004 00D82DE9 		sub	fp, ip, #4
+  90              	.LCFI2:
+  91 0008 04B04CE2 		.loc 1 92 0
+  92              		mov	r3, #-536870912
+  92:main.c        ****   T0IR = 0x01;      //Clear the timer 0 interrupt
+  93              	3, #16384
+  94 000c 0E32A0E3 		mov	r2, #1
+  95 0010 013983E2 		str	r2, [r3, #0]
+  96 0014 0120A0E3 		.loc 1 94 0
+  97 0018 002083E5 		ldr	r3, .L7
+  93:main.c        ****   IENABLE;
+  94:main.c        ****   trigger_cnt++;
+  98              	r3, [r3, #0]
+  99 001c B4309FE5 		add	r2, r3, #1
+ 100 0020 003093E5 		ldr	r3, .L7
+ 101 0024 012083E2 		str	r2, [r3, #0]
+ 102 0028 A8309FE5 		.loc 1 95 0
+ 103 002c 002083E5 		ldr	r3, .L7
+  95:main.c        ****   if(trigger_cnt==ControllerCyclesPerSecond)
+ 104              	3, [r3, #0]
+ 105 0030 A0309FE5 		cmp	r3, #1000
+ 106 0034 003093E5 		bne	.L2
+ 107 0038 FA0F53E3 		.loc 1 97 0
+ 108 003c 1200001A 		ldr	r2, .L7
+  96:main.c        ****   {
+  97:main.c        ****   	trigger_cnt=0;
+ 109              	r3, #0
+ 110 0040 90209FE5 		str	r3, [r2, #0]
+ 111 0044 0030A0E3 		.loc 1 98 0
+ 112 0048 003082E5 		ldr	r3, .L7+4
+  98:main.c        ****   	HL_Status.up_time++;
+ 113              	h	r3, [r3, #4]
+ 114 004c 88309FE5 		add	r3, r3, #1
+ 115 0050 B430D3E1 		mov	r3, r3, asl #16
+ 116 0054 013083E2 		mov	r2, r3, lsr #16
+ 117 0058 0338A0E1 		ldr	r3, .L7+4
+ 118 005c 2328A0E1 		strh	r2, [r3, #4]	@ movhi
+ 119 0060 74309FE5 		.loc 1 99 0
+ 120 0064 B420C3E1 		ldr	r3, .L7+8
+  99:main.c        ****   	HL_Status.cpu_load=mainloop_cnt;
+ 121              	 [r3, #0]
+ 122 0068 70309FE5 		mov	r3, r3, asl #16
+ 123 006c 003093E5 		mov	r2, r3, lsr #16
+ 124 0070 0338A0E1 		ldr	r3, .L7+4
+ 125 0074 2328A0E1 		strh	r2, [r3, #18]	@ movhi
+ 126 0078 5C309FE5 		.loc 1 101 0
+ 127 007c B221C3E1 		ldr	r2, .L7+8
+ 100:main.c        **** 
+ 101:main.c        ****   	mainloop_cnt=0;
+ 128              	, #0
+ 129 0080 58209FE5 		str	r3, [r2, #0]
+ 130 0084 0030A0E3 	.L2:
+ 131 0088 003082E5 		.loc 1 104 0
+ 132              		ldr	r3, .L7+12
+ 102:main.c        ****   }
+ 103:main.c        **** 
+ 104:main.c        ****   if(mainloop_trigger<10) mainloop_trigger++;
+ 133              		r3, [r3, #0]
+ 134 008c 50309FE5 		and	r3, r3, #255
+ 135 0090 0030D3E5 		cmp	r3, #9
+ 136 0094 FF3003E2 		bhi	.L4
+ 137 0098 090053E3 		ldr	r3, .L7+12
+ 138 009c 0600008A 		ldrb	r3, [r3, #0]
+ 139 00a0 3C309FE5 		and	r3, r3, #255
+ 140 00a4 0030D3E5 		add	r3, r3, #1
+ 141 00a8 FF3003E2 		and	r3, r3, #255
+ 142 00ac 013083E2 		ldr	r2, .L7+12
+ 143 00b0 FF3003E2 		strb	r3, [r2, #0]
+ 144 00b4 28209FE5 	.L4:
+ 145 00b8 0030C2E5 		.loc 1 107 0
+ 146              		mov	r3, #0
+ 105:main.c        **** 
+ 106:main.c        ****   IDISABLE;
+ 107:main.c        ****   VICVectAddr = 0;		// Acknowledge Interrupt
+ 147              	4048
+ 148 00bc 0030A0E3 		mov	r2, #0
+ 149 00c0 FD3E43E2 		str	r2, [r3, #0]
+ 150 00c4 0020A0E3 		.loc 1 108 0
+ 151 00c8 002083E5 		sub	sp, fp, #12
+ 108:main.c        **** }
+ 152              	d	sp, {fp, sp, lr}
+ 153 00cc 0CD04BE2 		bx	lr
+ 154 00d0 00689DE8 	.L8:
+ 155 00d4 1EFF2FE1 		.align	2
+ 156              	.L7:
+ 157              		.word	trigger_cnt
+ 158              		.word	HL_Status
+ 159 00d8 00000000 		.word	mainloop_cnt
+ 160 00dc 00000000 		.word	mainloop_trigger
+ 161 00e0 00000000 	.LFE2:
+ 163              		.bss
+ 164              		.align	2
+ 165              	vbat1.2046:
+ 166              		.space	4
+ 167              		.global	__udivsi3
+ 168 001c 00000000 		.text
+ 169              		.align	2
+ 170              		.global	main
+ 172              	main:
+ 173              	.LFB3:
+ 174              		.loc 1 113 0
+ 175              		@ Function supports interworking.
+ 109:main.c        **** 
+ 110:main.c        **** /**********************************************************
+ 111:main.c        ****                        MAIN
+ 112:main.c        **** **********************************************************/
+ 113:main.c        **** int	main (void) {
+ 176              	, frame = 12
+ 177              		@ frame_needed = 1, uses_anonymous_args = 0
+ 178              		mov	ip, sp
+ 179              	.LCFI3:
+ 180 00e8 0DC0A0E1 		stmfd	sp!, {fp, ip, lr, pc}
+ 181              	.LCFI4:
+ 182 00ec 00D82DE9 		sub	fp, ip, #4
+ 183              	.LCFI5:
+ 184 00f0 04B04CE2 		sub	sp, sp, #12
+ 185              	.LCFI6:
+ 186 00f4 0CD04DE2 		.loc 1 118 0
+ 187              		bl	init
+ 114:main.c        **** 
+ 115:main.c        ****   static int vbat1; //battery_voltage (lowpass-filtered)
+ 116:main.c        ****   unsigned int TimerT1, TimerT2;
+ 117:main.c        **** 
+ 118:main.c        ****   init();
+ 188              	0
+ 189 00f8 FEFFFFEB 		mov	r0, #0
+ 119:main.c        ****   buzzer(OFF);
+ 190              	l	buzzer
+ 191 00fc 0000A0E3 		.loc 1 120 0
+ 192 0100 FEFFFFEB 		bl	LL_write_init
+ 120:main.c        ****   LL_write_init();
+ 193              	oc 1 123 0
+ 194 0104 FEFFFFEB 		bl	I2C1Init
+ 121:main.c        **** 
+ 122:main.c        ****   //initialize AscTec Firefly LED fin on I2C1 (not necessary on AscTec Hummingbird or Pelican)
+ 123:main.c        ****   I2C1Init();
+ 195              	loc 1 124 0
+ 196 0108 FEFFFFEB 		mov	r0, #255
+ 124:main.c        ****   I2C1_setRGBLed(255,0,0);
+ 197              	ov	r1, #0
+ 198 010c FF00A0E3 		mov	r2, #0
+ 199 0110 0010A0E3 		bl	I2C1_setRGBLed
+ 200 0114 0020A0E3 		.loc 1 127 0
+ 201 0118 FEFFFFEB 		mov	r0, #1
+ 125:main.c        **** 
+ 126:main.c        **** 	/* Initialize I2C controller. by Xun */
+ 127:main.c        **** 	I2CInit(I2CMASTER);
+ 202              	2CInit
+ 203 011c 0100A0E3 		.loc 1 129 0
+ 204 0120 FEFFFFEB 		mov	r0, #4
+ 128:main.c        **** 
+ 129:main.c        ****   ADC0triggerSampling(1<<VOLTAGE_1); //activate ADC sampling
+ 205              		ADC0triggerSampling
+ 206 0124 0400A0E3 		.loc 1 131 0
+ 207 0128 FEFFFFEB 		bl	generateBuildInfo
+ 130:main.c        **** 
+ 131:main.c        ****   generateBuildInfo();
+ 208              	oc 1 133 0
+ 209 012c FEFFFFEB 		ldr	r3, .L27
+ 132:main.c        **** 
+ 133:main.c        ****   HL_Status.up_time=0;
+ 210              	ov	r2, #0
+ 211 0130 18339FE5 		strh	r2, [r3, #4]	@ movhi
+ 212 0134 0020A0E3 		.loc 1 135 0
+ 213 0138 B420C3E1 		mov	r0, #1
+ 134:main.c        **** 
+ 135:main.c        ****   LED(1,ON);
+ 214              		r1, #1
+ 215 013c 0100A0E3 		bl	LED
+ 216 0140 0110A0E3 		.loc 1 137 0
+ 217 0144 FEFFFFEB 		bl	ACISDK
+ 136:main.c        **** 
+ 137:main.c        ****   ACISDK();	//AscTec Communication Interface: publish variables, set callbacks, etc.
+ 218              	c 1 142 0
+ 219 0148 FEFFFFEB 		bl	PTU_init
+ 138:main.c        **** 
+ 139:main.c        ****   //update parameters stored by ACI:
+ 140:main.c        ****   //...
+ 141:main.c        **** 
+ 142:main.c        ****   PTU_init();	//initialize camera PanTiltUnit
+ 220              		.L26
+ 221 014c FEFFFFEB 	.L10:
+ 222 0150 FFFFFFEA 	.L26:
+ 223              		.loc 1 150 0
+ 224              		ldr	r3, .L27+4
+ 143:main.c        **** #ifdef MATLAB
+ 144:main.c        ****   //ee_read((unsigned int*)&matlab_params); //read params from eeprom
+ 145:main.c        ****   onboard_matlab_initialize(); //initialize matlab code
+ 146:main.c        **** #endif
+ 147:main.c        **** 
+ 148:main.c        ****   while(1)
+ 149:main.c        ****   {
+ 150:main.c        ****       if(mainloop_trigger)
+ 225              		r3, [r3, #0]
+ 226 0154 F8329FE5 		and	r3, r3, #255
+ 227 0158 0030D3E5 		cmp	r3, #0
+ 228 015c FF3003E2 		beq	.L10
+ 229 0160 000053E3 		.loc 1 152 0
+ 230 0164 FAFFFF0A 		mov	r3, #16384
+ 151:main.c        ****       {
+ 152:main.c        ****       	TimerT1 =  T0TC;
+ 231              	3, r3, #-536870904
+ 232 0168 0139A0E3 		ldr	r3, [r3, #0]
+ 233 016c 8E3283E2 		str	r3, [fp, #-20]
+ 234 0170 003093E5 		.loc 1 153 0
+ 235 0174 14300BE5 		ldr	r3, .L27+8
+ 153:main.c        ****      	if(GPS_timeout<ControllerCyclesPerSecond) GPS_timeout++;
+ 236              	r2, [r3, #0]
+ 237 0178 D8329FE5 		mov	r3, #996
+ 238 017c 002093E5 		add	r3, r3, #3
+ 239 0180 F93FA0E3 		cmp	r2, r3
+ 240 0184 033083E2 		bhi	.L13
+ 241 0188 030052E1 		ldr	r3, .L27+8
+ 242 018c 0500008A 		ldr	r3, [r3, #0]
+ 243 0190 C0329FE5 		add	r2, r3, #1
+ 244 0194 003093E5 		ldr	r3, .L27+8
+ 245 0198 012083E2 		str	r2, [r3, #0]
+ 246 019c B4329FE5 		b	.L15
+ 247 01a0 002083E5 	.L13:
+ 248 01a4 0D0000EA 		.loc 1 154 0
+ 249              		ldr	r3, .L27+8
+ 154:main.c        **** 	  	else if(GPS_timeout==ControllerCyclesPerSecond)
+ 250              	#0]
+ 251 01a8 A8329FE5 		cmp	r3, #1000
+ 252 01ac 003093E5 		bne	.L15
+ 253 01b0 FA0F53E3 		.loc 1 156 0
+ 254 01b4 0900001A 		ldr	r2, .L27+8
+ 155:main.c        **** 	  	{
+ 156:main.c        ****   	 		GPS_timeout=ControllerCyclesPerSecond+1;
+ 255              	r3, #1000
+ 256 01b8 98229FE5 		add	r3, r3, #1
+ 257 01bc FA3FA0E3 		str	r3, [r2, #0]
+ 258 01c0 013083E2 		.loc 1 157 0
+ 259 01c4 003082E5 		ldr	r2, .L27+12
+ 157:main.c        **** 	  		GPS_Data.status=0;
+ 260              	r3, #0
+ 261 01c8 8C229FE5 		str	r3, [r2, #40]
+ 262 01cc 0030A0E3 		.loc 1 158 0
+ 263 01d0 283082E5 		ldr	r2, .L27+12
+ 158:main.c        **** 	  		GPS_Data.numSV=0;
+ 264              		r3, #0
+ 265 01d4 80229FE5 		str	r3, [r2, #36]
+ 266 01d8 0030A0E3 	.L15:
+ 267 01dc 243082E5 		.loc 1 162 0
+ 268              		mov	r0, #255
+ 159:main.c        **** 	  	}
+ 160:main.c        **** 
+ 161:main.c        ****         //battery monitoring
+ 162:main.c        ****         ADC0getSamplingResults(0xFF,adcChannelValues);
+ 269              	r1, .L27+16
+ 270 01e0 FF00A0E3 		bl	ADC0getSamplingResults
+ 271 01e4 74129FE5 		.loc 1 163 0
+ 272 01e8 FEFFFFEB 		ldr	r3, .L27+20
+ 163:main.c        ****         vbat1=(vbat1*14+(adcChannelValues[VOLTAGE_1]*9872/579))/15;	//voltage in mV
+ 273              		r2, [r3, #0]
+ 274 01ec 70329FE5 		mov	r3, r2
+ 275 01f0 002093E5 		mov	r3, r3, asl #3
+ 276 01f4 0230A0E1 		rsb	r3, r2, r3
+ 277 01f8 8331A0E1 		mov	r3, r3, asl #1
+ 278 01fc 033062E0 		mov	r0, r3
+ 279 0200 8330A0E1 		ldr	r3, .L27+16
+ 280 0204 0300A0E1 		ldr	r1, [r3, #8]
+ 281 0208 50329FE5 		mov	r2, r1
+ 282 020c 081093E5 		mov	r2, r2, asl #2
+ 283 0210 0120A0E1 		add	r2, r2, r1
+ 284 0214 0221A0E1 		mov	r2, r2, asl #1
+ 285 0218 012082E0 		add	r2, r2, r1
+ 286 021c 8220A0E1 		mov	r3, r2, asl #3
+ 287 0220 012082E0 		rsb	r3, r2, r3
+ 288 0224 8231A0E1 		mov	r3, r3, asl #3
+ 289 0228 033062E0 		add	r3, r3, r1
+ 290 022c 8331A0E1 		mov	r3, r3, asl #4
+ 291 0230 013083E0 		mov	r2, r3
+ 292 0234 0332A0E1 		mov	r3, #-536870901
+ 293 0238 0320A0E1 		add	r3, r3, #39845888
+ 294 023c BE32A0E3 		add	r3, r3, #25344
+ 295 0240 263683E2 		umull	r1, r3, r2, r3
+ 296 0244 633C83E2 		mov	r3, r3, lsr #9
+ 297 0248 921383E0 		add	r2, r0, r3
+ 298 024c A334A0E1 		ldr	r3, .L27+24
+ 299 0250 032080E0 		umull	r1, r3, r2, r3
+ 300 0254 0C329FE5 		mov	r3, r3, lsr #3
+ 301 0258 921383E0 		mov	r2, r3
+ 302 025c A331A0E1 		ldr	r3, .L27+20
+ 303 0260 0320A0E1 		str	r2, [r3, #0]
+ 304 0264 F8319FE5 		.loc 1 165 0
+ 305 0268 002083E5 		ldr	r3, .L27+20
+ 164:main.c        **** 
+ 165:main.c        **** 		HL_Status.battery_voltage_1=vbat1;
+ 306              	l #16
+ 307 026c F0319FE5 		mov	r2, r3, lsr #16
+ 308 0270 003093E5 		ldr	r3, .L27
+ 309 0274 0338A0E1 		strh	r2, [r3, #0]	@ movhi
+ 310 0278 2328A0E1 		.loc 1 166 0
+ 311 027c CC319FE5 		ldr	r3, .L27+28
+ 312 0280 B020C3E1 		ldr	r3, [r3, #0]
+ 166:main.c        ****         mainloop_cnt++;
+ 313              	, r3, #1
+ 314 0284 E0319FE5 		ldr	r3, .L27+28
+ 315 0288 003093E5 		str	r2, [r3, #0]
+ 316 028c 012083E2 		.loc 1 167 0
+ 317 0290 D4319FE5 		ldr	r3, .L27+28
+ 318 0294 002083E5 		ldr	r2, [r3, #0]
+ 167:main.c        **** 		if(!(mainloop_cnt%10)) buzzer_handler(HL_Status.battery_voltage_1);
+ 319              	3, .L27+32
+ 320 0298 CC319FE5 		umull	r1, r3, r2, r3
+ 321 029c 002093E5 		mov	r3, r3, lsr #3
+ 322 02a0 C8319FE5 		str	r3, [fp, #-24]
+ 323 02a4 921383E0 		ldr	r3, [fp, #-24]
+ 324 02a8 A331A0E1 		mov	r3, r3, asl #2
+ 325 02ac 18300BE5 		ldr	r1, [fp, #-24]
+ 326 02b0 18301BE5 		add	r3, r3, r1
+ 327 02b4 0331A0E1 		mov	r3, r3, asl #1
+ 328 02b8 18101BE5 		rsb	r2, r3, r2
+ 329 02bc 013083E0 		str	r2, [fp, #-24]
+ 330 02c0 8330A0E1 		ldr	r3, [fp, #-24]
+ 331 02c4 022063E0 		cmp	r3, #0
+ 332 02c8 18200BE5 		bne	.L17
+ 333 02cc 18301BE5 		ldr	r3, .L27
+ 334 02d0 000053E3 		ldrh	r3, [r3, #0]
+ 335 02d4 0500001A 		mov	r3, r3, asl #16
+ 336 02d8 70319FE5 		mov	r3, r3, asr #16
+ 337 02dc B030D3E1 		mov	r0, r3
+ 338 02e0 0338A0E1 		bl	buzzer_handler
+ 339 02e4 4338A0E1 	.L17:
+ 340 02e8 0300A0E1 		.loc 1 169 0
+ 341 02ec FEFFFFEB 		ldr	r3, .L27+4
+ 342              		ldrb	r3, [r3, #0]
+ 168:main.c        **** 
+ 169:main.c        **** 	    if(mainloop_trigger) mainloop_trigger--;
+ 343              	3, #0
+ 344 02f0 5C319FE5 		beq	.L19
+ 345 02f4 0030D3E5 		ldr	r3, .L27+4
+ 346 02f8 FF3003E2 		ldrb	r3, [r3, #0]
+ 347 02fc 000053E3 		and	r3, r3, #255
+ 348 0300 0600000A 		sub	r3, r3, #1
+ 349 0304 48319FE5 		and	r3, r3, #255
+ 350 0308 0030D3E5 		ldr	r2, .L27+4
+ 351 030c FF3003E2 		strb	r3, [r2, #0]
+ 352 0310 013043E2 	.L19:
+ 353 0314 FF3003E2 		.loc 1 170 0
+ 354 0318 34219FE5 		bl	mainloop
+ 355 031c 0030C2E5 		.loc 1 172 0
+ 356              		mov	r3, #16384
+ 170:main.c        ****         mainloop();
+ 357              	-536870904
+ 358 0320 FEFFFFEB 		ldr	r3, [r3, #0]
+ 171:main.c        ****         // CPU Usage calculation
+ 172:main.c        ****         TimerT2 = T0TC;
+ 359              	tr	r3, [fp, #-16]
+ 360 0324 0139A0E3 		.loc 1 173 0
+ 361 0328 8E3283E2 		ldr	r3, .L27+4
+ 362 032c 003093E5 		ldrb	r3, [r3, #0]
+ 363 0330 10300BE5 		and	r3, r3, #255
+ 173:main.c        ****         if (mainloop_trigger)
+ 364              	r3, #0
+ 365 0334 18319FE5 		beq	.L21
+ 366 0338 0030D3E5 		.loc 1 175 0
+ 367 033c FF3003E2 		ldr	r2, .L27
+ 368 0340 000053E3 		mov	r3, #1000
+ 369 0344 0A00000A 		strh	r3, [r2, #18]	@ movhi
+ 174:main.c        ****         {
+ 175:main.c        ****         	HL_Status.cpu_load = 1000;
+ 370              	1 176 0
+ 371 0348 00219FE5 		ldr	r3, .L27+36
+ 372 034c FA3FA0E3 		ldrh	r3, [r3, #0]
+ 373 0350 B231C2E1 		add	r3, r3, #1
+ 176:main.c        ****         	mainloop_overflows++;
+ 374              		r3, r3, asl #16
+ 375 0354 18319FE5 		mov	r2, r3, lsr #16
+ 376 0358 B030D3E1 		ldr	r3, .L27+36
+ 377 035c 013083E2 		strh	r2, [r3, #0]	@ movhi
+ 378 0360 0338A0E1 		b	.L10
+ 379 0364 2328A0E1 	.L21:
+ 380 0368 04319FE5 		.loc 1 178 0
+ 381 036c B020C3E1 		ldr	r2, [fp, #-16]
+ 382 0370 77FFFFEA 		ldr	r3, [fp, #-20]
+ 383              		cmp	r2, r3
+ 177:main.c        ****         }
+ 178:main.c        ****         else if (TimerT2 < TimerT1)
+ 384              		.loc 1 179 0
+ 385 0374 10201BE5 		mov	r3, #-536870912
+ 386 0378 14301BE5 		add	r3, r3, #16384
+ 387 037c 030052E1 		add	r3, r3, #24
+ 388 0380 1B00002A 		ldr	r2, [r3, #0]
+ 179:main.c        ****         	HL_Status.cpu_load = (T0MR0 - TimerT1 + TimerT2)*1000/T0MR0; // load = "timer cycles" / "t
+ 389              	r3, [fp, #-20]
+ 390 0384 0E32A0E3 		rsb	r2, r3, r2
+ 391 0388 013983E2 		ldr	r3, [fp, #-16]
+ 392 038c 183083E2 		add	r2, r2, r3
+ 393 0390 002093E5 		mov	r3, r2
+ 394 0394 14301BE5 		mov	r3, r3, asl #5
+ 395 0398 022063E0 		rsb	r3, r2, r3
+ 396 039c 10301BE5 		mov	r3, r3, asl #2
+ 397 03a0 032082E0 		add	r3, r3, r2
+ 398 03a4 0230A0E1 		mov	r3, r3, asl #3
+ 399 03a8 8332A0E1 		mov	r2, r3
+ 400 03ac 033062E0 		mov	r3, #-536870912
+ 401 03b0 0331A0E1 		add	r3, r3, #16384
+ 402 03b4 023083E0 		add	r3, r3, #24
+ 403 03b8 8331A0E1 		ldr	r3, [r3, #0]
+ 404 03bc 0320A0E1 		mov	r0, r2
+ 405 03c0 0E32A0E3 		mov	r1, r3
+ 406 03c4 013983E2 		bl	__udivsi3
+ 407 03c8 183083E2 		mov	r3, r0
+ 408 03cc 003093E5 		mov	r3, r3, asl #16
+ 409 03d0 0200A0E1 		mov	r2, r3, lsr #16
+ 410 03d4 0310A0E1 		ldr	r3, .L27
+ 411 03d8 FEFFFFEB 		strh	r2, [r3, #18]	@ movhi
+ 412 03dc 0030A0E1 		b	.L10
+ 413 03e0 0338A0E1 	.L23:
+ 414 03e4 2328A0E1 		.loc 1 181 0
+ 415 03e8 60309FE5 		ldr	r2, [fp, #-16]
+ 416 03ec B221C3E1 		ldr	r3, [fp, #-20]
+ 417 03f0 57FFFFEA 		rsb	r2, r3, r2
+ 418              		mov	r3, r2
+ 180:main.c        ****         else
+ 181:main.c        ****         	HL_Status.cpu_load = (TimerT2 - TimerT1)*1000/T0MR0; // load = "timer cycles" / "timer cyc
+ 419              	2, r3
+ 420 03f4 10201BE5 		mov	r3, r3, asl #2
+ 421 03f8 14301BE5 		add	r3, r3, r2
+ 422 03fc 022063E0 		mov	r3, r3, asl #3
+ 423 0400 0230A0E1 		mov	r2, r3
+ 424 0404 8332A0E1 		mov	r3, #-536870912
+ 425 0408 033062E0 		add	r3, r3, #16384
+ 426 040c 0331A0E1 		add	r3, r3, #24
+ 427 0410 023083E0 		ldr	r3, [r3, #0]
+ 428 0414 8331A0E1 		mov	r0, r2
+ 429 0418 0320A0E1 		mov	r1, r3
+ 430 041c 0E32A0E3 		bl	__udivsi3
+ 431 0420 013983E2 		mov	r3, r0
+ 432 0424 183083E2 		mov	r3, r3, asl #16
+ 433 0428 003093E5 		mov	r2, r3, lsr #16
+ 434 042c 0200A0E1 		ldr	r3, .L27
+ 435 0430 0310A0E1 		strh	r2, [r3, #18]	@ movhi
+ 436 0434 FEFFFFEB 		.loc 1 184 0
+ 437 0438 0030A0E1 		b	.L10
+ 438 043c 0338A0E1 	.L28:
+ 439 0440 2328A0E1 		.align	2
+ 440 0444 04309FE5 	.L27:
+ 441 0448 B221C3E1 		.word	HL_Status
+ 182:main.c        ****       }
+ 183:main.c        **** 
+ 184:main.c        ****   }
+ 442              	
+ 443 044c 40FFFFEA 		.word	GPS_timeout
+ 444              		.word	GPS_Data
+ 445              		.word	adcChannelValues
+ 446              		.word	vbat1.2046
+ 447 0450 00000000 		.word	-2004318071
+ 448 0454 00000000 		.word	mainloop_cnt
+ 449 0458 00000000 		.word	-858993459
+ 450 045c 00000000 		.word	mainloop_overflows
+ 451 0460 00000000 	.LFE3:
+ 453 0468 89888888 		.bss
+ 454 046c 00000000 		.align	2
+ 455 0470 CDCCCCCC 	Firefly_led_fin_cnt.2120:
+ 456 0474 00000000 		.space	4
+ 457              		.data
+ 460              	led_state.2119:
+ 461              		.byte	1
+ 462 0020 00000000 		.bss
+ 463              	led_cnt.2118:
+ 464              		.space	1
+ 465              		.text
+ 466              		.align	2
+ 467 0002 01       		.global	mainloop
+ 469              	mainloop:
+ 470 0024 00       	.LFB4:
+ 471 0025 000000   		.loc 1 190 0
+ 472              		@ Function supports interworking.
+ 473              		@ args = 0, pretend = 0, frame = 8
+ 474              		@ frame_needed = 1, uses_anonymous_args = 0
+ 475              		mov	ip, sp
+ 476              	.LCFI7:
+ 185:main.c        ****   return 0;
+ 186:main.c        **** }
+ 187:main.c        **** 
+ 188:main.c        **** 
+ 189:main.c        **** void mainloop(void) //mainloop is triggered at 1 kHz
+ 190:main.c        **** {
+ 477              	8:
+ 478              		sub	fp, ip, #4
+ 479              	.LCFI9:
+ 480              		sub	sp, sp, #12
+ 481 0478 0DC0A0E1 	.LCFI10:
+ 482              		.loc 1 196 0
+ 483 047c 00D82DE9 		ldr	r3, .L62
+ 484              		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 485 0480 04B04CE2 		add	r3, r3, #1
+ 486              		and	r3, r3, #255
+ 487 0484 0CD04DE2 		ldr	r2, .L62
+ 488              		strb	r3, [r2, #0]
+ 191:main.c        ****     static unsigned char led_cnt=0, led_state=1;
+ 192:main.c        ****     static int Firefly_led_fin_cnt=0;
+ 193:main.c        **** 	unsigned char t;
+ 194:main.c        **** 
+ 195:main.c        **** 	//blink red led if no GPS lock available
+ 196:main.c        **** 	led_cnt++;
+ 489              	0
+ 490 0488 BC339FE5 		ldr	r3, .L62+4
+ 491 048c 0030D3E5 		ldr	r3, [r3, #40]
+ 492 0490 013083E2 		and	r3, r3, #255
+ 493 0494 FF3003E2 		cmp	r3, #3
+ 494 0498 AC239FE5 		bne	.L30
+ 495 049c 0030C2E5 		.loc 1 199 0
+ 197:main.c        **** 	if((GPS_Data.status&0xFF)==0x03)
+ 496              	, #0
+ 497 04a0 A8339FE5 		mov	r1, #0
+ 498 04a4 283093E5 		bl	LED
+ 499 04a8 FF3003E2 		b	.L32
+ 500 04ac 030053E3 	.L30:
+ 501 04b0 0300001A 		.loc 1 203 0
+ 198:main.c        **** 	{
+ 199:main.c        **** 		LED(0,OFF);
+ 502              	3, .L62
+ 503 04b4 0000A0E3 		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 504 04b8 0010A0E3 		cmp	r3, #150
+ 505 04bc FEFFFFEB 		bne	.L33
+ 506 04c0 110000EA 		.loc 1 205 0
+ 507              		mov	r0, #0
+ 200:main.c        **** 	}
+ 201:main.c        **** 	else
+ 202:main.c        **** 	{
+ 203:main.c        **** 	    if(led_cnt==150)
+ 508              	1, #1
+ 509 04c4 80339FE5 		bl	LED
+ 510 04c8 0030D3E5 		b	.L32
+ 511 04cc 960053E3 	.L33:
+ 512 04d0 0300001A 		.loc 1 207 0
+ 204:main.c        **** 	    {
+ 205:main.c        **** 	      LED(0,ON);
+ 513              	r3, .L62
+ 514 04d4 0000A0E3 		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 515 04d8 0110A0E3 		cmp	r3, #200
+ 516 04dc FEFFFFEB 		bne	.L32
+ 517 04e0 090000EA 		.loc 1 209 0
+ 518              		ldr	r3, .L62
+ 206:main.c        **** 	    }
+ 207:main.c        **** 	    else if(led_cnt==200)
+ 519              	2, #0
+ 520 04e4 60339FE5 		strb	r2, [r3, #0]
+ 521 04e8 0030D3E5 		.loc 1 210 0
+ 522 04ec C80053E3 		mov	r0, #0
+ 523 04f0 0500001A 		mov	r1, #0
+ 208:main.c        **** 	    {
+ 209:main.c        **** 	      led_cnt=0;
+ 524              	ED
+ 525 04f4 50339FE5 	.L32:
+ 526 04f8 0020A0E3 		.loc 1 216 0
+ 527 04fc 0020C3E5 		ldr	r3, .L62+8
+ 210:main.c        **** 	      LED(0,OFF);
+ 528              	b	r3, [r3, #0]
+ 529 0500 0000A0E3 		and	r3, r3, #255
+ 530 0504 0010A0E3 		cmp	r3, #0
+ 531 0508 FEFFFFEB 		beq	.L36
+ 532              		.loc 1 218 0
+ 211:main.c        **** 	    }
+ 212:main.c        **** 	}
+ 213:main.c        **** 
+ 214:main.c        **** 
+ 215:main.c        **** 	//after first lock, determine magnetic inclination and declination
+ 216:main.c        **** 	if (SYSTEM_initialized)
+ 533              	r3, .L62+12
+ 534 050c 40339FE5 		ldrb	r3, [r3, #0]
+ 535 0510 0030D3E5 		and	r3, r3, #255
+ 536 0514 FF3003E2 		cmp	r3, #0
+ 537 0518 000053E3 		bne	.L36
+ 538 051c 3500000A 		ldr	r3, .L62+4
+ 217:main.c        **** 	{
+ 218:main.c        **** 		if ((!declinationAvailable) && (GPS_Data.horizontal_accuracy<10000) && ((GPS_Data.status&0x03)==0
+ 539              	2, [r3, #24]
+ 540 0520 30339FE5 		mov	r3, #9984
+ 541 0524 0030D3E5 		add	r3, r3, #15
+ 542 0528 FF3003E2 		cmp	r2, r3
+ 543 052c 000053E3 		bhi	.L36
+ 544 0530 3000001A 		ldr	r3, .L62+4
+ 545 0534 14339FE5 		ldr	r3, [r3, #40]
+ 546 0538 182093E5 		and	r3, r3, #3
+ 547 053c 273CA0E3 		cmp	r3, #3
+ 548 0540 0F3083E2 		bne	.L36
+ 549 0544 030052E1 	.LBB2:
+ 550 0548 2A00008A 		.loc 1 221 0
+ 551 054c FC329FE5 		ldr	r3, .L62+4
+ 552 0550 283093E5 		ldr	r0, [r3, #0]
+ 553 0554 033003E2 		ldr	r3, .L62+4
+ 554 0558 030053E3 		ldr	ip, [r3, #4]
+ 555 055c 2500001A 		ldr	r3, .L62+4
+ 556              		ldr	r1, [r3, #8]
+ 219:main.c        **** 		{
+ 220:main.c        **** 			int status;
+ 221:main.c        **** 			estimatedDeclination=getDeclination(GPS_Data.latitude,GPS_Data.longitude,GPS_Data.height/1000,20
+ 557              	smull	r2, r3, r1, r3
+ 558 0560 E8329FE5 		mov	r2, r3, asr #6
+ 559 0564 000093E5 		mov	r3, r1, asr #31
+ 560 0568 E0329FE5 		rsb	r2, r3, r2
+ 561 056c 04C093E5 		sub	r3, fp, #20
+ 562 0570 D8329FE5 		str	r3, [sp, #0]
+ 563 0574 081093E5 		mov	r1, ip
+ 564 0578 DC329FE5 		mov	r3, #2000
+ 565 057c 9123C3E0 		add	r3, r3, #12
+ 566 0580 4323A0E1 		bl	getDeclination
+ 567 0584 C13FA0E1 		mov	r2, r0
+ 568 0588 022063E0 		ldr	r3, .L62+20
+ 569 058c 14304BE2 		str	r2, [r3, #0]
+ 570 0590 00308DE5 		.loc 1 222 0
+ 571 0594 0C10A0E1 		ldr	r3, .L62+20
+ 572 0598 7D3EA0E3 		ldr	r3, [r3, #0]
+ 573 059c 0C3083E2 		cmn	r3, #32000
+ 574 05a0 FEFFFFEB 		bge	.L41
+ 575 05a4 0020A0E1 		ldr	r2, .L62+20
+ 576 05a8 B0329FE5 		mov	r3, #-2097152000
+ 577 05ac 002083E5 		mov	r3, r3, asr #16
+ 222:main.c        **** 			if (estimatedDeclination<-32000) estimatedDeclination=-32000;
+ 578              	1:
+ 579 05b0 A8329FE5 		.loc 1 223 0
+ 580 05b4 003093E5 		ldr	r3, .L62+20
+ 581 05b8 7D0C73E3 		ldr	r3, [r3, #0]
+ 582 05bc 030000AA 		cmp	r3, #32000
+ 583 05c0 98229FE5 		ble	.L43
+ 584 05c4 8334A0E3 		ldr	r2, .L62+20
+ 585 05c8 4338A0E1 		mov	r3, #32000
+ 586 05cc 003082E5 		str	r3, [r2, #0]
+ 587              	.L43:
+ 223:main.c        **** 			if (estimatedDeclination>32000) estimatedDeclination=32000;
+ 588              	4 0
+ 589 05d0 88329FE5 		ldr	r3, .L62+12
+ 590 05d4 003093E5 		mov	r2, #1
+ 591 05d8 7D0C53E3 		strb	r2, [r3, #0]
+ 592 05dc 020000DA 	.L36:
+ 593 05e0 78229FE5 	.LBE2:
+ 594 05e4 7D3CA0E3 		.loc 1 229 0
+ 595 05e8 003082E5 		ldr	r3, .L62+24
+ 596              		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 224:main.c        **** 			declinationAvailable=1;
+ 597              	#0
+ 598 05ec 64329FE5 		beq	.L45
+ 599 05f0 0120A0E3 		.loc 1 231 0
+ 600 05f4 0020C3E5 		ldr	r3, .L62+28
+ 601              		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 602              		cmp	r3, #0
+ 225:main.c        **** 		}
+ 226:main.c        **** 	}
+ 227:main.c        **** 
+ 228:main.c        **** 	//toggle green LED and update SDK input struct when GPS data packet is received
+ 229:main.c        ****     if (gpsLEDTrigger)
+ 603              	L47
+ 604 05f8 64329FE5 		.loc 1 233 0
+ 605 05fc 0030D3E5 		ldr	r3, .L62+28
+ 606 0600 000053E3 		mov	r2, #0
+ 607 0604 4700000A 		strb	r2, [r3, #0]
+ 230:main.c        ****     {
+ 231:main.c        **** 		if(led_state)
+ 608              	 1 234 0
+ 609 0608 58329FE5 		mov	r0, #1
+ 610 060c 0030D3E5 		mov	r1, #0
+ 611 0610 000053E3 		bl	LED
+ 612 0614 0600000A 		b	.L49
+ 232:main.c        **** 		{
+ 233:main.c        **** 			led_state=0;
+ 613              	
+ 614 0618 48329FE5 		.loc 1 238 0
+ 615 061c 0020A0E3 		mov	r0, #1
+ 616 0620 0020C3E5 		mov	r1, #1
+ 234:main.c        **** 			LED(1,OFF);
+ 617              		LED
+ 618 0624 0100A0E3 		.loc 1 239 0
+ 619 0628 0010A0E3 		ldr	r3, .L62+28
+ 620 062c FEFFFFEB 		mov	r2, #1
+ 621 0630 050000EA 		strb	r2, [r3, #0]
+ 622              	.L49:
+ 235:main.c        **** 		}
+ 236:main.c        **** 		else
+ 237:main.c        **** 		{
+ 238:main.c        **** 			LED(1,ON);
+ 623              	1 242 0
+ 624 0634 0100A0E3 		ldr	r3, .L62+4
+ 625 0638 0110A0E3 		ldr	r2, [r3, #8]
+ 626 063c FEFFFFEB 		ldr	r3, .L62+32
+ 239:main.c        **** 			led_state=1;
+ 627              		r2, [r3, #88]
+ 628 0640 20329FE5 		.loc 1 243 0
+ 629 0644 0120A0E3 		ldr	r3, .L62+4
+ 630 0648 0020C3E5 		ldr	r2, [r3, #0]
+ 631              		ldr	r3, .L62+32
+ 240:main.c        **** 		}
+ 241:main.c        **** 
+ 242:main.c        **** 		RO_ALL_Data.GPS_height=GPS_Data.height;
+ 632              	r2, [r3, #80]
+ 633 064c FC319FE5 		.loc 1 244 0
+ 634 0650 082093E5 		ldr	r3, .L62+4
+ 635 0654 10329FE5 		ldr	r2, [r3, #4]
+ 636 0658 582083E5 		ldr	r3, .L62+32
+ 243:main.c        **** 		RO_ALL_Data.GPS_latitude=GPS_Data.latitude;
+ 637              	r2, [r3, #84]
+ 638 065c EC319FE5 		.loc 1 245 0
+ 639 0660 002093E5 		ldr	r3, .L62+4
+ 640 0664 00329FE5 		ldr	r2, [r3, #12]
+ 641 0668 502083E5 		ldr	r3, .L62+32
+ 244:main.c        **** 		RO_ALL_Data.GPS_longitude=GPS_Data.longitude;
+ 642              	r2, [r3, #92]
+ 643 066c DC319FE5 		.loc 1 246 0
+ 644 0670 042093E5 		ldr	r3, .L62+4
+ 645 0674 F0319FE5 		ldr	r2, [r3, #16]
+ 646 0678 542083E5 		ldr	r3, .L62+32
+ 245:main.c        **** 		RO_ALL_Data.GPS_speed_x=GPS_Data.speed_x;
+ 647              	r2, [r3, #96]
+ 648 067c CC319FE5 		.loc 1 247 0
+ 649 0680 0C2093E5 		ldr	r3, .L62+4
+ 650 0684 E0319FE5 		ldr	r2, [r3, #40]
+ 651 0688 5C2083E5 		ldr	r3, .L62+32
+ 246:main.c        **** 		RO_ALL_Data.GPS_speed_y=GPS_Data.speed_y;
+ 652              	r2, [r3, #120]
+ 653 068c BC319FE5 		.loc 1 248 0
+ 654 0690 102093E5 		ldr	r3, .L62+4
+ 655 0694 D0319FE5 		ldr	r2, [r3, #36]
+ 656 0698 602083E5 		ldr	r3, .L62+32
+ 247:main.c        **** 		RO_ALL_Data.GPS_status=GPS_Data.status;
+ 657              	r2, [r3, #116]
+ 658 069c AC319FE5 		.loc 1 249 0
+ 659 06a0 282093E5 		ldr	r3, .L62+36
+ 660 06a4 C0319FE5 		ldrh	r2, [r3, #4]
+ 661 06a8 782083E5 		ldr	r3, .L62+32
+ 248:main.c        **** 		RO_ALL_Data.GPS_sat_num=GPS_Data.numSV;
+ 662              		r2, [r3, #128]	@ movhi
+ 663 06ac 9C319FE5 		.loc 1 250 0
+ 664 06b0 242093E5 		ldr	r3, .L62+36
+ 665 06b4 B0319FE5 		ldr	r2, [r3, #0]
+ 666 06b8 742083E5 		ldr	r3, .L62+32
+ 249:main.c        **** 		RO_ALL_Data.GPS_week=GPS_Time.week;
+ 667              	r2, [r3, #124]
+ 668 06bc AC319FE5 		.loc 1 251 0
+ 669 06c0 B420D3E1 		ldr	r3, .L62+4
+ 670 06c4 A0319FE5 		ldr	r2, [r3, #20]
+ 671 06c8 B028C3E1 		ldr	r3, .L62+32
+ 250:main.c        **** 		RO_ALL_Data.GPS_time_of_week=GPS_Time.time_of_week;
+ 672              	r2, [r3, #100]
+ 673 06cc 9C319FE5 		.loc 1 252 0
+ 674 06d0 002093E5 		ldr	r3, .L62+4
+ 675 06d4 90319FE5 		ldr	r2, [r3, #24]
+ 676 06d8 7C2083E5 		ldr	r3, .L62+32
+ 251:main.c        **** 		RO_ALL_Data.GPS_heading=GPS_Data.heading;
+ 677              	r2, [r3, #104]
+ 678 06dc 6C319FE5 		.loc 1 253 0
+ 679 06e0 142093E5 		ldr	r3, .L62+4
+ 680 06e4 80319FE5 		ldr	r2, [r3, #32]
+ 681 06e8 642083E5 		ldr	r3, .L62+32
+ 252:main.c        **** 		RO_ALL_Data.GPS_position_accuracy=GPS_Data.horizontal_accuracy;
+ 682              	r2, [r3, #112]
+ 683 06ec 5C319FE5 		.loc 1 254 0
+ 684 06f0 182093E5 		ldr	r3, .L62+4
+ 685 06f4 70319FE5 		ldr	r2, [r3, #28]
+ 686 06f8 682083E5 		ldr	r3, .L62+32
+ 253:main.c        **** 		RO_ALL_Data.GPS_speed_accuracy=GPS_Data.speed_accuracy;
+ 687              	r2, [r3, #108]
+ 688 06fc 4C319FE5 		.loc 1 256 0
+ 689 0700 202093E5 		ldr	r2, .L62+24
+ 690 0704 60319FE5 		mov	r3, #0
+ 691 0708 702083E5 		strb	r3, [r2, #0]
+ 254:main.c        **** 		RO_ALL_Data.GPS_height_accuracy=GPS_Data.vertical_accuracy;
+ 692              	
+ 693 070c 3C319FE5 		.loc 1 260 0
+ 694 0710 1C2093E5 		ldr	r3, .L62+40
+ 695 0714 50319FE5 		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 696 0718 6C2083E5 		cmp	r3, #0
+ 255:main.c        **** 
+ 256:main.c        **** 		gpsLEDTrigger=0;
+ 697              		.L50
+ 698 071c 40219FE5 		.loc 1 262 0
+ 699 0720 0030A0E3 		mov	r3, #-536870912
+ 700 0724 0030C2E5 		add	r3, r3, #163840
+ 701              		ldr	r3, [r3, #0]
+ 257:main.c        ****     }
+ 258:main.c        **** 
+ 259:main.c        **** 	//re-trigger UART-transmission if it was paused by modem CTS pin
+ 260:main.c        **** 	if(trigger_transmission)
+ 702              	r3, r3, #4194304
+ 703 0728 44319FE5 		cmp	r3, #0
+ 704 072c 0030D3E5 		bne	.L50
+ 705 0730 000053E3 		.loc 1 264 0
+ 706 0734 1600000A 		ldr	r2, .L62+40
+ 261:main.c        **** 	{
+ 262:main.c        **** 		if(!(IOPIN0&(1<<CTS_RADIO)))
+ 707              	r3, #0
+ 708 0738 0E32A0E3 		strb	r3, [r2, #0]
+ 709 073c 0A3983E2 		.loc 1 265 0
+ 710 0740 003093E5 		sub	r3, fp, #13
+ 711 0744 013503E2 		mov	r0, #0
+ 712 0748 000053E3 		mov	r1, r3
+ 713 074c 1000001A 		mov	r2, #1
+ 263:main.c        **** 	  	{
+ 264:main.c        **** 	  		trigger_transmission=0;
+ 714              	gbuffer
+ 715 0750 1C219FE5 		mov	r3, r0
+ 716 0754 0030A0E3 		cmp	r3, #0
+ 717 0758 0030C2E5 		beq	.L50
+ 265:main.c        **** 		    if(ringbuffer(RBREAD, &t, 1))
+ 718              	c 1 267 0
+ 719 075c 0D304BE2 		ldr	r2, .L62+44
+ 720 0760 0000A0E3 		mov	r3, #1
+ 721 0764 0310A0E1 		strb	r3, [r2, #0]
+ 722 0768 0120A0E3 		.loc 1 268 0
+ 723 076c FEFFFFEB 		ldrb	r3, [fp, #-13]	@ zero_extendqisi2
+ 724 0770 0030A0E1 		mov	r0, r3
+ 725 0774 000053E3 		bl	UARTWriteChar
+ 726 0778 0500000A 	.L50:
+ 266:main.c        **** 		    {
+ 267:main.c        **** 		      transmission_running=1;
+ 727              	01 0
+ 728 077c F4209FE5 		bl	uBloxReceiveEngine
+ 729 0780 0130A0E3 		.loc 1 304 0
+ 730 0784 0030C2E5 		bl	SDK_mainloop
+ 268:main.c        **** 		      UARTWriteChar(t);
+ 731              	c 1 307 0
+ 732 0788 0D305BE5 		bl	HL2LL_write_cycle
+ 733 078c 0300A0E1 		.loc 1 310 0
+ 734 0790 FEFFFFEB 		bl	PTU_update
+ 735              		.loc 1 313 0
+ 269:main.c        **** 		    }
+ 270:main.c        **** 	  	}
+ 271:main.c        **** 	}
+ 272:main.c        **** 
+ 273:main.c        **** #ifdef MATLAB
+ 274:main.c        **** 	//re-trigger UART-transmission if it was paused by modem CTS pin
+ 275:main.c        **** 	if(trigger_transmission)
+ 276:main.c        **** 	{
+ 277:main.c        **** 		if(!(IOPIN0&(1<<CTS_RADIO)))
+ 278:main.c        **** 	  	{
+ 279:main.c        **** 	  		trigger_transmission=0;
+ 280:main.c        **** 		    if(UART_Matlab_fifo(RBREAD, &t, 1))
+ 281:main.c        **** 		    {
+ 282:main.c        **** 		      transmission_running=1;
+ 283:main.c        **** 		      UARTWriteChar(t);
+ 284:main.c        **** 		    }
+ 285:main.c        **** 	  	}
+ 286:main.c        **** 	}
+ 287:main.c        **** #endif
+ 288:main.c        **** 
+ 289:main.c        **** 	//send data packet as an example how to use HL_serial_0 (please refer to uart.c for details)
+ 290:main.c        **** /*
+ 291:main.c        ****     if(uart_cnt++==ControllerCyclesPerSecond/DataOutputsPerSecond)
+ 292:main.c        ****     {
+ 293:main.c        ****     	uart_cnt=0;
+ 294:main.c        ****       	if((sizeof(RO_ALL_Data))<ringbuffer(RBFREE, 0, 0))
+ 295:main.c        ****        	{
+ 296:main.c        ****        		UART_SendPacket(&RO_ALL_Data, sizeof(RO_ALL_Data), PD_RO_ALL_DATA);
+ 297:main.c        ****        	}
+ 298:main.c        ****     }
+ 299:main.c        **** */
+ 300:main.c        ****     //handle gps data reception
+ 301:main.c        ****     uBloxReceiveEngine();
+ 736              	ciSyncVar
+ 737 0794 FEFFFFEB 		.loc 1 314 0
+ 302:main.c        **** 
+ 303:main.c        **** 	//run SDK mainloop. Please put all your data handling / controller code in sdk.c
+ 304:main.c        **** 	SDK_mainloop();
+ 738              	l	aciSyncCmd
+ 739 0798 FEFFFFEB 		.loc 1 315 0
+ 305:main.c        **** 
+ 306:main.c        ****     //write data to transmit buffer for immediate transfer to LL processor
+ 307:main.c        ****     HL2LL_write_cycle();
+ 740              	l	aciSyncPar
+ 741 079c FEFFFFEB 		.loc 1 318 0
+ 308:main.c        **** 
+ 309:main.c        ****     //control pan-tilt-unit ("cam option 4" @ AscTec Pelican and AscTec Firefly)
+ 310:main.c        ****     PTU_update();
+ 742              	l	aciEngine
+ 743 07a0 FEFFFFEB 		.loc 1 321 0
+ 311:main.c        **** 
+ 312:main.c        ****     //synchronize all variables, commands and parameters with ACI
+ 313:main.c        ****     aciSyncVar();
+ 744              	dr	r3, .L62+8
+ 745 07a4 FEFFFFEB 		ldrb	r3, [r3, #0]
+ 314:main.c        ****     aciSyncCmd();
+ 746              	nd	r3, r3, #255
+ 747 07a8 FEFFFFEB 		cmp	r3, #0
+ 315:main.c        ****     aciSyncPar();
+ 748              	eq	.L54
+ 749 07ac FEFFFFEB 		ldr	r3, .L62+48
+ 316:main.c        **** 
+ 317:main.c        ****     //run ACI engine
+ 318:main.c        ****     aciEngine();
+ 750              	drb	r3, [r3, #0]
+ 751 07b0 FEFFFFEB 		and	r3, r3, #255
+ 319:main.c        **** 
+ 320:main.c        ****     //send buildinfo
+ 321:main.c        ****     if ((SYSTEM_initialized) && (!transmitBuildInfoTrigger))
+ 752              	mp	r3, #0
+ 753 07b4 98309FE5 		bne	.L54
+ 754 07b8 0030D3E5 		.loc 1 322 0
+ 755 07bc FF3003E2 		ldr	r3, .L62+48
+ 756 07c0 000053E3 		mov	r2, #1
+ 757 07c4 0700000A 		strb	r2, [r3, #0]
+ 758 07c8 AC309FE5 	.L54:
+ 759 07cc 0030D3E5 		.loc 1 325 0
+ 760 07d0 FF3003E2 		ldr	r3, .L62+8
+ 761 07d4 000053E3 		ldrb	r3, [r3, #0]
+ 762 07d8 0200001A 		and	r3, r3, #255
+ 322:main.c        **** 		transmitBuildInfoTrigger=1;
+ 763              	
+ 764 07dc 98309FE5 		beq	.L61
+ 765 07e0 0120A0E3 		ldr	r3, .L62+52
+ 766 07e4 0020C3E5 		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 767              		cmp	r3, #0
+ 323:main.c        **** 
+ 324:main.c        ****     //Firefly LED
+ 325:main.c        ****     if (SYSTEM_initialized&&fireflyLedEnabled)
+ 768              		.L61
+ 769 07e8 64309FE5 		.loc 1 327 0
+ 770 07ec 0030D3E5 		ldr	r3, .L62+56
+ 771 07f0 FF3003E2 		ldr	r3, [r3, #0]
+ 772 07f4 000053E3 		add	r2, r3, #1
+ 773 07f8 1000000A 		ldr	r3, .L62+56
+ 774 07fc 7C309FE5 		str	r2, [r3, #0]
+ 775 0800 0030D3E5 		ldr	r3, .L62+56
+ 776 0804 000053E3 		ldr	r3, [r3, #0]
+ 777 0808 0C00000A 		cmp	r3, #10
+ 326:main.c        ****     {
+ 327:main.c        ****     	if(++Firefly_led_fin_cnt==10)
+ 778              		.loc 1 329 0
+ 779 080c 70309FE5 		ldr	r2, .L62+56
+ 780 0810 003093E5 		mov	r3, #0
+ 781 0814 012083E2 		str	r3, [r2, #0]
+ 782 0818 64309FE5 		.loc 1 330 0
+ 783 081c 002083E5 		bl	fireFlyLedHandler
+ 784 0820 5C309FE5 	.L61:
+ 785 0824 003093E5 		.loc 1 334 0
+ 786 0828 0A0053E3 		sub	sp, fp, #12
+ 787 082c 0300001A 		ldmfd	sp, {fp, sp, lr}
+ 328:main.c        ****     	{
+ 329:main.c        ****     		Firefly_led_fin_cnt=0;
+ 788              	3:
+ 789 0830 4C209FE5 		.align	2
+ 790 0834 0030A0E3 	.L62:
+ 791 0838 003082E5 		.word	led_cnt.2118
+ 330:main.c        ****     		fireFlyLedHandler();
+ 792              	rd	GPS_Data
+ 793 083c FEFFFFEB 		.word	SYSTEM_initialized
+ 794              		.word	declinationAvailable
+ 331:main.c        ****     	}
+ 332:main.c        ****     }
+ 333:main.c        **** 
+ 334:main.c        **** }
+ 795              	ord	274877907
+ 796 0840 0CD04BE2 		.word	estimatedDeclination
+ 797 0844 00689DE8 		.word	gpsLEDTrigger
+ 798 0848 1EFF2FE1 		.word	led_state.2119
+ 799              		.word	RO_ALL_Data
+ 800              		.word	GPS_Time
+ 801              		.word	trigger_transmission
+ 802 084c 24000000 		.word	transmission_running
+ 803 0850 00000000 		.word	transmitBuildInfoTrigger
+ 804 0854 00000000 		.word	fireflyLedEnabled
+ 805 0858 00000000 		.word	Firefly_led_fin_cnt.2120
+ 806 085c D34D6210 	.LFE4:
+ 808 0864 00000000 		.section	.rodata
+ 809 0868 02000000 		.align	2
+ 812 0874 00000000 	cpCharUnit0x0005.2278:
+ 813 0878 00000000 		.ascii	"1=enable 0=disable\000"
+ 814 087c 00000000 		.align	2
+ 817              	cpCharDesc0x0005.2277:
+ 818              		.ascii	"Channel7 mapped directly to servo out\000"
+ 819              		.align	2
+ 822              	cpCharName0x0005.2276:
+ 823              		.ascii	"PTU_enable_plain_ch7_to_servo\000"
+ 824 0000 313D656E 		.align	2
+ 824      61626C65 
+ 824      20303D64 
+ 824      69736162 
+ 824      6C6500
+ 827              	ccCharUnit0x0602.2274:
+ 828              		.ascii	"0x00: disable, 0x01 enable\000"
+ 829 0014 4368616E 		.align	2
+ 829      6E656C37 
+ 829      206D6170 
+ 829      70656420 
+ 829      64697265 
+ 832              	ccCharDesc0x0602.2273:
+ 833              		.ascii	"Setting if motors can be turned on by using the sti"
+ 834 003c 5054555F 		.ascii	"ck input\000"
+ 834      656E6162 
+ 834      6C655F70 
+ 834      6C61696E 
+ 834      5F636837 
+ 835 005a 0000     		.align	2
+ 838              	ccCharName0x0602.2272:
+ 839 005c 30783030 		.ascii	"disable_motor_onoff_by_stick\000"
+ 839      3A206469 
+ 839      7361626C 
+ 839      652C2030 
+ 839      78303120 
+ 840 0077 00       		.align	2
+ 843              	cvCharUnit0x0309.2271:
+ 844 0078 53657474 		.ascii	"cm\000"
+ 844      696E6720 
+ 844      6966206D 
+ 844      6F746F72 
+ 844      73206361 
+ 845 00ab 636B2069 		.align	2
+ 845      6E707574 
+ 845      00
+ 848              	cvCharDesc0x0309.2270:
+ 849              		.ascii	"the 16-bit measured distance\000"
+ 850 00b4 64697361 		.align	2
+ 850      626C655F 
+ 850      6D6F746F 
+ 850      725F6F6E 
+ 850      6F66665F 
+ 853              	cvCharName0x0309.2269:
+ 854              		.ascii	"laser measurement\000"
+ 855 00d4 636D00   		.align	2
+ 858              	cvCharUnit0x0308.2268:
+ 859              		.ascii	"mm/s\000"
+ 860 00d8 74686520 		.align	2
+ 860      31362D62 
+ 860      6974206D 
+ 860      65617375 
+ 860      72656420 
+ 863              	cvCharDesc0x0308.2267:
+ 864              		.ascii	"Fused speed in North/South with all other sensors ("
+ 865 00f8 6C617365 		.ascii	"best estimations)\000"
+ 865      72206D65 
+ 865      61737572 
+ 865      656D656E 
+ 865      7400
+ 866 010a 0000     		.align	2
+ 869              	cvCharName0x0308.2266:
+ 870 010c 6D6D2F73 		.ascii	"fusion_speed_y\000"
+ 870      00
+ 871 0111 000000   		.align	2
+ 874              	cvCharUnit0x0307.2265:
+ 875 0114 46757365 		.ascii	"mm/s\000"
+ 875      64207370 
+ 875      65656420 
+ 875      696E204E 
+ 875      6F727468 
+ 876 0147 62657374 		.align	2
+ 876      20657374 
+ 876      696D6174 
+ 876      696F6E73 
+ 876      2900
+ 879              	cvCharDesc0x0307.2264:
+ 880              		.ascii	"Fused speed in East/West with all other sensors (be"
+ 881 015c 66757369 		.ascii	"st estimations)\000"
+ 881      6F6E5F73 
+ 881      70656564 
+ 881      5F7900
+ 882 016b 00       		.align	2
+ 885              	cvCharName0x0307.2263:
+ 886 016c 6D6D2F73 		.ascii	"fusion_speed_x\000"
+ 886      00
+ 887 0171 000000   		.align	2
+ 890              	cvCharUnit0x0306.2262:
+ 891 0174 46757365 		.ascii	"mm\000"
+ 891      64207370 
+ 891      65656420 
+ 891      696E2045 
+ 891      6173742F 
+ 892 01a7 73742065 		.align	2
+ 892      7374696D 
+ 892      6174696F 
+ 892      6E732900 
+ 895              	cvCharDesc0x0306.2261:
+ 896              		.ascii	"Height after data fusion\000"
+ 897 01b8 66757369 		.align	2
+ 897      6F6E5F73 
+ 897      70656564 
+ 897      5F7800
+ 900              	cvCharName0x0306.2260:
+ 901              		.ascii	"fusion_height\000"
+ 902 01c8 6D6D00   		.align	2
+ 905              	cvCharUnit0x0305.2259:
+ 906              		.ascii	"mm/s\000"
+ 907 01cc 48656967 		.align	2
+ 907      68742061 
+ 907      66746572 
+ 907      20646174 
+ 907      61206675 
+ 910              	cvCharDesc0x0305.2258:
+ 911              		.ascii	"Difference height after data fusion\000"
+ 912 01e8 66757369 		.align	2
+ 912      6F6E5F68 
+ 912      65696768 
+ 912      7400
+ 915              	cvCharName0x0305.2257:
+ 916              		.ascii	"fusion_dheight\000"
+ 917 01f8 6D6D2F73 		.align	2
+ 917      00
+ 920              	cvCharUnit0x0304.2256:
+ 921              		.ascii	"degrees * 10^7\000"
+ 922 0200 44696666 		.align	2
+ 922      6572656E 
+ 922      63652068 
+ 922      65696768 
+ 922      74206166 
+ 925              	cvCharDesc0x0304.2255:
+ 926              		.ascii	"Fused longitude with all other sensors (best estima"
+ 927 0224 66757369 		.ascii	"tions)\000"
+ 927      6F6E5F64 
+ 927      68656967 
+ 927      687400
+ 928 0233 00       		.align	2
+ 931              	cvCharName0x0304.2254:
+ 932 0234 64656772 		.ascii	"fusion_longitude\000"
+ 932      65657320 
+ 932      2A203130 
+ 932      5E3700
+ 933 0243 00       		.align	2
+ 936              	cvCharUnit0x0303.2253:
+ 937 0244 46757365 		.ascii	"degrees * 10^7\000"
+ 937      64206C6F 
+ 937      6E676974 
+ 937      75646520 
+ 937      77697468 
+ 938 0277 74696F6E 		.align	2
+ 938      732900
+ 941              	cvCharDesc0x0303.2252:
+ 942              		.ascii	"Fused latitude with all other sensors (best estimat"
+ 943 0280 66757369 		.ascii	"ions)\000"
+ 943      6F6E5F6C 
+ 943      6F6E6769 
+ 943      74756465 
+ 943      00
+ 944 0291 000000   		.align	2
+ 947              	cvCharName0x0303.2251:
+ 948 0294 64656772 		.ascii	"fusion_latitude\000"
+ 948      65657320 
+ 948      2A203130 
+ 948      5E3700
+ 949 02a3 00       		.align	2
+ 952              	cvCharUnit0x0302.2250:
+ 953 02a4 46757365 		.ascii	"degree*1000\000"
+ 953      64206C61 
+ 953      74697475 
+ 953      64652077 
+ 953      69746820 
+ 954 02d7 696F6E73 		.align	2
+ 954      2900
+ 957              	cvCharDesc0x0302.2249:
+ 958              		.ascii	"Yaw angle derived by data fusion\000"
+ 959 02e0 66757369 		.align	2
+ 959      6F6E5F6C 
+ 959      61746974 
+ 959      75646500 
+ 962              	cvCharName0x0302.2248:
+ 963              		.ascii	"angle_yaw\000"
+ 964 02f0 64656772 		.align	2
+ 964      65652A31 
+ 964      30303000 
+ 967              	cvCharUnit0x0301.2247:
+ 968              		.ascii	"degree*1000\000"
+ 969 02fc 59617720 		.align	2
+ 969      616E676C 
+ 969      65206465 
+ 969      72697665 
+ 969      64206279 
+ 972              	cvCharDesc0x0301.2246:
+ 973              		.ascii	"Roll angle derived by data fusion\000"
+ 974 0320 616E676C 		.align	2
+ 974      655F7961 
+ 974      7700
+ 977              	cvCharName0x0301.2245:
+ 978              		.ascii	"angle_roll\000"
+ 979 032c 64656772 		.align	2
+ 979      65652A31 
+ 979      30303000 
+ 982              	cvCharUnit0x0300.2244:
+ 983              		.ascii	"degree*1000\000"
+ 984 0338 526F6C6C 		.align	2
+ 984      20616E67 
+ 984      6C652064 
+ 984      65726976 
+ 984      65642062 
+ 987              	cvCharDesc0x0300.2243:
+ 988              		.ascii	"Pitch angle derived by by data fusion\000"
+ 989 035c 616E676C 		.align	2
+ 989      655F726F 
+ 989      6C6C00
+ 992              	cvCharName0x0300.2242:
+ 993              		.ascii	"angle_pitch\000"
+ 994 0368 64656772 		.align	2
+ 994      65652A31 
+ 994      30303000 
+ 997              	cvCharUnit0x0208.2241:
+ 998              		.ascii	"+-2500 =+- earth field strength\000"
+ 999 0374 50697463 		.align	2
+ 999      6820616E 
+ 999      676C6520 
+ 999      64657269 
+ 999      76656420 
+ 1002              	cvCharDesc0x0208.2240:
+ 1003              		.ascii	"Magnetic field sensors output in z\000"
+ 1004 039c 616E676C 		.align	2
+ 1004      655F7069 
+ 1004      74636800 
+ 1007              	cvCharName0x0208.2239:
+ 1008              		.ascii	"Hz\000"
+ 1009 03a8 2B2D3235 		.align	2
+ 1009      3030203D 
+ 1009      2B2D2065 
+ 1009      61727468 
+ 1009      20666965 
+ 1012              	cvCharUnit0x0207.2238:
+ 1013              		.ascii	"+-2500 =+- earth field strength\000"
+ 1014 03c8 4D61676E 		.align	2
+ 1014      65746963 
+ 1014      20666965 
+ 1014      6C642073 
+ 1014      656E736F 
+ 1017              	cvCharDesc0x0207.2237:
+ 1018              		.ascii	"Magnetic field sensors output in y\000"
+ 1019 03ec 487A00   		.align	2
+ 1022              	cvCharName0x0207.2236:
+ 1023              		.ascii	"Hy\000"
+ 1024 03f0 2B2D3235 		.align	2
+ 1024      3030203D 
+ 1024      2B2D2065 
+ 1024      61727468 
+ 1024      20666965 
+ 1027              	cvCharUnit0x0206.2235:
+ 1028              		.ascii	"+-2500 =+- earth field strength\000"
+ 1029 0410 4D61676E 		.align	2
+ 1029      65746963 
+ 1029      20666965 
+ 1029      6C642073 
+ 1029      656E736F 
+ 1032              	cvCharDesc0x0206.2234:
+ 1033              		.ascii	"Magnetic field sensors output in x\000"
+ 1034 0434 487900   		.align	2
+ 1037              	cvCharName0x0206.2233:
+ 1038              		.ascii	"Hx\000"
+ 1039 0438 2B2D3235 		.align	2
+ 1039      3030203D 
+ 1039      2B2D2065 
+ 1039      61727468 
+ 1039      20666965 
+ 1042              	cvCharUnit0x0205.2232:
+ 1043              		.ascii	"-10000..+10000 = -1g..+1g\000"
+ 1044 0458 4D61676E 		.align	2
+ 1044      65746963 
+ 1044      20666965 
+ 1044      6C642073 
+ 1044      656E736F 
+ 1047              	cvCharDesc0x0205.2231:
+ 1048              		.ascii	"Acc-sensor output in z, body frame coordinate syste"
+ 1049 047c 487800   		.ascii	"m\000"
+ 1050 047f 00       		.align	2
+ 1053              	cvCharName0x0205.2230:
+ 1054 0480 2D313030 		.ascii	"acc_z\000"
+ 1054      30302E2E 
+ 1054      2B313030 
+ 1054      3030203D 
+ 1054      202D3167 
+ 1055 049a 0000     		.align	2
+ 1058              	cvCharUnit0x0204.2229:
+ 1059 049c 4163632D 		.ascii	"-10000..+10000 = -1g..+1g\000"
+ 1059      73656E73 
+ 1059      6F72206F 
+ 1059      75747075 
+ 1059      7420696E 
+ 1060 04cf 6D00     		.align	2
+ 1063              	cvCharDesc0x0204.2228:
+ 1064              		.ascii	"Acc-sensor output in y, body frame coordinate syste"
+ 1065 04d4 6163635F 		.ascii	"m\000"
+ 1065      7A00
+ 1066 04da 0000     		.align	2
+ 1069              	cvCharName0x0204.2227:
+ 1070 04dc 2D313030 		.ascii	"acc_y\000"
+ 1070      30302E2E 
+ 1070      2B313030 
+ 1070      3030203D 
+ 1070      202D3167 
+ 1071 04f6 0000     		.align	2
+ 1074              	cvCharUnit0x0203.2226:
+ 1075 04f8 4163632D 		.ascii	"-10000..+10000 = -1g..+1g\000"
+ 1075      73656E73 
+ 1075      6F72206F 
+ 1075      75747075 
+ 1075      7420696E 
+ 1076 052b 6D00     		.align	2
+ 1079              	cvCharDesc0x0203.2225:
+ 1080              		.ascii	"Acc-sensor output in x, body frame coordinate syste"
+ 1081 0530 6163635F 		.ascii	"m\000"
+ 1081      7900
+ 1082 0536 0000     		.align	2
+ 1085              	cvCharName0x0203.2224:
+ 1086 0538 2D313030 		.ascii	"acc_x\000"
+ 1086      30302E2E 
+ 1086      2B313030 
+ 1086      3030203D 
+ 1086      202D3167 
+ 1087 0552 0000     		.align	2
+ 1090              	cvCharUnit0x0202.2223:
+ 1091 0554 4163632D 		.ascii	"0.0154 degree/s, bias free\000"
+ 1091      73656E73 
+ 1091      6F72206F 
+ 1091      75747075 
+ 1091      7420696E 
+ 1092 0587 6D00     		.align	2
+ 1095              	cvCharDesc0x0202.2222:
+ 1096              		.ascii	"Yaw angle velocity\000"
+ 1097 058c 6163635F 		.align	2
+ 1097      7800
+ 1100              	cvCharName0x0202.2221:
+ 1101              		.ascii	"angvel_yaw\000"
+ 1102 0594 302E3031 		.align	2
+ 1102      35342064 
+ 1102      65677265 
+ 1102      652F732C 
+ 1102      20626961 
+ 1105              	cvCharUnit0x0201.2220:
+ 1106              		.ascii	"0.0154 degree/s, bias free\000"
+ 1107 05b0 59617720 		.align	2
+ 1107      616E676C 
+ 1107      65207665 
+ 1107      6C6F6369 
+ 1107      747900
+ 1110              	cvCharDesc0x0201.2219:
+ 1111              		.ascii	"Roll angle velocity\000"
+ 1112 05c4 616E6776 		.align	2
+ 1112      656C5F79 
+ 1112      617700
+ 1115              	cvCharName0x0201.2218:
+ 1116              		.ascii	"angvel_roll\000"
+ 1117 05d0 302E3031 		.align	2
+ 1117      35342064 
+ 1117      65677265 
+ 1117      652F732C 
+ 1117      20626961 
+ 1120              	cvCharUnit0x0200.2216:
+ 1121              		.ascii	"0.0154 degree/s, bias free\000"
+ 1122 05ec 526F6C6C 		.align	2
+ 1122      20616E67 
+ 1122      6C652076 
+ 1122      656C6F63 
+ 1122      69747900 
+ 1125              	cvCharDesc0x0200.2215:
+ 1126              		.ascii	"Pitch angle velocity\000"
+ 1127 0600 616E6776 		.align	2
+ 1127      656C5F72 
+ 1127      6F6C6C00 
+ 1130              	cvCharName0x0200.2214:
+ 1131              		.ascii	"angvel_pitch\000"
+ 1132 060c 302E3031 		.text
+ 1132      35342064 
+ 1132      65677265 
+ 1132      652F732C 
+ 1132      20626961 
+ 1133 0627 00       		.align	2
+ 1134              		.global	ACISDK
+ 1136              	ACISDK:
+ 1137 0628 50697463 	.LFB5:
+ 1137      6820616E 
+ 1137      676C6520 
+ 1137      76656C6F 
+ 1137      63697479 
+ 1138 063d 000000   		.loc 1 338 0
+ 1139              		@ Function supports interworking.
+ 1140              		@ args = 0, pretend = 0, frame = 0
+ 1141              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1142 0640 616E6776 		mov	ip, sp
+ 1142      656C5F70 
+ 1142      69746368 
+ 1142      00
+ 1143 064d 000000   	.LCFI11:
+ 1144              		stmfd	sp!, {fp, ip, lr, pc}
+ 1145              	.LCFI12:
+ 1146              		sub	fp, ip, #4
+ 1147              	.LCFI13:
+ 1148              		sub	sp, sp, #8
+ 335:main.c        **** 
+ 336:main.c        **** 
+ 337:main.c        **** void ACISDK(void)
+ 338:main.c        **** {
+ 1149              	40 0
+ 1150              		bl	lpc_aci_init
+ 1151              		.loc 1 342 0
+ 1152              		ldr	r0, .L66
+ 1153 0888 0DC0A0E1 		bl	aciSetStartTxCallback
+ 1154              		.loc 1 373 0
+ 1155 088c 00D82DE9 		ldr	r3, .L66+4
+ 1156              		str	r3, [sp, #0]
+ 1157 0890 04B04CE2 		ldr	r3, .L66+8
+ 1158              		str	r3, [sp, #4]
+ 1159 0894 08D04DE2 		ldr	r0, .L66+12
+ 1160              		mov	r1, #16
+ 339:main.c        **** 	aciInit(1000);
+ 1161              	2
+ 1162 0898 FA0FA0E3 		ldr	r3, .L66+16
+ 1163 089c FEFFFFEB 		bl	aciPublishVariableInt
+ 340:main.c        **** 	lpc_aci_init();
+ 1164              	oc 1 374 0
+ 1165 08a0 FEFFFFEB 		ldr	r3, .L66+20
+ 341:main.c        **** #ifndef MATLAB
+ 342:main.c        **** 	aciSetStartTxCallback(UARTWriteChar);
+ 1166              	tr	r3, [sp, #0]
+ 1167 08a4 3C039FE5 		ldr	r3, .L66+24
+ 1168 08a8 FEFFFFEB 		str	r3, [sp, #4]
+ 343:main.c        **** 	// Variables
+ 344:main.c        **** 	/*
+ 345:main.c        **** 	aciPublishVariable(&RO_ALL_Data.UAV_status, VARTYPE_INT16, 0x0001, "UAV_status", "UAV status infor
+ 346:main.c        **** 	aciPublishVariable(&RO_ALL_Data.flight_time, VARTYPE_INT16, 0x0002, "flight_time", "Total flight t
+ 347:main.c        **** 	aciPublishVariable(&RO_ALL_Data.battery_voltage, VARTYPE_INT16, 0x0003, "battery_voltage", "Batter
+ 348:main.c        **** 	aciPublishVariable(&RO_ALL_Data.HL_cpu_load, VARTYPE_INT16, 0x0004, "HL_cpu_load", "High-level CPU
+ 349:main.c        **** 	aciPublishVariable(&RO_ALL_Data.HL_up_time, VARTYPE_INT16, 0x0005, "HL_up_time", "AHigh-level up-t
+ 350:main.c        **** 
+ 351:main.c        **** 	aciPublishVariable(&RO_ALL_Data.motor_rpm[0], VARTYPE_UINT8, 0x0100, "motor_rpm[0]", "Quadcopter: 
+ 352:main.c        **** 	aciPublishVariable(&RO_ALL_Data.motor_rpm[1], VARTYPE_UINT8, 0x0101, "motor_rpm[1]", "Quadcopter: 
+ 353:main.c        **** 	aciPublishVariable(&RO_ALL_Data.motor_rpm[2], VARTYPE_UINT8, 0x0102, "motor_rpm[2]", "Quadcopter: 
+ 354:main.c        **** 	aciPublishVariable(&RO_ALL_Data.motor_rpm[3], VARTYPE_UINT8, 0x0103, "motor_rpm[3]", "Quadcopter: 
+ 355:main.c        **** 	aciPublishVariable(&RO_ALL_Data.motor_rpm[4], VARTYPE_UINT8, 0x0104, "motor_rpm[4]", "Quadcopter: 
+ 356:main.c        **** 	aciPublishVariable(&RO_ALL_Data.motor_rpm[5], VARTYPE_UINT8, 0x0105, "motor_rpm[5]", "Quadcopter: 
+ 357:main.c        **** 
+ 358:main.c        **** 	aciPublishVariable(&RO_ALL_Data.GPS_latitude, VARTYPE_INT32, 0x0106, "GPS_latitude", "Latitude fro
+ 359:main.c        **** 	aciPublishVariable(&RO_ALL_Data.GPS_longitude, VARTYPE_INT32, 0x0107, "GPS_longitude", "Longitude 
+ 360:main.c        **** 	aciPublishVariable(&RO_ALL_Data.GPS_height, VARTYPE_INT32, 0x0108, "GPS_height", "Height from the 
+ 361:main.c        **** 	aciPublishVariable(&RO_ALL_Data.GPS_speed_x, VARTYPE_INT32, 0x0109, "GPS_speed_x", "Speed in East/
+ 362:main.c        **** 	aciPublishVariable(&RO_ALL_Data.GPS_speed_y, VARTYPE_INT32, 0x010A, "GPS_speed_y", "Speed in North
+ 363:main.c        **** 	aciPublishVariable(&RO_ALL_Data.GPS_heading, VARTYPE_INT32, 0x010B, "GPS_heading", "Heading from t
+ 364:main.c        **** 	aciPublishVariable(&RO_ALL_Data.GPS_position_accuracy, VARTYPE_UINT32, 0x010C, "GPS_position_accur
+ 365:main.c        **** 	aciPublishVariable(&RO_ALL_Data.GPS_height_accuracy, VARTYPE_UINT32, 0x010D, "GPS_height_accuracy"
+ 366:main.c        **** 	aciPublishVariable(&RO_ALL_Data.GPS_speed_accuracy, VARTYPE_UINT32, 0x010E, "GPS_speed_accuracy", 
+ 367:main.c        **** 	aciPublishVariable(&RO_ALL_Data.GPS_sat_num, VARTYPE_UINT32, 0x010F, "GPS_sat_num", "Number of sat
+ 368:main.c        **** 	aciPublishVariable(&RO_ALL_Data.GPS_status, VARTYPE_INT32, 0x0110, "GPS_status", "GPS status infor
+ 369:main.c        **** 	aciPublishVariable(&RO_ALL_Data.GPS_time_of_week, VARTYPE_UINT32, 0x0111, "GPS_time_of_week", "Tim
+ 370:main.c        **** 	aciPublishVariable(&RO_ALL_Data.GPS_week, VARTYPE_UINT16, 0x0112, "GPS_week", "Week counter since 
+ 371:main.c        **** 	*/
+ 372:main.c        **** 
+ 373:main.c        **** 	aciPublishVariable(&RO_ALL_Data.angvel_pitch, VARTYPE_INT32, 0x0200, "angvel_pitch", "Pitch angle 
+ 1169              	r	r0, .L66+28
+ 1170 08ac 38339FE5 		mov	r1, #16
+ 1171 08b0 00308DE5 		mov	r2, #512
+ 1172 08b4 34339FE5 		add	r2, r2, #1
+ 1173 08b8 04308DE5 		ldr	r3, .L66+32
+ 1174 08bc 30039FE5 		bl	aciPublishVariableInt
+ 1175 08c0 1010A0E3 		.loc 1 375 0
+ 1176 08c4 022CA0E3 		ldr	r3, .L66+36
+ 1177 08c8 28339FE5 		str	r3, [sp, #0]
+ 1178 08cc FEFFFFEB 		ldr	r3, .L66+40
+ 374:main.c        **** 	aciPublishVariable(&RO_ALL_Data.angvel_roll, VARTYPE_INT32, 0x0201, "angvel_roll", "Roll angle vel
+ 1179              	sp, #4]
+ 1180 08d0 24339FE5 		ldr	r0, .L66+44
+ 1181 08d4 00308DE5 		mov	r1, #16
+ 1182 08d8 20339FE5 		mov	r2, #512
+ 1183 08dc 04308DE5 		add	r2, r2, #2
+ 1184 08e0 1C039FE5 		ldr	r3, .L66+48
+ 1185 08e4 1010A0E3 		bl	aciPublishVariableInt
+ 1186 08e8 022CA0E3 		.loc 1 377 0
+ 1187 08ec 012082E2 		ldr	r3, .L66+52
+ 1188 08f0 10339FE5 		str	r3, [sp, #0]
+ 1189 08f4 FEFFFFEB 		ldr	r3, .L66+56
+ 375:main.c        **** 	aciPublishVariable(&RO_ALL_Data.angvel_yaw, VARTYPE_INT32, 0x0202, "angvel_yaw", "Yaw angle veloci
+ 1190              	p, #4]
+ 1191 08f8 0C339FE5 		ldr	r0, .L66+60
+ 1192 08fc 00308DE5 		mov	r1, #8
+ 1193 0900 08339FE5 		mov	r2, #512
+ 1194 0904 04308DE5 		add	r2, r2, #3
+ 1195 0908 04039FE5 		ldr	r3, .L66+64
+ 1196 090c 1010A0E3 		bl	aciPublishVariableInt
+ 1197 0910 022CA0E3 		.loc 1 378 0
+ 1198 0914 022082E2 		ldr	r3, .L66+68
+ 1199 0918 F8329FE5 		str	r3, [sp, #0]
+ 1200 091c FEFFFFEB 		ldr	r3, .L66+72
+ 376:main.c        **** 
+ 377:main.c        **** 	aciPublishVariable(&RO_ALL_Data.acc_x, VARTYPE_INT16, 0x0203, "acc_x", "Acc-sensor output in x, bo
+ 1201              	p, #4]
+ 1202 0920 F4329FE5 		ldr	r0, .L66+76
+ 1203 0924 00308DE5 		mov	r1, #8
+ 1204 0928 F0329FE5 		mov	r2, #516
+ 1205 092c 04308DE5 		ldr	r3, .L66+80
+ 1206 0930 EC029FE5 		bl	aciPublishVariableInt
+ 1207 0934 0810A0E3 		.loc 1 379 0
+ 1208 0938 022CA0E3 		ldr	r3, .L66+84
+ 1209 093c 032082E2 		str	r3, [sp, #0]
+ 1210 0940 E0329FE5 		ldr	r3, .L66+88
+ 1211 0944 FEFFFFEB 		str	r3, [sp, #4]
+ 378:main.c        **** 	aciPublishVariable(&RO_ALL_Data.acc_y, VARTYPE_INT16, 0x0204, "acc_y", "Acc-sensor output in y, bo
+ 1212              	66+92
+ 1213 0948 DC329FE5 		mov	r1, #8
+ 1214 094c 00308DE5 		mov	r2, #516
+ 1215 0950 D8329FE5 		add	r2, r2, #1
+ 1216 0954 04308DE5 		ldr	r3, .L66+96
+ 1217 0958 D4029FE5 		bl	aciPublishVariableInt
+ 1218 095c 0810A0E3 		.loc 1 381 0
+ 1219 0960 812FA0E3 		ldr	r3, .L66+100
+ 1220 0964 CC329FE5 		str	r3, [sp, #0]
+ 1221 0968 FEFFFFEB 		ldr	r3, .L66+104
+ 379:main.c        **** 	aciPublishVariable(&RO_ALL_Data.acc_z, VARTYPE_INT16, 0x0205, "acc_z", "Acc-sensor output in z, bo
+ 1222              	sp, #4]
+ 1223 096c C8329FE5 		ldr	r0, .L66+108
+ 1224 0970 00308DE5 		mov	r1, #16
+ 1225 0974 C4329FE5 		mov	r2, #516
+ 1226 0978 04308DE5 		add	r2, r2, #2
+ 1227 097c C0029FE5 		ldr	r3, .L66+112
+ 1228 0980 0810A0E3 		bl	aciPublishVariableInt
+ 1229 0984 812FA0E3 		.loc 1 382 0
+ 1230 0988 012082E2 		ldr	r3, .L66+116
+ 1231 098c B4329FE5 		str	r3, [sp, #0]
+ 1232 0990 FEFFFFEB 		ldr	r3, .L66+120
+ 380:main.c        **** 
+ 381:main.c        **** 	aciPublishVariable(&RO_ALL_Data.Hx, VARTYPE_INT32, 0x0206, "Hx", "Magnetic field sensors output in
+ 1233              	p, #4]
+ 1234 0994 B0329FE5 		ldr	r0, .L66+124
+ 1235 0998 00308DE5 		mov	r1, #16
+ 1236 099c AC329FE5 		mov	r2, #516
+ 1237 09a0 04308DE5 		add	r2, r2, #3
+ 1238 09a4 A8029FE5 		ldr	r3, .L66+128
+ 1239 09a8 1010A0E3 		bl	aciPublishVariableInt
+ 1240 09ac 812FA0E3 		.loc 1 383 0
+ 1241 09b0 022082E2 		ldr	r3, .L66+132
+ 1242 09b4 9C329FE5 		str	r3, [sp, #0]
+ 1243 09b8 FEFFFFEB 		ldr	r3, .L66+136
+ 382:main.c        **** 	aciPublishVariable(&RO_ALL_Data.Hy, VARTYPE_INT32, 0x0207, "Hy", "Magnetic field sensors output in
+ 1244              	p, #4]
+ 1245 09bc 98329FE5 		ldr	r0, .L66+140
+ 1246 09c0 00308DE5 		mov	r1, #16
+ 1247 09c4 94329FE5 		mov	r2, #520
+ 1248 09c8 04308DE5 		ldr	r3, .L66+144
+ 1249 09cc 90029FE5 		bl	aciPublishVariableInt
+ 1250 09d0 1010A0E3 		.loc 1 385 0
+ 1251 09d4 812FA0E3 		ldr	r3, .L66+148
+ 1252 09d8 032082E2 		str	r3, [sp, #0]
+ 1253 09dc 84329FE5 		ldr	r3, .L66+152
+ 1254 09e0 FEFFFFEB 		str	r3, [sp, #4]
+ 383:main.c        **** 	aciPublishVariable(&RO_ALL_Data.Hz, VARTYPE_INT32, 0x0208, "Hz", "Magnetic field sensors output in
+ 1255              	66+156
+ 1256 09e4 80329FE5 		mov	r1, #16
+ 1257 09e8 00308DE5 		mov	r2, #768
+ 1258 09ec 7C329FE5 		ldr	r3, .L66+160
+ 1259 09f0 04308DE5 		bl	aciPublishVariableInt
+ 1260 09f4 78029FE5 		.loc 1 386 0
+ 1261 09f8 1010A0E3 		ldr	r3, .L66+164
+ 1262 09fc 822FA0E3 		str	r3, [sp, #0]
+ 1263 0a00 70329FE5 		ldr	r3, .L66+168
+ 1264 0a04 FEFFFFEB 		str	r3, [sp, #4]
+ 384:main.c        **** 
+ 385:main.c        **** 	aciPublishVariable(&RO_ALL_Data.angle_pitch, VARTYPE_INT32, 0x0300, "angle_pitch", "Pitch angle de
+ 1265              	L66+172
+ 1266 0a08 6C329FE5 		mov	r1, #16
+ 1267 0a0c 00308DE5 		mov	r2, #768
+ 1268 0a10 68329FE5 		add	r2, r2, #1
+ 1269 0a14 04308DE5 		ldr	r3, .L66+176
+ 1270 0a18 64029FE5 		bl	aciPublishVariableInt
+ 1271 0a1c 1010A0E3 		.loc 1 387 0
+ 1272 0a20 032CA0E3 		ldr	r3, .L66+180
+ 1273 0a24 5C329FE5 		str	r3, [sp, #0]
+ 1274 0a28 FEFFFFEB 		ldr	r3, .L66+184
+ 386:main.c        **** 	aciPublishVariable(&RO_ALL_Data.angle_roll, VARTYPE_INT32, 0x0301, "angle_roll", "Roll angle deriv
+ 1275              	sp, #4]
+ 1276 0a2c 58329FE5 		ldr	r0, .L66+188
+ 1277 0a30 00308DE5 		mov	r1, #16
+ 1278 0a34 54329FE5 		mov	r2, #768
+ 1279 0a38 04308DE5 		add	r2, r2, #2
+ 1280 0a3c 50029FE5 		ldr	r3, .L66+192
+ 1281 0a40 1010A0E3 		bl	aciPublishVariableInt
+ 1282 0a44 032CA0E3 		.loc 1 389 0
+ 1283 0a48 012082E2 		ldr	r3, .L66+196
+ 1284 0a4c 44329FE5 		str	r3, [sp, #0]
+ 1285 0a50 FEFFFFEB 		ldr	r3, .L66+200
+ 387:main.c        **** 	aciPublishVariable(&RO_ALL_Data.angle_yaw, VARTYPE_INT32, 0x0302, "angle_yaw", "Yaw angle derived 
+ 1286              	p, #4]
+ 1287 0a54 40329FE5 		ldr	r0, .L66+204
+ 1288 0a58 00308DE5 		mov	r1, #16
+ 1289 0a5c 3C329FE5 		mov	r2, #768
+ 1290 0a60 04308DE5 		add	r2, r2, #3
+ 1291 0a64 38029FE5 		ldr	r3, .L66+208
+ 1292 0a68 1010A0E3 		bl	aciPublishVariableInt
+ 1293 0a6c 032CA0E3 		.loc 1 390 0
+ 1294 0a70 022082E2 		ldr	r3, .L66+212
+ 1295 0a74 2C329FE5 		str	r3, [sp, #0]
+ 1296 0a78 FEFFFFEB 		ldr	r3, .L66+216
+ 388:main.c        **** 
+ 389:main.c        **** 	aciPublishVariable(&RO_ALL_Data.fusion_latitude, VARTYPE_INT32, 0x0303, "fusion_latitude", "Fused 
+ 1297              	p, #4]
+ 1298 0a7c 28329FE5 		ldr	r0, .L66+220
+ 1299 0a80 00308DE5 		mov	r1, #16
+ 1300 0a84 24329FE5 		mov	r2, #772
+ 1301 0a88 04308DE5 		ldr	r3, .L66+224
+ 1302 0a8c 20029FE5 		bl	aciPublishVariableInt
+ 1303 0a90 1010A0E3 		.loc 1 391 0
+ 1304 0a94 032CA0E3 		ldr	r3, .L66+228
+ 1305 0a98 032082E2 		str	r3, [sp, #0]
+ 1306 0a9c 14329FE5 		ldr	r3, .L66+232
+ 1307 0aa0 FEFFFFEB 		str	r3, [sp, #4]
+ 390:main.c        **** 	aciPublishVariable(&RO_ALL_Data.fusion_longitude, VARTYPE_INT32, 0x0304, "fusion_longitude", "Fuse
+ 1308              	66+236
+ 1309 0aa4 10329FE5 		mov	r1, #16
+ 1310 0aa8 00308DE5 		mov	r2, #772
+ 1311 0aac 0C329FE5 		add	r2, r2, #1
+ 1312 0ab0 04308DE5 		ldr	r3, .L66+240
+ 1313 0ab4 08029FE5 		bl	aciPublishVariableInt
+ 1314 0ab8 1010A0E3 		.loc 1 392 0
+ 1315 0abc C12FA0E3 		ldr	r3, .L66+244
+ 1316 0ac0 00329FE5 		str	r3, [sp, #0]
+ 1317 0ac4 FEFFFFEB 		ldr	r3, .L66+248
+ 391:main.c        **** 	aciPublishVariable(&RO_ALL_Data.fusion_dheight, VARTYPE_INT32, 0x0305, "fusion_dheight", "Differen
+ 1318              	sp, #4]
+ 1319 0ac8 FC319FE5 		ldr	r0, .L66+252
+ 1320 0acc 00308DE5 		mov	r1, #16
+ 1321 0ad0 F8319FE5 		mov	r2, #772
+ 1322 0ad4 04308DE5 		add	r2, r2, #2
+ 1323 0ad8 F4019FE5 		ldr	r3, .L66+256
+ 1324 0adc 1010A0E3 		bl	aciPublishVariableInt
+ 1325 0ae0 C12FA0E3 		.loc 1 393 0
+ 1326 0ae4 012082E2 		ldr	r3, .L66+260
+ 1327 0ae8 E8319FE5 		str	r3, [sp, #0]
+ 1328 0aec FEFFFFEB 		ldr	r3, .L66+264
+ 392:main.c        **** 	aciPublishVariable(&RO_ALL_Data.fusion_height, VARTYPE_INT32, 0x0306, "fusion_height", "Height aft
+ 1329              	p, #4]
+ 1330 0af0 E4319FE5 		ldr	r0, .L66+268
+ 1331 0af4 00308DE5 		mov	r1, #8
+ 1332 0af8 E0319FE5 		mov	r2, #772
+ 1333 0afc 04308DE5 		add	r2, r2, #3
+ 1334 0b00 DC019FE5 		ldr	r3, .L66+272
+ 1335 0b04 1010A0E3 		bl	aciPublishVariableInt
+ 1336 0b08 C12FA0E3 		.loc 1 394 0
+ 1337 0b0c 022082E2 		ldr	r3, .L66+276
+ 1338 0b10 D0319FE5 		str	r3, [sp, #0]
+ 1339 0b14 FEFFFFEB 		ldr	r3, .L66+280
+ 393:main.c        **** 	aciPublishVariable(&RO_ALL_Data.fusion_speed_x, VARTYPE_INT16, 0x0307, "fusion_speed_x", "Fused sp
+ 1340              	p, #4]
+ 1341 0b18 CC319FE5 		ldr	r0, .L66+284
+ 1342 0b1c 00308DE5 		mov	r1, #8
+ 1343 0b20 C8319FE5 		mov	r2, #776
+ 1344 0b24 04308DE5 		ldr	r3, .L66+288
+ 1345 0b28 C4019FE5 		bl	aciPublishVariableInt
+ 1346 0b2c 0810A0E3 		.loc 1 396 0
+ 1347 0b30 C12FA0E3 		ldr	r3, .L66+292
+ 1348 0b34 032082E2 		str	r3, [sp, #0]
+ 1349 0b38 B8319FE5 		ldr	r3, .L66+296
+ 1350 0b3c FEFFFFEB 		str	r3, [sp, #4]
+ 394:main.c        **** 	aciPublishVariable(&RO_ALL_Data.fusion_speed_y, VARTYPE_INT16, 0x0308, "fusion_speed_y", "Fused sp
+ 1351              	66+300
+ 1352 0b40 B4319FE5 		mov	r1, #8
+ 1353 0b44 00308DE5 		mov	r2, #776
+ 1354 0b48 B0319FE5 		add	r2, r2, #1
+ 1355 0b4c 04308DE5 		ldr	r3, .L66+304
+ 1356 0b50 AC019FE5 		bl	aciPublishVariableInt
+ 1357 0b54 0810A0E3 		.loc 1 431 0
+ 1358 0b58 C22FA0E3 		ldr	r3, .L66+308
+ 1359 0b5c A4319FE5 		str	r3, [sp, #0]
+ 1360 0b60 FEFFFFEB 		ldr	r3, .L66+312
+ 395:main.c        **** 
+ 396:main.c        **** 	aciPublishVariable(&laser_distance, VARTYPE_INT16, 0x0309, "laser measurement", "the 16-bit measur
+ 1361              	sp, #4]
+ 1362 0b64 A0319FE5 		ldr	r0, .L66+316
+ 1363 0b68 00308DE5 		mov	r1, #5
+ 1364 0b6c 9C319FE5 		mov	r2, #1536
+ 1365 0b70 04308DE5 		add	r2, r2, #2
+ 1366 0b74 98019FE5 		ldr	r3, .L66+320
+ 1367 0b78 0810A0E3 		bl	aciPublishCommandInt
+ 1368 0b7c C22FA0E3 		.loc 1 442 0
+ 1369 0b80 012082E2 		ldr	r3, .L66+324
+ 1370 0b84 8C319FE5 		str	r3, [sp, #0]
+ 1371 0b88 FEFFFFEB 		ldr	r3, .L66+328
+ 397:main.c        **** 
+ 398:main.c        **** 	/*
+ 399:main.c        **** 	aciPublishVariable(&RO_ALL_Data.channel[0], VARTYPE_UINT16, 0x0600, "channel[0]", "Pitch command r
+ 400:main.c        **** 	aciPublishVariable(&RO_ALL_Data.channel[1], VARTYPE_UINT16, 0x0601, "channel[1]", "Roll command re
+ 401:main.c        **** 	aciPublishVariable(&RO_ALL_Data.channel[2], VARTYPE_UINT16, 0x0602, "channel[2]", "Thrust command 
+ 402:main.c        **** 	aciPublishVariable(&RO_ALL_Data.channel[3], VARTYPE_UINT16, 0x0603, "channel[3]", "Yaw command rec
+ 403:main.c        **** 	aciPublishVariable(&RO_ALL_Data.channel[4], VARTYPE_UINT16, 0x0604, "channel[4]", "Serial interfac
+ 404:main.c        **** 	aciPublishVariable(&RO_ALL_Data.channel[5], VARTYPE_UINT16, 0x0605, "channel[5]", "Manual / height
+ 405:main.c        **** 	aciPublishVariable(&RO_ALL_Data.channel[6], VARTYPE_UINT16, 0x0606, "channel[6]", "Custom remote c
+ 406:main.c        **** 	aciPublishVariable(&RO_ALL_Data.channel[7], VARTYPE_UINT16, 0x0607, "channel[7]", "Custom remote c
+ 407:main.c        **** 
+ 408:main.c        **** 
+ 409:main.c        **** 	// Commands
+ 410:main.c        **** 	aciPublishCommand(&(WO_Direct_Individual_Motor_Control.motor[0]), VARTYPE_UINT8, 0x0500, "DIMC mot
+ 411:main.c        **** 	aciPublishCommand(&(WO_Direct_Individual_Motor_Control.motor[1]), VARTYPE_UINT8, 0x0501, "DIMC mot
+ 412:main.c        **** 	aciPublishCommand(&(WO_Direct_Individual_Motor_Control.motor[2]), VARTYPE_UINT8, 0x0502, "DIMC mot
+ 413:main.c        **** 	aciPublishCommand(&(WO_Direct_Individual_Motor_Control.motor[3]), VARTYPE_UINT8, 0x0503, "DIMC mot
+ 414:main.c        **** 	aciPublishCommand(&(WO_Direct_Individual_Motor_Control.motor[4]), VARTYPE_UINT8, 0x0504, "DIMC mot
+ 415:main.c        **** 	aciPublishCommand(&(WO_Direct_Individual_Motor_Control.motor[5]), VARTYPE_UINT8, 0x0505, "DIMC mot
+ 416:main.c        **** 
+ 417:main.c        **** 	aciPublishCommand(&WO_Direct_Motor_Control.pitch, VARTYPE_UINT8, 0x0506, "DMC pitch", "Pitch input
+ 418:main.c        **** 	aciPublishCommand(&WO_Direct_Motor_Control.roll, VARTYPE_UINT8, 0x0507, "DMC roll", "Roll input (D
+ 419:main.c        **** 	aciPublishCommand(&WO_Direct_Motor_Control.yaw, VARTYPE_UINT8, 0x0508, "DMC yaw", "Yaw input (DMC)
+ 420:main.c        **** 	aciPublishCommand(&WO_Direct_Motor_Control.thrust, VARTYPE_UINT8, 0x0509, "DMC thrust", "Thrust in
+ 421:main.c        **** 
+ 422:main.c        **** 	aciPublishCommand(&WO_CTRL_Input.pitch, VARTYPE_INT16, 0x050A, "CRTL pitch", "Pitch input (CRTL)",
+ 423:main.c        **** 	aciPublishCommand(&WO_CTRL_Input.roll, VARTYPE_INT16, 0x050B, "CTRL roll", "Roll input (CRTL)", "-
+ 424:main.c        **** 	aciPublishCommand(&WO_CTRL_Input.yaw, VARTYPE_INT16, 0x050C, "CTRL yaw", "Yaw input (CRTL)", "-204
+ 425:main.c        **** 	aciPublishCommand(&WO_CTRL_Input.thrust, VARTYPE_INT16, 0x050D, "CTRL thrust", "Thrust input (CRTL
+ 426:main.c        **** 	aciPublishCommand(&WO_CTRL_Input.ctrl, VARTYPE_INT16, 0x050E, "CTRL ctrl", "Control byte for enabl
+ 427:main.c        **** 
+ 428:main.c        **** 	aciPublishCommand(&WO_SDK.ctrl_mode,VARTYPE_UINT8,0x0600,"ctrl_mode","Control mode setting paramet
+ 429:main.c        **** 	aciPublishCommand(&WO_SDK.ctrl_enabled,VARTYPE_UINT8,0x0601,"ctrl_enabled","Control commands are a
+ 430:main.c        **** */
+ 431:main.c        **** 	aciPublishCommand(&WO_SDK.disable_motor_onoff_by_stick,VARTYPE_UINT8,0x0602,"disable_motor_onoff_b
+ 1372              	p, #4]
+ 1373 0b8c 88319FE5 		ldr	r0, .L66+332
+ 1374 0b90 00308DE5 		mov	r1, #5
+ 1375 0b94 84319FE5 		mov	r2, #5
+ 1376 0b98 04308DE5 		ldr	r3, .L66+336
+ 1377 0b9c 80019FE5 		bl	aciPublishParameterInt
+ 1378 0ba0 0510A0E3 		.loc 1 454 0
+ 1379 0ba4 062CA0E3 		bl	lpc_aci_ReadParafromFlash
+ 1380 0ba8 022082E2 		.loc 1 456 0
+ 1381 0bac 74319FE5 		sub	sp, fp, #12
+ 1382 0bb0 FEFFFFEB 		ldmfd	sp, {fp, sp, lr}
+ 432:main.c        **** 
+ 433:main.c        **** 	/*
+ 434:main.c        **** 	// Parameters
+ 435:main.c        **** 	aciPublishParameter(&ALARM_battery_warning_voltage_high,VARTYPE_UINT16,0x0001,"battery_warning_vol
+ 436:main.c        **** 	aciPublishParameter(&ALARM_battery_warning_voltage_low,VARTYPE_UINT16,0x0002,"battery_warning_volt
+ 437:main.c        **** 	aciPublishParameter(&buzzer_warnings,VARTYPE_UINT8,0x0003,"buzzer_warnings","Enable/Disable acoust
+ 438:main.c        **** 	aciPublishParameter(&PTU_cam_option_4_version,VARTYPE_UINT8,0x0004,"PTU_cam_option_4_version","Ver
+ 439:main.c        **** 	aciPublishParameter(&PTU_cam_angle_roll_offset,VARTYPE_INT32,0x0400,"cam_angle_roll_offset","Camer
+ 440:main.c        **** 	aciPublishParameter(&PTU_cam_angle_pitch_offset,VARTYPE_INT32,0x0401,"cam_angle_pitch_offset","Cam
+ 441:main.c        **** */
+ 442:main.c        **** 	aciPublishParameter(&PTU_enable_plain_ch7_to_servo,VARTYPE_UINT8,0x0005,"PTU_enable_plain_ch7_to_s
+ 1383              	:
+ 1384 0bb4 70319FE5 		.align	2
+ 1385 0bb8 00308DE5 	.L66:
+ 1386 0bbc 6C319FE5 		.word	UARTWriteChar
+ 1387 0bc0 04308DE5 		.word	cvCharDesc0x0200.2215
+ 1388 0bc4 68019FE5 		.word	cvCharUnit0x0200.2216
+ 1389 0bc8 0510A0E3 		.word	RO_ALL_Data+40
+ 1390 0bcc 0520A0E3 		.word	cvCharName0x0200.2214
+ 1391 0bd0 60319FE5 		.word	cvCharDesc0x0201.2219
+ 1392 0bd4 FEFFFFEB 		.word	cvCharUnit0x0201.2220
+ 443:main.c        **** 
+ 444:main.c        **** 
+ 445:main.c        **** #else
+ 446:main.c        **** 	// Matlab parameters
+ 447:main.c        **** 
+ 448:main.c        **** 	aciPublishParameter(&matlab_params.p01,VARTYPE_STRUCT_WITH_SIZE(60),0x0F00,"Matlab Parameter Set 1
+ 449:main.c        **** 	aciPublishParameter(&matlab_params.p16,VARTYPE_STRUCT_WITH_SIZE(60),0x0F01,"Matlab Parameter Set 2
+ 450:main.c        **** 	aciPublishParameter(&matlab_params.p30,VARTYPE_STRUCT_WITH_SIZE(48),0x0F02,"Matlab Parameter Set 3
+ 451:main.c        **** #endif
+ 452:main.c        **** 
+ 453:main.c        **** 	//get initial values from flash for all parameters
+ 454:main.c        **** 	lpc_aci_ReadParafromFlash();
+ 1393              	ALL_Data+44
+ 1394 0bd8 FEFFFFEB 		.word	cvCharName0x0201.2218
+ 455:main.c        **** 
+ 456:main.c        **** }
+ 1395              	word	cvCharDesc0x0202.2222
+ 1396 0bdc 0CD04BE2 		.word	cvCharUnit0x0202.2223
+ 1397 0be0 00689DE8 		.word	RO_ALL_Data+48
+ 1398 0be4 1EFF2FE1 		.word	cvCharName0x0202.2221
+ 1399              		.word	cvCharDesc0x0203.2225
+ 1400              		.word	cvCharUnit0x0203.2226
+ 1401              		.word	RO_ALL_Data+52
+ 1402 0be8 00000000 		.word	cvCharName0x0203.2224
+ 1403 0bec 28060000 		.word	cvCharDesc0x0204.2228
+ 1404 0bf0 0C060000 		.word	cvCharUnit0x0204.2229
+ 1405 0bf4 28000000 		.word	RO_ALL_Data+54
+ 1406 0bf8 40060000 		.word	cvCharName0x0204.2227
+ 1407 0bfc EC050000 		.word	cvCharDesc0x0205.2231
+ 1408 0c00 D0050000 		.word	cvCharUnit0x0205.2232
+ 1409 0c04 2C000000 		.word	RO_ALL_Data+56
+ 1410 0c08 00060000 		.word	cvCharName0x0205.2230
+ 1411 0c0c B0050000 		.word	cvCharDesc0x0206.2234
+ 1412 0c10 94050000 		.word	cvCharUnit0x0206.2235
+ 1413 0c14 30000000 		.word	RO_ALL_Data+60
+ 1414 0c18 C4050000 		.word	cvCharName0x0206.2233
+ 1415 0c1c 54050000 		.word	cvCharDesc0x0207.2237
+ 1416 0c20 38050000 		.word	cvCharUnit0x0207.2238
+ 1417 0c24 34000000 		.word	RO_ALL_Data+64
+ 1418 0c28 8C050000 		.word	cvCharName0x0207.2236
+ 1419 0c2c F8040000 		.word	cvCharDesc0x0208.2240
+ 1420 0c30 DC040000 		.word	cvCharUnit0x0208.2241
+ 1421 0c34 36000000 		.word	RO_ALL_Data+68
+ 1422 0c38 30050000 		.word	cvCharName0x0208.2239
+ 1423 0c3c 9C040000 		.word	cvCharDesc0x0300.2243
+ 1424 0c40 80040000 		.word	cvCharUnit0x0300.2244
+ 1425 0c44 38000000 		.word	RO_ALL_Data+28
+ 1426 0c48 D4040000 		.word	cvCharName0x0300.2242
+ 1427 0c4c 58040000 		.word	cvCharDesc0x0301.2246
+ 1428 0c50 38040000 		.word	cvCharUnit0x0301.2247
+ 1429 0c54 3C000000 		.word	RO_ALL_Data+32
+ 1430 0c58 7C040000 		.word	cvCharName0x0301.2245
+ 1431 0c5c 10040000 		.word	cvCharDesc0x0302.2249
+ 1432 0c60 F0030000 		.word	cvCharUnit0x0302.2250
+ 1433 0c64 40000000 		.word	RO_ALL_Data+36
+ 1434 0c68 34040000 		.word	cvCharName0x0302.2248
+ 1435 0c6c C8030000 		.word	cvCharDesc0x0303.2252
+ 1436 0c70 A8030000 		.word	cvCharUnit0x0303.2253
+ 1437 0c74 44000000 		.word	RO_ALL_Data+140
+ 1438 0c78 EC030000 		.word	cvCharName0x0303.2251
+ 1439 0c7c 74030000 		.word	cvCharDesc0x0304.2255
+ 1440 0c80 68030000 		.word	cvCharUnit0x0304.2256
+ 1441 0c84 1C000000 		.word	RO_ALL_Data+144
+ 1442 0c88 9C030000 		.word	cvCharName0x0304.2254
+ 1443 0c8c 38030000 		.word	cvCharDesc0x0305.2258
+ 1444 0c90 2C030000 		.word	cvCharUnit0x0305.2259
+ 1445 0c94 20000000 		.word	RO_ALL_Data+136
+ 1446 0c98 5C030000 		.word	cvCharName0x0305.2257
+ 1447 0c9c FC020000 		.word	cvCharDesc0x0306.2261
+ 1448 0ca0 F0020000 		.word	cvCharUnit0x0306.2262
+ 1449 0ca4 24000000 		.word	RO_ALL_Data+132
+ 1450 0ca8 20030000 		.word	cvCharName0x0306.2260
+ 1451 0cac A4020000 		.word	cvCharDesc0x0307.2264
+ 1452 0cb0 94020000 		.word	cvCharUnit0x0307.2265
+ 1453 0cb4 8C000000 		.word	RO_ALL_Data+148
+ 1454 0cb8 E0020000 		.word	cvCharName0x0307.2263
+ 1455 0cbc 44020000 		.word	cvCharDesc0x0308.2267
+ 1456 0cc0 34020000 		.word	cvCharUnit0x0308.2268
+ 1457 0cc4 90000000 		.word	RO_ALL_Data+150
+ 1458 0cc8 80020000 		.word	cvCharName0x0308.2266
+ 1459 0ccc 00020000 		.word	cvCharDesc0x0309.2270
+ 1460 0cd0 F8010000 		.word	cvCharUnit0x0309.2271
+ 1461 0cd4 88000000 		.word	laser_distance
+ 1462 0cd8 24020000 		.word	cvCharName0x0309.2269
+ 1463 0cdc CC010000 		.word	ccCharDesc0x0602.2273
+ 1464 0ce0 C8010000 		.word	ccCharUnit0x0602.2274
+ 1465 0ce4 84000000 		.word	WO_SDK+2
+ 1466 0ce8 E8010000 		.word	ccCharName0x0602.2272
+ 1467 0cec 74010000 		.word	cpCharDesc0x0005.2277
+ 1468 0cf0 6C010000 		.word	cpCharUnit0x0005.2278
+ 1469 0cf4 94000000 		.word	PTU_enable_plain_ch7_to_servo
+ 1470 0cf8 B8010000 		.word	cpCharName0x0005.2276
+ 1471 0cfc 14010000 	.LFE5:
+ 1473 0d04 96000000 		.comm	IMU_CalcData,92,4
+ 1474 0d08 5C010000 		.comm	IMU_CalcData_tmp,92,4
+ 1475 0d0c D8000000 		.comm	HL_Status,24,4
+ 1476 0d10 D4000000 		.comm	GPS_Time,8,4
+ 1477 0d14 00000000 		.comm	SSP_trans_cnt,4,4
+ 1478 0d18 F8000000 		.comm	uart_cnt,4,4
+ 1479 0d1c 78000000 		.section	.debug_frame,"",%progbits
+ 1480 0d20 5C000000 	.Lframe0:
+ 1481 0d24 02000000 		.4byte	.LECIE0-.LSCIE0
+ 1482 0d28 B4000000 	.LSCIE0:
+ 1483 0d2c 14000000 		.4byte	0xffffffff
+ 1484 0d30 00000000 		.byte	0x1
+ 1485 0d34 00000000 		.ascii	"\000"
+ 1486 0d38 3C000000 		.uleb128 0x1
+ 1487              		.sleb128 -4
+ 1488              		.byte	0xe
+ 1489              		.byte	0xc
+ 1490              		.uleb128 0xd
+ 1491              		.uleb128 0x0
+ 1492              		.align	2
+ 1493              	.LECIE0:
+ 1494              	.LSFDE0:
+ 1622              		.sleb128 4
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:15     .bss:00000000 int_cnt
+                             .bss:00000000 $d
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:21     .bss:00000004 cnt
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:27     .bss:00000008 mainloop_cnt
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:32     .bss:0000000c mainloop_trigger
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:38     .bss:00000010 GPS_timeout
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:44     .bss:00000014 trigger_cnt
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:49     .bss:00000018 SYSTEM_initialized
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:55     .data:00000000 DataOutputsPerSecond
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:61     .bss:00000019 fireflyLedEnabled
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:52     .bss:00000019 $d
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:67     .data:00000001 PTU_cam_option_4_version
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:74     .bss:0000001a mainloop_overflows
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:64     .bss:0000001a $d
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:80     .text:00000000 timer0ISR
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:87     .text:00000000 $a
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:159    .text:000000d8 $d
+                            *COM*:00000018 HL_Status
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:167    .bss:0000001c vbat1.2046
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:174    .text:000000e8 main
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:180    .text:000000e8 $a
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1147   .text:00000888 ACISDK
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:475    .text:00000478 mainloop
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:447    .text:00000450 $d
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:461    .bss:00000020 Firefly_led_fin_cnt.2120
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:466    .data:00000002 led_state.2119
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:463    .bss:00000024 $d
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:469    .bss:00000024 led_cnt.2118
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:481    .text:00000478 $a
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:802    .text:0000084c $d
+                            *COM*:00000008 GPS_Time
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:823    .rodata:00000000 cpCharUnit0x0005.2278
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:828    .rodata:00000014 cpCharDesc0x0005.2277
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:833    .rodata:0000003c cpCharName0x0005.2276
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:838    .rodata:0000005c ccCharUnit0x0602.2274
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:843    .rodata:00000078 ccCharDesc0x0602.2273
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:849    .rodata:000000b4 ccCharName0x0602.2272
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:854    .rodata:000000d4 cvCharUnit0x0309.2271
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:859    .rodata:000000d8 cvCharDesc0x0309.2270
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:864    .rodata:000000f8 cvCharName0x0309.2269
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:869    .rodata:0000010c cvCharUnit0x0308.2268
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:874    .rodata:00000114 cvCharDesc0x0308.2267
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:880    .rodata:0000015c cvCharName0x0308.2266
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:885    .rodata:0000016c cvCharUnit0x0307.2265
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:890    .rodata:00000174 cvCharDesc0x0307.2264
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:896    .rodata:000001b8 cvCharName0x0307.2263
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:901    .rodata:000001c8 cvCharUnit0x0306.2262
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:906    .rodata:000001cc cvCharDesc0x0306.2261
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:911    .rodata:000001e8 cvCharName0x0306.2260
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:916    .rodata:000001f8 cvCharUnit0x0305.2259
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:921    .rodata:00000200 cvCharDesc0x0305.2258
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:926    .rodata:00000224 cvCharName0x0305.2257
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:931    .rodata:00000234 cvCharUnit0x0304.2256
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:936    .rodata:00000244 cvCharDesc0x0304.2255
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:942    .rodata:00000280 cvCharName0x0304.2254
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:947    .rodata:00000294 cvCharUnit0x0303.2253
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:952    .rodata:000002a4 cvCharDesc0x0303.2252
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:958    .rodata:000002e0 cvCharName0x0303.2251
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:963    .rodata:000002f0 cvCharUnit0x0302.2250
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:968    .rodata:000002fc cvCharDesc0x0302.2249
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:973    .rodata:00000320 cvCharName0x0302.2248
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:978    .rodata:0000032c cvCharUnit0x0301.2247
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:983    .rodata:00000338 cvCharDesc0x0301.2246
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:988    .rodata:0000035c cvCharName0x0301.2245
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:993    .rodata:00000368 cvCharUnit0x0300.2244
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:998    .rodata:00000374 cvCharDesc0x0300.2243
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1003   .rodata:0000039c cvCharName0x0300.2242
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1008   .rodata:000003a8 cvCharUnit0x0208.2241
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1013   .rodata:000003c8 cvCharDesc0x0208.2240
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1018   .rodata:000003ec cvCharName0x0208.2239
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1023   .rodata:000003f0 cvCharUnit0x0207.2238
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1028   .rodata:00000410 cvCharDesc0x0207.2237
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1033   .rodata:00000434 cvCharName0x0207.2236
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1038   .rodata:00000438 cvCharUnit0x0206.2235
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1043   .rodata:00000458 cvCharDesc0x0206.2234
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1048   .rodata:0000047c cvCharName0x0206.2233
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1053   .rodata:00000480 cvCharUnit0x0205.2232
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1058   .rodata:0000049c cvCharDesc0x0205.2231
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1064   .rodata:000004d4 cvCharName0x0205.2230
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1069   .rodata:000004dc cvCharUnit0x0204.2229
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1074   .rodata:000004f8 cvCharDesc0x0204.2228
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1080   .rodata:00000530 cvCharName0x0204.2227
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1085   .rodata:00000538 cvCharUnit0x0203.2226
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1090   .rodata:00000554 cvCharDesc0x0203.2225
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1096   .rodata:0000058c cvCharName0x0203.2224
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1101   .rodata:00000594 cvCharUnit0x0202.2223
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1106   .rodata:000005b0 cvCharDesc0x0202.2222
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1111   .rodata:000005c4 cvCharName0x0202.2221
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1116   .rodata:000005d0 cvCharUnit0x0201.2220
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1121   .rodata:000005ec cvCharDesc0x0201.2219
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1126   .rodata:00000600 cvCharName0x0201.2218
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1131   .rodata:0000060c cvCharUnit0x0200.2216
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1136   .rodata:00000628 cvCharDesc0x0200.2215
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1141   .rodata:00000640 cvCharName0x0200.2214
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1153   .text:00000888 $a
+C:\Users\XY\AppData\Local\Temp/ccSCbaaa.s:1402   .text:00000be8 $d
+                            *COM*:0000005c IMU_CalcData
+                            *COM*:0000005c IMU_CalcData_tmp
+                            *COM*:00000004 SSP_trans_cnt
+                            *COM*:00000004 uart_cnt
+
+UNDEFINED SYMBOLS
+__udivsi3
+init
+buzzer
+LL_write_init
+I2C1Init
+I2C1_setRGBLed
+I2CInit
+ADC0triggerSampling
+generateBuildInfo
+LED
+PTU_init
+ADC0getSamplingResults
+buzzer_handler
+GPS_Data
+adcChannelValues
+getDeclination
+ringbuffer
+UARTWriteChar
+uBloxReceiveEngine
+SDK_mainloop
+HL2LL_write_cycle
+PTU_update
+aciSyncVar
+aciSyncCmd
+aciSyncPar
+aciEngine
+fireFlyLedHandler
+declinationAvailable
+estimatedDeclination
+gpsLEDTrigger
+RO_ALL_Data
+trigger_transmission
+transmission_running
+transmitBuildInfoTrigger
+aciInit
+lpc_aci_init
+aciSetStartTxCallback
+aciPublishVariableInt
+aciPublishCommandInt
+aciPublishParameterInt
+lpc_aci_ReadParafromFlash
+laser_distance
+WO_SDK
+PTU_enable_plain_ch7_to_servo

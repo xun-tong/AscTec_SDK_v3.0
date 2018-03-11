@@ -1,0 +1,151 @@
+   1              		.file	"miscellaneous.c"
+   9              	.Ltext0:
+  10              		.align	2
+  11              		.global	matrix_float_alloc
+  13              	matrix_float_alloc:
+  14              	.LFB2:
+  15              		.file 1 "miscellaneous.c"
+   1:miscellaneous.c **** /*
+   2:miscellaneous.c ****  * miscellaneous.h
+   3:miscellaneous.c ****  *
+   4:miscellaneous.c ****  *  Author: Tomas Baca
+   5:miscellaneous.c ****  */
+   6:miscellaneous.c **** 
+   7:miscellaneous.c **** #include "miscellaneous.h"
+   8:miscellaneous.c **** 
+   9:miscellaneous.c **** /**
+  10:miscellaneous.c ****  * dynamically allocate the matrix using FreeRTOS pvPortMalloc
+  11:miscellaneous.c ****  */
+  12:miscellaneous.c **** matrix_float * matrix_float_alloc(const int16_t h, const int16_t w) {
+  16              	 Function supports interworking.
+  17              		@ args = 0, pretend = 0, frame = 0
+  18              		@ frame_needed = 0, uses_anonymous_args = 0
+  19              		@ link register save eliminated.
+  20              	.LVL0:
+  21              		@ lr needed for prologue
+  22              	.LVL1:
+  23              		.loc 1 15 0
+  13:miscellaneous.c **** alloc(const int16_t h, const int16_t w) {
+  14:miscellaneous.c **** 	matrix_float * m;
+  15:miscellaneous.c **** 
+  24              	, [r0, #2]	@ movhi
+  25 0000 B200C0E1 		.loc 1 16 0
+  16:miscellaneous.c ****  const int16_t w) {
+  26              	trh	r1, [r0, #0]	@ movhi
+  27 0004 B010C0E1 	.LVL2:
+  28              		.loc 1 19 0
+  17:miscellaneous.c **** alloc(const int16_t h, const int16_t w) {
+  18:miscellaneous.c **** 	matrix_float * m;
+  19:miscellaneous.c **** 
+  29              		lr
+  30 0008 1EFF2FE1 	.LFE2:
+  32              		.align	2
+  33              		.global	matrix_float_alloc_hollow
+  35              	matrix_float_alloc_hollow:
+  36              	.LFB3:
+  37              		.loc 1 24 0
+  20:miscellaneous.c ****  const int16_t w) {
+  21:miscellaneous.c **** 	matrix_float * m;
+  22:miscellaneous.c **** 
+  23:miscellaneous.c **** 	m->height = h;
+  24:miscellaneous.c **** 	m->width = w;
+  38              	on supports interworking.
+  39              		@ args = 0, pretend = 0, frame = 0
+  40              		@ frame_needed = 0, uses_anonymous_args = 0
+  41              		@ link register save eliminated.
+  42              	.LVL3:
+  43              		@ lr needed for prologue
+  44              	.LVL4:
+  45              		.loc 1 27 0
+  25:miscellaneous.c ****  * m;
+  26:miscellaneous.c **** 
+  27:miscellaneous.c **** 	m->height = h;
+  46              	, [r0, #2]	@ movhi
+  47 000c B200C0E1 		.loc 1 28 0
+  28:miscellaneous.c ****  {
+  48              	trh	r1, [r0, #0]	@ movhi
+  49 0010 B010C0E1 		.loc 1 29 0
+  29:miscellaneous.c **** alloc(const int16_t h, const int16_t w) {
+  50              	tr	r2, [r0, #4]
+  51 0014 042080E5 	.LVL5:
+  52              		.loc 1 32 0
+  30:miscellaneous.c **** alloc(const int16_t h, const int16_t w) {
+  31:miscellaneous.c **** 	matrix_float * m;
+  32:miscellaneous.c **** 
+  53              		lr
+  54 0018 1EFF2FE1 	.LFE3:
+  56              		.align	2
+  57              		.global	vector_float_alloc
+  59              	vector_float_alloc:
+  60              	.LFB4:
+  61              		.loc 1 35 0
+  33:miscellaneous.c ****  const int16_t w) {
+  34:miscellaneous.c **** 	matrix_float * m;
+  35:miscellaneous.c **** 
+  62              	on supports interworking.
+  63              		@ args = 0, pretend = 0, frame = 0
+  64              		@ frame_needed = 0, uses_anonymous_args = 0
+  65              		@ link register save eliminated.
+  66              	.LVL6:
+  67              		@ lr needed for prologue
+  68              	.LVL7:
+  69              		.loc 1 38 0
+  36:miscellaneous.c ****  const int16_t w) {
+  37:miscellaneous.c **** 	matrix_float * m;
+  38:miscellaneous.c **** 
+  70              	, [r0, #0]	@ movhi
+  71 001c B000C0E1 		.loc 1 39 0
+  39:miscellaneous.c ****  const int16_t w) {
+  72              	trb	r1, [r0, #2]
+  73 0020 0210C0E5 	.LVL8:
+  74              		.loc 1 42 0
+  40:miscellaneous.c **** alloc(const int16_t h, const int16_t w) {
+  41:miscellaneous.c **** 	matrix_float * m;
+  42:miscellaneous.c **** 
+  75              		lr
+  76 0024 1EFF2FE1 	.LFE4:
+  78              		.align	2
+  79              		.global	vector_float_alloc_hollow
+  81              	vector_float_alloc_hollow:
+  82              	.LFB5:
+  83              		.loc 1 45 0
+  43:miscellaneous.c ****  const int16_t w) {
+  44:miscellaneous.c **** 	matrix_float * m;
+  45:miscellaneous.c **** 
+  84              	on supports interworking.
+  85              		@ args = 0, pretend = 0, frame = 0
+  86              		@ frame_needed = 0, uses_anonymous_args = 0
+  87              		@ link register save eliminated.
+  88              	.LVL9:
+  89              		@ lr needed for prologue
+  90              	.LVL10:
+  91              		.loc 1 49 0
+  46:miscellaneous.c ****  const int16_t w) {
+  47:miscellaneous.c **** 	matrix_float * m;
+  48:miscellaneous.c **** 
+  49:miscellaneous.c **** 	m->height = h;
+  92              	, [r0, #0]	@ movhi
+  93 0028 B000C0E1 		.loc 1 50 0
+  50:miscellaneous.c ****  {
+  94              	trb	r1, [r0, #2]
+  95 002c 0210C0E5 		.loc 1 51 0
+  51:miscellaneous.c **** alloc(const int16_t h, const int16_t w) {
+  96              	tr	r2, [r0, #4]
+  97 0030 042080E5 	.LVL11:
+  98              		.loc 1 54 0
+  52:miscellaneous.c **** alloc(const int16_t h, const int16_t w) {
+  53:miscellaneous.c **** 	matrix_float * m;
+  54:miscellaneous.c **** 
+  99              		lr
+ 100 0034 1EFF2FE1 	.LFE5:
+ 102              		.section	.debug_frame,"",%progbits
+ 153              		.section	.debug_loc,"",%progbits
+DEFINED SYMBOLS
+                            *ABS*:00000000 miscellaneous.c
+C:\Users\XY\AppData\Local\Temp/ccc9aaaa.s:13     .text:00000000 matrix_float_alloc
+C:\Users\XY\AppData\Local\Temp/ccc9aaaa.s:25     .text:00000000 $a
+C:\Users\XY\AppData\Local\Temp/ccc9aaaa.s:36     .text:0000000c matrix_float_alloc_hollow
+C:\Users\XY\AppData\Local\Temp/ccc9aaaa.s:60     .text:0000001c vector_float_alloc
+C:\Users\XY\AppData\Local\Temp/ccc9aaaa.s:82     .text:00000028 vector_float_alloc_hollow
+
+NO UNDEFINED SYMBOLS
